@@ -1,3 +1,6 @@
+import Alea from "alea";
+import { createNoise2D } from "simplex-noise";
+
 const canvas = document.querySelector("canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
@@ -6,6 +9,7 @@ const TILE_SIZE = 16;
 const PLAYER_SIZE = TILE_SIZE * 0.8;
 const CHUNK_SIZE = 8;
 const CHUNK_SIZE_IN_PIXELS = TILE_SIZE * CHUNK_SIZE;
+const SEED = 123;
 
 let debugModeEnabled = false;
 
@@ -20,6 +24,97 @@ document.addEventListener("keydown", (event: KeyboardEvent) => {
 document.addEventListener("keyup", (event: KeyboardEvent) => {
   pressedKeys.delete(event.key);
 });
+
+// math
+function floor(value: number) {
+  return Math.floor(value);
+}
+
+function map(
+  value: number,
+  start1: number,
+  stop1: number,
+  start2: number,
+  stop2: number,
+) {
+  const result =
+    ((value - start1) / (stop1 - start1)) * (stop2 - start2) + start2;
+
+  if (start2 < stop2) {
+    return constrain(result, start2, stop2);
+  } else {
+    return constrain(result, stop2, start2);
+  }
+}
+
+function constrain(value: number, low: number, high: number) {
+  return Math.max(Math.min(value, high), low);
+}
+
+// random
+const prng = Alea(SEED);
+const noise = createNoise2D(prng);
+
+function rand(min: number, max: number) {
+  return Math.floor(prng() * (max - min) + min);
+}
+
+// entities
+enum EntityType {
+  TREE,
+}
+
+type Entity = {
+  type: EntityType;
+  x: number;
+  y: number;
+};
+
+const entities: Entity[] = [];
+
+function createEntity(type: EntityType, worldX: number, worldY: number) {
+  entities.push({ type, x: worldX, y: worldY });
+}
+
+function spawnChunkEntities(chunkKey: ChunkKey) {
+  const [chunkX, chunkY] = getChunkPositionFromKey(chunkKey);
+
+  for (let dx = 0; dx < CHUNK_SIZE; dx++) {
+    for (let dy = 0; dy < CHUNK_SIZE; dy++) {
+      const entityWorldX = chunkX * CHUNK_SIZE_IN_PIXELS + dx * TILE_SIZE;
+      const entityWorldY = chunkY * CHUNK_SIZE_IN_PIXELS + dy * TILE_SIZE;
+
+      const spawnProbability = map(
+        noise(entityWorldX / 300, entityWorldY / 300),
+        -1,
+        1,
+        0,
+        1,
+      );
+
+      if (spawnProbability < 0.2) {
+        createEntity(EntityType.TREE, entityWorldX, entityWorldY);
+      }
+    }
+  }
+}
+
+function drawEntities() {
+  for (let i = 0; i < entities.length; i++) {
+    const entity = entities[i];
+    switch (entity.type) {
+      case EntityType.TREE: {
+        ctx.fillStyle = "#002C04";
+        ctx.fillRect(
+          entity.x - camera.x,
+          entity.y - camera.y,
+          TILE_SIZE,
+          TILE_SIZE,
+        );
+      }
+    }
+  }
+}
 
 // tiles
 enum Tile {
@@ -79,14 +174,14 @@ function getChunkPositionFromKey(chunkKey: ChunkKey) {
   return chunkKey.split(",").map(Number);
 }
 
-function getChunkPositionFromScreenPosition(screenX: number, screenY: number) {
+function getChunkPositionFromWorldPosition(screenX: number, screenY: number) {
   const chunkX = floor(screenX / CHUNK_SIZE_IN_PIXELS);
   const chunkY = floor(screenY / CHUNK_SIZE_IN_PIXELS);
   return [chunkX, chunkY];
 }
 
-function getChunkKeyFromScreenPosition(screenX: number, screenY: number) {
-  const [chunkX, chunkY] = getChunkPositionFromScreenPosition(screenX, screenY);
+function getChunkKeyFromWorldPosition(screenX: number, screenY: number) {
+  const [chunkX, chunkY] = getChunkPositionFromWorldPosition(screenX, screenY);
   return createChunkKey(chunkX, chunkY);
 }
 
@@ -94,6 +189,7 @@ function highlightChunks() {
   ctx.font = "16px Arial";
   ctx.textBaseline = "middle";
   ctx.textAlign = "center";
+  ctx.fillStyle = "black";
   for (const key of chunks.keys()) {
     const [x, y] = getChunkTopLeftCorner(key);
     ctx.strokeRect(
@@ -117,46 +213,59 @@ function getRandomChunkKey() {
 }
 
 function generateChunksAround(screenX: number, screenY: number) {
-  const [chunkX, chunkY] = getChunkPositionFromScreenPosition(screenX, screenY);
+  const [chunkX, chunkY] = getChunkPositionFromWorldPosition(screenX, screenY);
 
-  const neighbors = [
-    // Top
-    createChunkKey(chunkX, chunkY - 1),
-    // Bottom
-    createChunkKey(chunkX, chunkY + 1),
-    // Left
-    createChunkKey(chunkX - 1, chunkY),
-    // Right
-    createChunkKey(chunkX + 1, chunkY),
-    // Top Left
-    createChunkKey(chunkX - 1, chunkY - 1),
-    // Top Right
-    createChunkKey(chunkX + 1, chunkY - 1),
-    // Bottom Left
-    createChunkKey(chunkX - 1, chunkY + 1),
-    // Bottom Right
-    createChunkKey(chunkX + 1, chunkY + 1),
-  ];
+  const neighbors: ChunkKey[] = [];
+  const n = 5;
+
+  for (let dx = floor(-n / 2); dx < n / 2; dx++) {
+    for (let dy = floor(-n / 2); dy < n / 2; dy++) {
+      if (dx === 0 && dy === 0) continue;
+      neighbors.push(createChunkKey(chunkX + dx, chunkY + dy));
+    }
+  }
 
   for (const neighborKey of neighbors) {
     if (!chunks.has(neighborKey)) {
       const [newChunkX, newChunkY] = getChunkPositionFromKey(neighborKey);
       createChunk(newChunkX, newChunkY);
+      spawnChunkEntities(neighborKey);
     }
   }
 }
+
+// cursor
+const cursor = {
+  x: 0,
+  y: 0,
+  hoveringEntity: false,
+};
+
+function drawCursor() {
+  ctx.fillStyle = "#AC46CB";
+  ctx.beginPath();
+  ctx.arc(cursor.x, cursor.y, 8, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.closePath();
+}
+
+canvas.addEventListener("mousemove", (event) => {
+  const { top, left } = canvas.getBoundingClientRect();
+  cursor.x += (event.clientX - left - cursor.x) * 0.1;
+  cursor.y += (event.clientY - top - cursor.y) * 0.1;
+});
 
 // player
 const player = {
   x: 0,
   y: 0,
-  speed: 1,
+  speed: 400,
 };
 
 function spawnPlayer() {
   const chunkKey = getRandomChunkKey();
-  const [chunkTopLeftX, chunkTopLeftY] = getChunkTopLeftCorner(chunkKey);
   const chunk = chunks.get(chunkKey);
+  const [chunkTopLeftX, chunkTopLeftY] = getChunkTopLeftCorner(chunkKey);
 
   if (!chunk) {
     throw new Error("Impossivel encontrar chunk aleatoria");
@@ -200,27 +309,17 @@ function movePlayer(deltaTime: number) {
 const camera = {
   x: 0,
   y: 0,
-  // width in tiles
   width: canvas.width,
-  // height in tiles
   height: canvas.height,
   target: player,
 };
 
 function moveCamera(deltaTime: number) {
-  camera.x = camera.target.x - camera.width / 2;
-  camera.y = camera.target.y - camera.height / 2;
+  camera.x += (camera.target.x - camera.width / 2 - camera.x) * 0.1;
+  camera.y += (camera.target.y - camera.height / 2 - camera.y) * 0.1;
 }
 
-// functions
-function rand(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min) + min);
-}
-
-function floor(value: number) {
-  return Math.floor(value);
-}
-
+// main
 function clearBackground() {
   ctx.fillStyle = "white";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -230,15 +329,15 @@ function main() {
   createChunk(0, 0);
 
   spawnPlayer();
-  update();
+  requestAnimationFrame(update);
 }
 
-let lastUpdatedAt = Date.now();
+let lastUpdatedAt = performance.now();
 let deltaTime = 0;
 
-function update() {
-  deltaTime = Date.now() - lastUpdatedAt;
-  lastUpdatedAt = Date.now();
+function update(now: number) {
+  deltaTime = (now - lastUpdatedAt) / 1000;
+  lastUpdatedAt = now;
 
   clearBackground();
 
@@ -249,6 +348,8 @@ function update() {
 
   drawChunks();
   drawPlayer();
+  drawEntities();
+  drawCursor();
 
   if (debugModeEnabled) {
     highlightChunks();
