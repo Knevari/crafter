@@ -30,7 +30,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 // constants
-const TILE_SIZE = 32;
+const TILE_SIZE = 6;
 const TILESET_TILE_SIZE = 16;
 const PLAYER_SIZE = TILE_SIZE * 0.8;
 const PLAYER_RANGE = 8;
@@ -596,8 +596,16 @@ function createChunkKey(x: number, y: number): ChunkKey {
 
 function createChunk(x: number, y: number) {
   const key = createChunkKey(x, y);
-  const chunk = Array.from({ length: CHUNK_SIZE }, () =>
-    Array.from({ length: CHUNK_SIZE }, () => Tile.GRASS),
+  const chunk = Array.from({ length: CHUNK_SIZE }, (_, i) =>
+    Array.from({ length: CHUNK_SIZE }, (_, j) => {
+      const noiseProbability = map(noise(i / 100, j / 100), -1, 1, 0, 1);
+
+      if (noiseProbability < 0.2) {
+        return Tile.WATER;
+      }
+
+      return Tile.GRASS;
+    }),
   );
 
   chunks.set(key, chunk);
@@ -810,6 +818,10 @@ const player = {
   x: 0,
   y: 0,
   speed: 400,
+  health: {
+    max: 10,
+    current: 10,
+  },
 };
 
 function spawnPlayer() {
@@ -927,6 +939,37 @@ function movePlayer(deltaTime: number) {
   }
 }
 
+function drawPlayerStats() {
+  const healthBarWidth = 265;
+  const healthBarHeight = 30;
+
+  const healthBarX = canvas.width / 2 - healthBarWidth / 2;
+  const healthBarY = canvas.height - healthBarHeight * 5.5;
+
+  ctx.beginPath();
+
+  // Draw outline
+  ctx.strokeStyle = "#1e2328";
+  ctx.strokeRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
+
+  // Draw Health Rect
+  ctx.fillStyle = "#f74d4d";
+  ctx.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
+
+  // Draw Health Text
+  ctx.font = "16px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "white";
+  ctx.fillText(
+    `${player.health.current}/${player.health.max}`,
+    healthBarX + healthBarWidth / 2,
+    healthBarY + healthBarHeight / 2,
+  );
+
+  ctx.closePath();
+}
+
 // camera
 const camera = {
   x: 0,
@@ -980,6 +1023,7 @@ function update(now: number) {
 
   // ui stuff
   drawInventory();
+  drawPlayerStats();
 
   if (debugModeEnabled) {
     drawPlayerRange();
