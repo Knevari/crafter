@@ -30,12 +30,14 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 // constants
-const TILE_SIZE = 16;
+const TILE_SIZE = 32;
+const TILESET_TILE_SIZE = 16;
 const PLAYER_SIZE = TILE_SIZE * 0.8;
 const PLAYER_RANGE = 8;
+const ITEM_PICKUP_RANGE = 2;
 const CHUNK_SIZE = 8;
 const CHUNK_SIZE_IN_PIXELS = TILE_SIZE * CHUNK_SIZE;
-const SEED = 123;
+const SEED = 82347892134;
 
 let debugModeEnabled = false;
 
@@ -126,14 +128,35 @@ function rand(min: number, max: number) {
   return Math.floor(prng() * (max - min) + min);
 }
 
+// animation
+function float(entity: Entity, speed: number = 10, amplitude: number = 0.5) {
+  const now = Date.now() / 1000;
+  entity.y += Math.cos(now * speed) * amplitude;
+}
+
 // entities
 enum EntityType {
   TREE,
+  ITEM_TREE,
 }
+
+type DropItem = {
+  type: EntityType;
+  quantity: number;
+  chance?: number;
+};
+
+type EntitySprite = {
+  sourceX: number;
+  sourceY: number;
+  sourceW: number;
+  sourceH: number;
+};
 
 type Entity = {
   id: number;
   type: EntityType;
+  sprite: EntitySprite | null;
   x: number;
   y: number;
   w: number;
@@ -142,11 +165,76 @@ type Entity = {
     current: number;
     max: number;
   };
+  drops: DropItem[];
+  inInventory: boolean;
 };
 
 let hoveredEntityId = -1;
 let entityId = 1;
 const entities: Entity[] = [];
+
+function getEntityHealth(type: EntityType) {
+  switch (type) {
+    default: {
+      return {
+        current: 1,
+        max: 1,
+      };
+    }
+  }
+}
+
+function getEntityDrops(type: EntityType) {
+  const drops: DropItem[] = [];
+  switch (type) {
+    case EntityType.TREE: {
+      drops.push({
+        type: EntityType.ITEM_TREE,
+        quantity: rand(1, 5),
+      });
+      break;
+    }
+  }
+  return drops;
+}
+
+function getEntitySprite(type: EntityType) {
+  switch (type) {
+    case EntityType.TREE: {
+      return {
+        sourceX: 4,
+        sourceY: 0,
+        sourceW: 1,
+        sourceH: 2,
+      };
+    }
+    case EntityType.ITEM_TREE: {
+      return {
+        sourceX: 10,
+        sourceY: 8,
+        sourceW: 1,
+        sourceH: 1,
+      };
+    }
+    default: {
+      return null;
+    }
+  }
+}
+
+function getEntityTypeAsString(type: EntityType) {
+  switch (type) {
+    case EntityType.TREE: {
+      return "TREE";
+    }
+    case EntityType.ITEM_TREE: {
+      return "ITEM_TREE";
+    }
+    default: {
+      return "UNKNOWN";
+    }
+  }
+}
 
 function createEntity(
   type: EntityType,
@@ -155,21 +243,39 @@ function createEntity(
   width: number,
   height: number,
 ) {
+  const drops = getEntityDrops(type);
+  const health = getEntityHealth(type);
+  const sprite = getEntitySprite(type);
   entities.push({
     id: entityId++,
     type,
+    sprite,
     x: worldX,
     y: worldY,
     w: width,
     h: height,
-    health: {
-      current: 1,
-      max: 1,
-    },
+    health,
+    drops,
+    inInventory: false,
   });
 }
 
 function destroyEntity(entityId: number) {
+  const entity = entities.find((entity) => entity.id === entityId);
+  if (!entity) return;
+
+  // Drop its items
+  for (const drop of entity.drops) {
+    createEntity(
+      drop.type,
+      entity.x,
+      entity.y + entity.h * TILE_SIZE - TILE_SIZE,
+      1,
+      1,
+    );
+  }
+
+  // Delete from entities
   const entityIndex = entities.findIndex((entity) => entity.id === entityId);
   if (entityIndex !== -1) entities.splice(entityIndex, 1);
 }
@@ -234,24 +340,48 @@ function spawnChunkEntities(chunkKey: ChunkKey) {
 function drawEntities() {
   for (let i = 0; i < entities.length; i++) {
     const entity = entities[i];
-    switch (entity.type) {
-      case EntityType.TREE: {
-        ctx.save();
 
-        if (hoveredEntityId === entity.id) {
-          ctx.globalAlpha = 0.5;
-        }
-
-        ctx.fillStyle = "#002C04";
-        ctx.fillRect(
-          entity.x - camera.x,
-          entity.y - camera.y,
-          entity.w * TILE_SIZE,
-          entity.h * TILE_SIZE,
-        );
-        ctx.restore();
-      }
+    if (entity.sprite && !entity.inInventory) {
+      drawSprite(entity);
     }
+  }
+}
+
+function drawSprite(entity: Entity) {
+  if (entity.sprite) {
+    ctx.drawImage(
+      tilesetImg,
+      entity.sprite.sourceX * TILESET_TILE_SIZE,
+      entity.sprite.sourceY * TILESET_TILE_SIZE,
+      entity.sprite.sourceW * TILESET_TILE_SIZE,
+      entity.sprite.sourceH * TILESET_TILE_SIZE,
+      entity.x - camera.x,
+      entity.y - camera.y,
+      entity.w * TILE_SIZE,
+      entity.h * TILE_SIZE,
+    );
+  }
+}
+
+function drawSpriteAt(
+  entity: Entity,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+) {
+  if (entity.sprite) {
+    ctx.drawImage(
+      tilesetImg,
+      entity.sprite.sourceX * TILESET_TILE_SIZE,
+      entity.sprite.sourceY * TILESET_TILE_SIZE,
+      entity.sprite.sourceW * TILESET_TILE_SIZE,
+      entity.sprite.sourceH * TILESET_TILE_SIZE,
+      x,
+      y,
+      w,
+      h,
+    );
   }
 }
 
@@ -290,6 +420,13 @@ function getEntityAtWorldPosition(worldX: number, worldY: number) {
 }
 
 function handleEntityClick(entity: Entity) {
+  if (debugModeEnabled) {
+    console.log(
+      `Clicked ${getEntityTypeAsString(entity.type)} at`,
+      entity.x,
+      entity.y,
+    );
+  }
   switch (entity.type) {
     case EntityType.TREE: {
       // destroy tree, drop item
@@ -297,8 +434,101 @@ function handleEntityClick(entity: Entity) {
       if (entity.health.current <= 0) {
         destroyEntity(entity.id);
       }
-      console.log("Clicked on a tree at", entity.x, entity.y);
     }
+  }
+}
+
+function updateDroppedItems() {
+  for (const entity of entities) {
+    if (getEntityTypeAsString(entity.type).startsWith("ITEM_")) {
+      float(entity);
+
+      const distanceFromPlayer = distance(
+        player.x,
+        player.y,
+        entity.x,
+        entity.y,
+      );
+
+      if (distanceFromPlayer < ITEM_PICKUP_RANGE * TILE_SIZE) {
+        if (debugModeEnabled) {
+          console.log(
+            `Picked up ${getEntityTypeAsString(entity.type)} from`,
+            entity.x,
+            entity.y,
+          );
+        }
+        addToInventory(entity);
+        destroyEntity(entity.id);
+      }
+    }
+  }
+}
+
+// inventory
+type InventoryItem = {
+  amount: number;
+  entity: Entity;
+};
+
+const inventory: InventoryItem[] = [];
+
+function addToInventory(entity: Entity) {
+  let itemInIventory = false;
+
+  for (const item of inventory) {
+    if (item.entity.type === entity.type) {
+      itemInIventory = true;
+      item.amount += 1;
+    }
+  }
+
+  if (!itemInIventory) {
+    entity.inInventory = true;
+    inventory.push({
+      amount: 1,
+      entity,
+    });
+  }
+}
+
+function drawInventory() {
+  const slotSize = 60;
+  const totalItemsSlots = 4;
+
+  const padding = 8;
+
+  const inventoryWidth =
+    totalItemsSlots * slotSize + padding * (totalItemsSlots - 1);
+  const inventoryX = canvas.width / 2 - inventoryWidth / 2;
+  const inventoryY = canvas.height - slotSize * 2;
+
+  let currentX = inventoryX;
+
+  for (let i = 0; i < totalItemsSlots; i++) {
+    ctx.save();
+
+    ctx.strokeStyle = "black";
+    ctx.strokeRect(currentX + i * slotSize, inventoryY, slotSize, slotSize);
+    ctx.font = "12px Arial";
+
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
+
+    // Draw item inside slot
+    const item = inventory[i];
+
+    if (item) {
+      const itemX = currentX + slotSize * 0.15;
+      const itemY = inventoryY + slotSize * 0.15;
+      const itemSize = slotSize * 0.7;
+      drawSpriteAt(item.entity, itemX, itemY, itemSize, itemSize);
+      ctx.fillText(`x${item.amount}`, itemX + itemSize, itemY + itemSize);
+    }
+
+    ctx.restore();
+
+    currentX += padding;
   }
 }
 
@@ -483,6 +713,7 @@ canvas.addEventListener("mousemove", (event) => {
     document.body.style.cursor = "pointer";
   } else if (!hoveringAnyEntity && document.body.style.cursor === "pointer") {
     document.body.style.cursor = "auto";
+    hoveredEntityId = -1;
   }
 });
 
@@ -673,13 +904,17 @@ function update(now: number) {
 
   clearBackground();
 
-  // generateChunksAround(player.x, player.y);
+  generateChunksAround(player.x, player.y);
   movePlayer(deltaTime);
   moveCamera(deltaTime);
+  updateDroppedItems();
 
   drawChunks();
   drawPlayer();
   drawEntities();
+
+  // ui stuff
+  drawInventory();
 
   if (debugModeEnabled) {
     drawPlayerRange();
