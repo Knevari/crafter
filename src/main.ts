@@ -137,7 +137,9 @@ function float(entity: Entity, speed: number = 10, amplitude: number = 0.5) {
 // entities
 enum EntityType {
   TREE,
+  ROCK,
   ITEM_TREE,
+  ITEM_ROCK,
 }
 
 type DropItem = {
@@ -194,6 +196,12 @@ function getEntityDrops(type: EntityType) {
       });
       break;
     }
+    case EntityType.ROCK: {
+      drops.push({
+        type: EntityType.ITEM_ROCK,
+        quantity: rand(1, 5),
+      });
+    }
   }
   return drops;
 }
@@ -216,6 +224,20 @@ function getEntitySprite(type: EntityType) {
         sourceH: 1,
       };
     }
+    case EntityType.ROCK:
+      return {
+        sourceX: 9,
+        sourceY: 7,
+        sourceW: 1,
+        sourceH: 1,
+      };
+    case EntityType.ITEM_ROCK:
+      return {
+        sourceX: 9,
+        sourceY: 7,
+        sourceW: 1,
+        sourceH: 1,
+      };
     default: {
       return null;
     }
@@ -229,6 +251,12 @@ function getEntityTypeAsString(type: EntityType) {
     }
     case EntityType.ITEM_TREE: {
       return "ITEM_TREE";
+    }
+    case EntityType.ROCK: {
+      return "ROCK";
+    }
+    case EntityType.ITEM_ROCK: {
+      return "ITEM_ROCK";
     }
     default: {
       return "UNKNOWN";
@@ -266,13 +294,16 @@ function destroyEntity(entityId: number) {
 
   // Drop its items
   for (const drop of entity.drops) {
-    createEntity(
-      drop.type,
-      entity.x,
-      entity.y + entity.h * TILE_SIZE - TILE_SIZE,
-      1,
-      1,
-    );
+    const dropProbability = drop.chance ?? 1;
+    if (prng() < dropProbability) {
+      createEntity(
+        drop.type,
+        entity.x,
+        entity.y + entity.h * TILE_SIZE - TILE_SIZE,
+        1,
+        1,
+      );
+    }
   }
 
   // Delete from entities
@@ -328,6 +359,11 @@ function spawnChunkEntities(chunkKey: ChunkKey) {
         1,
       );
 
+      if (spawnProbability < 0.02) {
+        if (canPlaceEntity(entityWorldX, entityWorldY, 1, 1)) {
+          createEntity(EntityType.ROCK, entityWorldX, entityWorldY, 1, 1);
+        }
+      }
       if (spawnProbability < 0.2) {
         if (canPlaceEntity(entityWorldX, entityWorldY, 1, 2)) {
           createEntity(EntityType.TREE, entityWorldX, entityWorldY, 1, 2);
@@ -434,6 +470,15 @@ function handleEntityClick(entity: Entity) {
       if (entity.health.current <= 0) {
         destroyEntity(entity.id);
       }
+      break;
+    }
+    case EntityType.ROCK: {
+      // destroy tree, drop item
+      entity.health.current -= 1;
+      if (entity.health.current <= 0) {
+        destroyEntity(entity.id);
+      }
+      break;
     }
   }
 }
@@ -519,7 +564,7 @@ function drawInventory() {
     const item = inventory[i];
 
     if (item) {
-      const itemX = currentX + slotSize * 0.15;
+      const itemX = currentX + i * slotSize + slotSize * 0.15;
       const itemY = inventoryY + slotSize * 0.15;
       const itemSize = slotSize * 0.7;
       drawSpriteAt(item.entity, itemX, itemY, itemSize, itemSize);
