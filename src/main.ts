@@ -30,7 +30,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 // constants
-const TILE_SIZE = 6;
+const TILE_SIZE = 16;
 const TILESET_TILE_SIZE = 16;
 const PLAYER_SIZE = TILE_SIZE * 0.8;
 const PLAYER_RANGE = 8;
@@ -322,6 +322,9 @@ function canPlaceEntity(
   const newEntityCenterX = worldX + (width * TILE_SIZE) / 2;
   const newEntityCenterY = worldY + (width * TILE_SIZE) / 2;
 
+  const chunk = getChunkFromWorldPosition(worldX, worldY);
+  const [tileX, tileY] = getChunkTileIndexFromWorldPosition(worldX, worldY);
+
   for (const entity of entities) {
     const entityCenterX = entity.x + (entity.w * TILE_SIZE) / 2;
     const entityCenterY = entity.y + (entity.h * TILE_SIZE) / 2;
@@ -339,6 +342,14 @@ function canPlaceEntity(
       )
     ) {
       return false;
+    }
+
+    for (let dx = 0; dx < entity.w; dx++) {
+      for (let dy = 0; dy < entity.h; dy++) {
+        if (chunk && chunk[tileX][tileY] !== Tile.GRASS) {
+          return false;
+        }
+      }
     }
   }
 
@@ -596,9 +607,19 @@ function createChunkKey(x: number, y: number): ChunkKey {
 
 function createChunk(x: number, y: number) {
   const key = createChunkKey(x, y);
+  const [chunkWorldX, chunkWorldY] = getChunkTopLeftCorner(key);
   const chunk = Array.from({ length: CHUNK_SIZE }, (_, i) =>
     Array.from({ length: CHUNK_SIZE }, (_, j) => {
-      const noiseProbability = map(noise(i / 100, j / 100), -1, 1, 0, 1);
+      const noiseProbability = map(
+        noise(
+          (chunkWorldX + i * TILE_SIZE) / 400,
+          (chunkWorldY + j * TILE_SIZE) / 400,
+        ),
+        -1,
+        1,
+        0,
+        1,
+      );
 
       if (noiseProbability < 0.2) {
         return Tile.WATER;
@@ -1010,8 +1031,8 @@ function update(now: number) {
 
   clearBackground();
 
-  generateChunksAround(player.x, player.y);
-  disposeOfDistantChunks();
+  // generateChunksAround(player.x, player.y);
+  // disposeOfDistantChunks();
 
   movePlayer(deltaTime);
   moveCamera(deltaTime);
