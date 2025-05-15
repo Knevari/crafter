@@ -37,6 +37,8 @@ const PLAYER_RANGE = 8;
 const ITEM_PICKUP_RANGE = 2;
 const CHUNK_SIZE = 8;
 const CHUNK_SIZE_IN_PIXELS = TILE_SIZE * CHUNK_SIZE;
+const CHUNK_LOADING_DISTANCE = 8;
+const CHUNK_DISPOSE_DISTANCE_IN_PIXELS = CHUNK_SIZE * TILE_SIZE * 10;
 const SEED = 82347892134;
 
 let debugModeEnabled = false;
@@ -621,6 +623,11 @@ function drawChunks() {
             ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
             break;
           }
+          case Tile.WATER: {
+            ctx.fillStyle = "lightblue";
+            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+            break;
+          }
           default: {
             ctx.fillStyle = "red";
             ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
@@ -682,7 +689,7 @@ function generateChunksAround(screenX: number, screenY: number) {
   const [chunkX, chunkY] = getChunkPositionFromWorldPosition(screenX, screenY);
 
   const neighbors: ChunkKey[] = [];
-  const n = 3;
+  const n = CHUNK_LOADING_DISTANCE;
 
   for (let dx = floor(-n / 2); dx < ceil(n / 2); dx++) {
     for (let dy = floor(-n / 2); dy < ceil(n / 2); dy++) {
@@ -696,6 +703,17 @@ function generateChunksAround(screenX: number, screenY: number) {
       const [newChunkX, newChunkY] = getChunkPositionFromKey(neighborKey);
       createChunk(newChunkX, newChunkY);
       spawnChunkEntities(neighborKey);
+    }
+  }
+}
+
+function disposeOfDistantChunks() {
+  for (const chunkKey of chunks.keys()) {
+    const [chunkX, chunkY] = getChunkTopLeftCorner(chunkKey);
+    const chunkDistance = distance(chunkX, chunkY, player.x, player.y);
+
+    if (chunkDistance > CHUNK_DISPOSE_DISTANCE_IN_PIXELS) {
+      chunks.delete(chunkKey);
     }
   }
 }
@@ -950,6 +968,8 @@ function update(now: number) {
   clearBackground();
 
   generateChunksAround(player.x, player.y);
+  disposeOfDistantChunks();
+
   movePlayer(deltaTime);
   moveCamera(deltaTime);
   updateDroppedItems();
