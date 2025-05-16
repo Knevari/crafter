@@ -2,11 +2,20 @@ import Alea from "alea";
 import { createNoise2D } from "simplex-noise";
 
 // images
-export const tilesetImg = new Image();
+const tilesetImg = new Image();
+const treeTileImg = new Image();
+const grassTileImg = new Image();
+const waterTileGroupImg = new Image();
+const playerTileImg = new Image();
+
 tilesetImg.src = "/tilemap_packed.png";
+treeTileImg.src = "/Oak_Tree.png";
+grassTileImg.src = "/Grass_Middle.png";
+waterTileGroupImg.src = "/Water_Tile.png";
+playerTileImg.src = "/Player.png";
 
 function loadAssets() {
-  const assets = [tilesetImg];
+  const assets = [tilesetImg, grassTileImg, treeTileImg, playerTileImg];
 
   return new Promise((resolve) => {
     let loaded = 0;
@@ -30,24 +39,29 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 // constants
-const TILE_SIZE = 16;
+const TILE_SIZE = 48;
 const TILESET_TILE_SIZE = 16;
-const PLAYER_SIZE = TILE_SIZE * 0.8;
-const PLAYER_RANGE = 8;
-const ITEM_PICKUP_RANGE = 2;
+const PLAYER_TILESET_TILE_SIZE = 32;
+const PLAYER_SIZE = TILE_SIZE * 1.2;
+const PLAYER_RANGE = 4;
+const ITEM_PICKUP_RANGE = 1;
 const CHUNK_SIZE = 8;
 const CHUNK_SIZE_IN_PIXELS = TILE_SIZE * CHUNK_SIZE;
 const CHUNK_LOADING_DISTANCE = 8;
-const CHUNK_DISPOSE_DISTANCE_IN_PIXELS = CHUNK_SIZE * TILE_SIZE * 10;
-const SEED = 82347892134;
+const CHUNK_DISPOSE_DISTANCE_IN_PIXELS = CHUNK_SIZE * TILE_SIZE * 5;
+const SEED = 1471;
+const NOISE_SCALE = 100;
+const WATER_THRESHOLD = 0.3;
 
-let debugModeEnabled = false;
+let debugModeEnabled = true;
+let profilingEnabled = false;
 
 // keymap
 const pressedKeys = new Set();
 
 document.addEventListener("keydown", (event: KeyboardEvent) => {
   if (event.key === "z") debugModeEnabled = !debugModeEnabled;
+  if (event.key === "x") profilingEnabled = !profilingEnabled;
   pressedKeys.add(event.key);
 });
 
@@ -126,11 +140,40 @@ function isColliding(
 const prng = Alea(SEED);
 const noise = createNoise2D(prng);
 
+function scaledNoise(x: number, y: number) {
+  return map(noise(x, y), -1, 1, 0, 1);
+}
+
 function rand(min: number, max: number) {
   return Math.floor(prng() * (max - min) + min);
 }
 
 // animation
+type Animation = {
+  row: number;
+  frames: number;
+  frameDuration: number;
+};
+
+type AnimationSet = Record<string, Animation>;
+
+type Animator = {
+  animations: AnimationSet;
+  current: string;
+  frame: number;
+  elapsed: number;
+};
+
+function updateAnimator(animator: Animator, deltaTime: number) {
+  const anim = animator.animations[animator.current];
+  animator.elapsed += deltaTime;
+
+  if (animator.elapsed >= anim.frameDuration) {
+    animator.frame = (animator.frame + 1) % anim.frames;
+    animator.elapsed = 0;
+  }
+}
+
 function float(entity: Entity, speed: number = 10, amplitude: number = 0.5) {
   const now = Date.now() / 1000;
   entity.y += Math.cos(now * speed) * amplitude;
@@ -155,6 +198,7 @@ type EntitySprite = {
   sourceY: number;
   sourceW: number;
   sourceH: number;
+  sourceSrc?: HTMLImageElement;
 };
 
 type Entity = {
@@ -212,10 +256,11 @@ function getEntitySprite(type: EntityType) {
   switch (type) {
     case EntityType.TREE: {
       return {
-        sourceX: 4,
+        sourceX: 0,
         sourceY: 0,
-        sourceW: 1,
-        sourceH: 2,
+        sourceW: 4,
+        sourceH: 5,
+        sourceSrc: treeTileImg,
       };
     }
     case EntityType.ITEM_TREE: {
@@ -300,8 +345,8 @@ function destroyEntity(entityId: number) {
     if (prng() < dropProbability) {
       createEntity(
         drop.type,
-        entity.x,
-        entity.y + entity.h * TILE_SIZE - TILE_SIZE,
+        entity.x + (entity.w * TILE_SIZE) / 2 - TILE_SIZE / 2,
+        entity.y + entity.h * TILE_SIZE - TILE_SIZE * 2,
         1,
         1,
       );
@@ -364,13 +409,10 @@ function spawnChunkEntities(chunkKey: ChunkKey) {
       const entityWorldX = chunkX * CHUNK_SIZE_IN_PIXELS + dx * TILE_SIZE;
       const entityWorldY = chunkY * CHUNK_SIZE_IN_PIXELS + dy * TILE_SIZE;
 
-      const spawnProbability = map(
-        noise(entityWorldX / 300, entityWorldY / 300),
-        -1,
-        1,
-        0,
-        1,
-      );
+      const tileX = chunkX * TILE_SIZE + dx;
+      const tileY = chunkY * TILE_SIZE + dy;
+
+      const spawnProbability = scaledNoise(tileX / 32, tileY / 32);
 
       if (spawnProbability < 0.02) {
         if (canPlaceEntity(entityWorldX, entityWorldY, 1, 1)) {
@@ -378,8 +420,8 @@ function spawnChunkEntities(chunkKey: ChunkKey) {
         }
       }
       if (spawnProbability < 0.2) {
-        if (canPlaceEntity(entityWorldX, entityWorldY, 1, 2)) {
-          createEntity(EntityType.TREE, entityWorldX, entityWorldY, 1, 2);
+        if (canPlaceEntity(entityWorldX, entityWorldY, 4, 5)) {
+          createEntity(EntityType.TREE, entityWorldX, entityWorldY, 4, 5);
         }
       }
     }
@@ -397,9 +439,13 @@ function drawEntities() {
 }
 
 function drawSprite(entity: Entity) {
+  ctx.save();
+  if (hoveredEntityId === entity.id) {
+    ctx.globalAlpha = 0.5;
+  }
   if (entity.sprite) {
     ctx.drawImage(
-      tilesetImg,
+      entity.sprite.sourceSrc ?? tilesetImg,
       entity.sprite.sourceX * TILESET_TILE_SIZE,
       entity.sprite.sourceY * TILESET_TILE_SIZE,
       entity.sprite.sourceW * TILESET_TILE_SIZE,
@@ -410,37 +456,45 @@ function drawSprite(entity: Entity) {
       entity.h * TILE_SIZE,
     );
   }
+  ctx.restore();
 }
 
 function drawSpriteAt(
-  entity: Entity,
+  entitySprite: EntitySprite | null,
   x: number,
   y: number,
   w: number,
   h: number,
 ) {
-  if (entity.sprite) {
+  if (entitySprite) {
     ctx.drawImage(
-      tilesetImg,
-      entity.sprite.sourceX * TILESET_TILE_SIZE,
-      entity.sprite.sourceY * TILESET_TILE_SIZE,
-      entity.sprite.sourceW * TILESET_TILE_SIZE,
-      entity.sprite.sourceH * TILESET_TILE_SIZE,
+      entitySprite.sourceSrc ?? tilesetImg,
+      entitySprite.sourceX * TILESET_TILE_SIZE,
+      entitySprite.sourceY * TILESET_TILE_SIZE,
+      entitySprite.sourceW * TILESET_TILE_SIZE,
+      entitySprite.sourceH * TILESET_TILE_SIZE,
       x,
       y,
       w,
       h,
     );
+  } else {
+    ctx.fillStyle = "salmon";
+    ctx.fillRect(x, y, w, h);
   }
 }
 
-function drawEntitiesCenterpoints() {
+function drawEntitiesHelper() {
   for (const entity of entities) {
     const entityCenterX = entity.x + (entity.w * TILE_SIZE) / 2;
     const entityCenterY = entity.y + (entity.h * TILE_SIZE) / 2;
 
+    ctx.save();
     ctx.beginPath();
+
+    // Centerpoint
     ctx.fillStyle = "red";
+
     ctx.arc(
       entityCenterX - camera.x,
       entityCenterY - camera.y,
@@ -450,6 +504,52 @@ function drawEntitiesCenterpoints() {
     );
     ctx.fill();
     ctx.closePath();
+
+    // Bounds
+    ctx.strokeStyle = "blue";
+    ctx.fillStyle = "blue";
+
+    ctx.strokeRect(
+      entity.x - camera.x,
+      entity.y - camera.y,
+      entity.w * TILE_SIZE,
+      entity.h * TILE_SIZE,
+    );
+
+    ctx.textAlign = "left";
+    ctx.textBaseline = "bottom";
+    ctx.font = "16px Arial";
+
+    ctx.fillText(
+      `${getEntityTypeAsString(entity.type)} BOUNDS`,
+      entity.x - camera.x,
+      entity.y - camera.y,
+    );
+
+    // Pickup range
+    if (getEntityTypeAsString(entity.type).startsWith("ITEM")) {
+      ctx.strokeStyle = "red";
+      ctx.fillStyle = "red";
+
+      ctx.beginPath();
+      ctx.arc(
+        entityCenterX - camera.x,
+        entityCenterY - camera.y,
+        ITEM_PICKUP_RANGE * TILE_SIZE,
+        0,
+        Math.PI * 2,
+      );
+      ctx.stroke();
+      ctx.closePath();
+
+      ctx.fillText(
+        `${getEntityTypeAsString(entity.type)} PICKUP RANGE`,
+        entityCenterX - ITEM_PICKUP_RANGE * TILE_SIZE - camera.x,
+        entityCenterY - ITEM_PICKUP_RANGE * TILE_SIZE - camera.y,
+      );
+    }
+
+    ctx.restore();
   }
 }
 
@@ -496,17 +596,32 @@ function handleEntityClick(entity: Entity) {
   }
 }
 
-function updateDroppedItems() {
+function getEntityCenter(entity: Entity) {
+  return [
+    entity.x + (entity.w * TILE_SIZE) / 2,
+    entity.y + (entity.h * TILE_SIZE) / 2,
+  ];
+}
+
+function updateDroppedItems(deltaTime: number) {
   for (const entity of entities) {
     if (getEntityTypeAsString(entity.type).startsWith("ITEM_")) {
-      float(entity);
-
       const distanceFromPlayer = distance(
         player.x,
         player.y,
         entity.x,
         entity.y,
       );
+
+      if (distanceFromPlayer < PLAYER_RANGE * TILE_SIZE) {
+        const dx = player.x - entity.x;
+        const dy = player.y - entity.y;
+
+        entity.x += (dx / distanceFromPlayer) * player.speed * deltaTime;
+        entity.y += (dy / distanceFromPlayer) * player.speed * deltaTime;
+      } else {
+        float(entity);
+      }
 
       if (distanceFromPlayer < ITEM_PICKUP_RANGE * TILE_SIZE) {
         if (debugModeEnabled) {
@@ -580,8 +695,11 @@ function drawInventory() {
       const itemX = currentX + i * slotSize + slotSize * 0.15;
       const itemY = inventoryY + slotSize * 0.15;
       const itemSize = slotSize * 0.7;
-      drawSpriteAt(item.entity, itemX, itemY, itemSize, itemSize);
+      drawSpriteAt(item.entity.sprite, itemX, itemY, itemSize, itemSize);
+      ctx.save();
+      ctx.fillStyle = "white";
       ctx.fillText(`x${item.amount}`, itemX + itemSize, itemY + itemSize);
+      ctx.restore();
     }
 
     ctx.restore();
@@ -593,7 +711,161 @@ function drawInventory() {
 // tiles
 enum Tile {
   GRASS,
-  WATER,
+  WATER_MIDDLE,
+  WATER_INNER_TOP_LEFT,
+  WATER_INNER_TOP_RIGHT,
+  WATER_INNER_BOTTOM_LEFT,
+  WATER_INNER_BOTTOM_RIGHT,
+  WATER_TOP_MIDDLE,
+  WATER_RIGHT_MIDDLE,
+  WATER_BOTTOM_MIDDLE,
+  WATER_LEFT_MIDDLE,
+  WATER_OUTER_TOP_LEFT,
+  WATER_OUTER_TOP_RIGHT,
+  WATER_OUTER_BOTTOM_LEFT,
+  WATER_OUTER_BOTTOM_RIGHT,
+  WATER_FISH_SHADOW_1,
+  WATER_FISH_SHADOW_2,
+  WATER_FISH_SHADOW_3,
+}
+
+const tileSprites: Record<Tile, EntitySprite> = {
+  [Tile.GRASS]: {
+    sourceX: 0,
+    sourceY: 0,
+    sourceW: 1,
+    sourceH: 1,
+    sourceSrc: grassTileImg,
+  },
+  [Tile.WATER_MIDDLE]: {
+    sourceX: 1,
+    sourceY: 1,
+    sourceW: 1,
+    sourceH: 1,
+    sourceSrc: waterTileGroupImg,
+  },
+  [Tile.WATER_INNER_TOP_LEFT]: {
+    sourceX: 0,
+    sourceY: 0,
+    sourceW: 1,
+    sourceH: 1,
+    sourceSrc: waterTileGroupImg,
+  },
+  [Tile.WATER_INNER_TOP_RIGHT]: {
+    sourceX: 2,
+    sourceY: 0,
+    sourceW: 1,
+    sourceH: 1,
+    sourceSrc: waterTileGroupImg,
+  },
+  [Tile.WATER_INNER_BOTTOM_LEFT]: {
+    sourceX: 0,
+    sourceY: 2,
+    sourceW: 1,
+    sourceH: 1,
+    sourceSrc: waterTileGroupImg,
+  },
+  [Tile.WATER_INNER_BOTTOM_RIGHT]: {
+    sourceX: 2,
+    sourceY: 2,
+    sourceW: 1,
+    sourceH: 1,
+    sourceSrc: waterTileGroupImg,
+  },
+  [Tile.WATER_TOP_MIDDLE]: {
+    sourceX: 1,
+    sourceY: 0,
+    sourceW: 1,
+    sourceH: 1,
+    sourceSrc: waterTileGroupImg,
+  },
+  [Tile.WATER_RIGHT_MIDDLE]: {
+    sourceX: 2,
+    sourceY: 1,
+    sourceW: 1,
+    sourceH: 1,
+    sourceSrc: waterTileGroupImg,
+  },
+  [Tile.WATER_BOTTOM_MIDDLE]: {
+    sourceX: 1,
+    sourceY: 2,
+    sourceW: 1,
+    sourceH: 1,
+    sourceSrc: waterTileGroupImg,
+  },
+  [Tile.WATER_LEFT_MIDDLE]: {
+    sourceX: 0,
+    sourceY: 1,
+    sourceW: 1,
+    sourceH: 1,
+    sourceSrc: waterTileGroupImg,
+  },
+  [Tile.WATER_OUTER_TOP_LEFT]: {
+    sourceX: 0,
+    sourceY: 3,
+    sourceW: 1,
+    sourceH: 1,
+    sourceSrc: waterTileGroupImg,
+  },
+  [Tile.WATER_OUTER_TOP_RIGHT]: {
+    sourceX: 1,
+    sourceY: 3,
+    sourceW: 1,
+    sourceH: 1,
+    sourceSrc: waterTileGroupImg,
+  },
+  [Tile.WATER_OUTER_BOTTOM_LEFT]: {
+    sourceX: 0,
+    sourceY: 4,
+    sourceW: 1,
+    sourceH: 1,
+    sourceSrc: waterTileGroupImg,
+  },
+  [Tile.WATER_OUTER_BOTTOM_RIGHT]: {
+    sourceX: 1,
+    sourceY: 4,
+    sourceW: 1,
+    sourceH: 1,
+    sourceSrc: waterTileGroupImg,
+  },
+  [Tile.WATER_FISH_SHADOW_1]: {
+    sourceX: 0,
+    sourceY: 5,
+    sourceW: 1,
+    sourceH: 1,
+    sourceSrc: waterTileGroupImg,
+  },
+  [Tile.WATER_FISH_SHADOW_2]: {
+    sourceX: 1,
+    sourceY: 5,
+    sourceW: 1,
+    sourceH: 1,
+    sourceSrc: waterTileGroupImg,
+  },
+  [Tile.WATER_FISH_SHADOW_3]: {
+    sourceX: 2,
+    sourceY: 5,
+    sourceW: 1,
+    sourceH: 1,
+    sourceSrc: waterTileGroupImg,
+  },
+};
+
+function drawTile(tile: Tile, x: number, y: number) {
+  const tileSprite = tileSprites[tile];
+
+  if (tileSprite) {
+    drawSpriteAt(
+      tileSprite,
+      x,
+      y,
+      tileSprite.sourceW * TILE_SIZE,
+      tileSprite.sourceH * TILE_SIZE,
+    );
+  } else {
+    ctx.fillStyle = "oceanblue";
+    ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+  }
 }
 
 // chunks
@@ -607,34 +879,80 @@ function createChunkKey(x: number, y: number): ChunkKey {
 
 function createChunk(x: number, y: number) {
   const key = createChunkKey(x, y);
-  const [chunkWorldX, chunkWorldY] = getChunkTopLeftCorner(key);
-  const chunk = Array.from({ length: CHUNK_SIZE }, (_, i) =>
-    Array.from({ length: CHUNK_SIZE }, (_, j) => {
-      const noiseProbability = map(
-        noise(
-          (chunkWorldX + i * TILE_SIZE) / 400,
-          (chunkWorldY + j * TILE_SIZE) / 400,
-        ),
-        -1,
-        1,
-        0,
-        1,
-      );
+  const originX = x * CHUNK_SIZE;
+  const originY = y * CHUNK_SIZE;
 
-      if (noiseProbability < 0.2) {
-        return Tile.WATER;
-      }
+  const chunk: Tile[][] = [];
 
-      return Tile.GRASS;
-    }),
-  );
+  for (let dx = 0; dx < CHUNK_SIZE; dx++) {
+    const row: Tile[] = [];
+    for (let dy = 0; dy < CHUNK_SIZE; dy++) {
+      const tileX = originX + dx;
+      const tileY = originY + dy;
+
+      const value = scaledNoise(tileX / NOISE_SCALE, tileY / NOISE_SCALE);
+      const tile =
+        value < WATER_THRESHOLD ? getSmoothWaterTile(tileX, tileY) : Tile.GRASS;
+
+      row.push(tile);
+    }
+    chunk.push(row);
+  }
 
   chunks.set(key, chunk);
 }
 
+function getSmoothWaterTile(x: number, y: number): Tile {
+  const get = (dx: number, dy: number) =>
+    scaledNoise((x + dx) / NOISE_SCALE, (y + dy) / NOISE_SCALE) <
+    WATER_THRESHOLD;
+
+  const n = {
+    top: get(0, -1),
+    right: get(1, 0),
+    bottom: get(0, 1),
+    left: get(-1, 0),
+    topLeft: get(-1, -1),
+    topRight: get(1, -1),
+    bottomLeft: get(-1, 1),
+    bottomRight: get(1, 1),
+  };
+
+  const rules: Array<[Tile, boolean]> = [
+    // INNER CORNERS
+    [Tile.WATER_INNER_TOP_LEFT, !n.top && !n.left],
+    [Tile.WATER_INNER_TOP_RIGHT, !n.top && !n.right],
+    [Tile.WATER_INNER_BOTTOM_LEFT, !n.bottom && !n.left],
+    [Tile.WATER_INNER_BOTTOM_RIGHT, !n.bottom && !n.right],
+
+    // SIDES
+    [Tile.WATER_TOP_MIDDLE, !n.top && n.left && n.right],
+    [Tile.WATER_RIGHT_MIDDLE, !n.right && n.top && n.bottom],
+    [Tile.WATER_BOTTOM_MIDDLE, !n.bottom && n.left && n.right],
+    [Tile.WATER_LEFT_MIDDLE, !n.left && n.top && n.bottom],
+
+    // OUTER CORNERS
+    [Tile.WATER_OUTER_TOP_LEFT, n.bottom && n.right && !n.bottomRight],
+    [Tile.WATER_OUTER_TOP_RIGHT, n.bottom && n.left && !n.bottomLeft],
+    [Tile.WATER_OUTER_BOTTOM_LEFT, n.top && n.right && !n.topRight],
+    [Tile.WATER_OUTER_BOTTOM_RIGHT, n.top && n.left && !n.topLeft],
+  ];
+
+  for (const [tile, condition] of rules) {
+    if (condition) return tile;
+  }
+
+  const r = prng();
+  if (r < 0.05) return Tile.WATER_FISH_SHADOW_1;
+  if (r < 0.1) return Tile.WATER_FISH_SHADOW_2;
+  if (r < 0.15) return Tile.WATER_FISH_SHADOW_3;
+
+  return Tile.WATER_MIDDLE;
+}
+
 function getChunkTopLeftCorner(key: ChunkKey) {
   const [x, y] = key.split(",").map(Number);
-  return [x * TILE_SIZE * CHUNK_SIZE, y * TILE_SIZE * CHUNK_SIZE];
+  return [x * CHUNK_SIZE_IN_PIXELS, y * CHUNK_SIZE_IN_PIXELS];
 }
 
 function drawChunks() {
@@ -646,22 +964,7 @@ function drawChunks() {
         const y = cy + j * TILE_SIZE - camera.y;
         const tile = chunk[i][j];
 
-        switch (tile) {
-          case Tile.GRASS: {
-            ctx.fillStyle = "lightgreen";
-            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-            break;
-          }
-          case Tile.WATER: {
-            ctx.fillStyle = "lightblue";
-            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-            break;
-          }
-          default: {
-            ctx.fillStyle = "red";
-            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-          }
-        }
+        drawTile(tile, x, y);
       }
     }
   }
@@ -839,9 +1142,24 @@ const player = {
   x: 0,
   y: 0,
   speed: 400,
+  moving: false,
+  direction: "down",
   health: {
     max: 10,
-    current: 10,
+    current: 8,
+  },
+  spriteSrc: playerTileImg,
+  animator: {
+    animations: {
+      "idle-down": { row: 0, frames: 6, frameDuration: 0.15 },
+      "walk-right": { row: 4, frames: 6, frameDuration: 0.15 },
+      "walk-left": { row: 4, frames: 6, frameDuration: 0.15 },
+      "walk-up": { row: 2, frames: 6, frameDuration: 0.15 },
+      "walk-down": { row: 3, frames: 6, frameDuration: 0.15 },
+    },
+    current: "idle",
+    frame: 0,
+    elapsed: 0,
   },
 };
 
@@ -867,17 +1185,51 @@ function spawnPlayer() {
 }
 
 function drawPlayer() {
-  ctx.fillStyle = "#1e2328";
-  ctx.beginPath();
-  ctx.arc(
-    player.x - camera.x,
-    player.y - camera.y,
-    PLAYER_SIZE / 2,
-    0,
-    Math.PI * 2,
-  );
-  ctx.fill();
-  ctx.closePath();
+  const anim =
+    player.animator.animations[
+      player.animator.current as keyof typeof player.animator.animations
+    ];
+  const sx = player.animator.frame * PLAYER_TILESET_TILE_SIZE;
+  const sy = anim.row * PLAYER_TILESET_TILE_SIZE;
+
+  ctx.save();
+
+  const drawX = player.x - PLAYER_SIZE / 2 - camera.x;
+  const drawY = player.y - PLAYER_SIZE / 2 - camera.y;
+
+  if (player.animator.current === "walk-left") {
+    // Translate to the center of the sprite
+    ctx.translate(drawX + PLAYER_SIZE / 2, drawY + PLAYER_SIZE / 2);
+    ctx.scale(-1, 1); // Flip horizontally
+
+    // Now draw centered using negative offset (because of the flip)
+    ctx.drawImage(
+      playerTileImg,
+      sx,
+      sy,
+      PLAYER_TILESET_TILE_SIZE,
+      PLAYER_TILESET_TILE_SIZE,
+      -PLAYER_SIZE / 2,
+      -PLAYER_SIZE / 2,
+      PLAYER_SIZE,
+      PLAYER_SIZE,
+    );
+  } else {
+    // Normal draw
+    ctx.drawImage(
+      playerTileImg,
+      sx,
+      sy,
+      PLAYER_TILESET_TILE_SIZE,
+      PLAYER_TILESET_TILE_SIZE,
+      drawX,
+      drawY,
+      PLAYER_SIZE,
+      PLAYER_SIZE,
+    );
+  }
+
+  ctx.restore();
 }
 
 function drawPlayerRange() {
@@ -892,6 +1244,27 @@ function drawPlayerRange() {
   );
   ctx.stroke();
   ctx.closePath();
+}
+
+function drawPlayerOutline() {
+  const outlineSize = 4;
+  ctx.save();
+  ctx.strokeStyle = "yellow";
+  ctx.strokeRect(
+    player.x - PLAYER_SIZE / 2 - camera.x,
+    player.y - PLAYER_SIZE / 2 - camera.y,
+    PLAYER_SIZE,
+    PLAYER_SIZE,
+  );
+
+  ctx.fillStyle = "red";
+  ctx.fillRect(
+    player.x - outlineSize / 2 - camera.x,
+    player.y - outlineSize / 2 - camera.y,
+    outlineSize,
+    outlineSize,
+  );
+  ctx.restore();
 }
 
 function playerCanMoveThere(worldX: number, worldY: number) {
@@ -941,6 +1314,23 @@ function movePlayer(deltaTime: number) {
   if (pressedKeys.has("a")) direction.x -= 1;
   if (pressedKeys.has("d")) direction.x += 1;
 
+  if (direction.x === 1) {
+    player.direction = "right";
+    player.moving = true;
+  } else if (direction.x === -1) {
+    player.direction = "left";
+    player.moving = true;
+  } else if (direction.y === -1) {
+    player.direction = "up";
+    player.moving = true;
+  } else if (direction.y === 1) {
+    player.direction = "down";
+    player.moving = true;
+  } else {
+    player.direction = "down";
+    player.moving = false;
+  }
+
   const length = Math.hypot(direction.x, direction.y);
   if (length > 0) {
     direction.x /= length;
@@ -957,6 +1347,20 @@ function movePlayer(deltaTime: number) {
     player.x = nextX;
   } else if (playerCanMoveThere(player.x, nextY)) {
     player.y = nextY;
+  }
+
+  updatePlayerAnimationState();
+  updateAnimator(player.animator, deltaTime);
+}
+
+function updatePlayerAnimationState() {
+  const prefix = player.moving ? "walk" : "idle";
+  const newKey = `${prefix}-${player.direction}`;
+
+  if (player.animator.current !== newKey) {
+    player.animator.current = newKey;
+    player.animator.frame = 0;
+    player.animator.elapsed = 0;
   }
 }
 
@@ -975,7 +1379,12 @@ function drawPlayerStats() {
 
   // Draw Health Rect
   ctx.fillStyle = "#f74d4d";
-  ctx.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
+  ctx.fillRect(
+    healthBarX,
+    healthBarY,
+    healthBarWidth * (player.health.current / player.health.max),
+    healthBarHeight,
+  );
 
   // Draw Health Text
   ctx.font = "16px Arial";
@@ -989,6 +1398,10 @@ function drawPlayerStats() {
   );
 
   ctx.closePath();
+}
+
+function getPlayerCenter() {
+  return [player.x + PLAYER_SIZE / 2, player.y + PLAYER_SIZE / 2];
 }
 
 // camera
@@ -1005,14 +1418,38 @@ function moveCamera(deltaTime: number) {
   camera.y += (camera.target.y - camera.height / 2 - camera.y) * 0.1;
 }
 
+// performance
+const timers: Record<string, number> = {};
+
+function timerStart(label: string) {
+  if (!profilingEnabled) return;
+  timers[label] = Date.now();
+}
+
+function timerEnd(label: string) {
+  if (!profilingEnabled) return;
+  const value = timers[label];
+  if (!value) throw new Error();
+  timers[label] = Date.now() - value;
+}
+
+function printTimers() {
+  if (!profilingEnabled) return;
+  console.table(timers);
+}
+
 // main
 function clearBackground() {
-  ctx.fillStyle = "white";
+  ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 async function main() {
-  await loadAssets();
+  try {
+    await loadAssets();
+  } catch {
+    throw new Error("Unable to load assets, verify if files exist");
+  }
 
   createChunk(0, 0);
   generateChunksAround(player.x, player.y);
@@ -1031,27 +1468,32 @@ function update(now: number) {
 
   clearBackground();
 
-  // generateChunksAround(player.x, player.y);
-  // disposeOfDistantChunks();
+  // chunks
+  generateChunksAround(player.x, player.y);
+  disposeOfDistantChunks();
 
+  // update stuff
   movePlayer(deltaTime);
   moveCamera(deltaTime);
-  updateDroppedItems();
+  updateDroppedItems(deltaTime);
 
+  // draw stuff
   drawChunks();
   drawPlayer();
   drawEntities();
 
+  // debug stuff
+  if (debugModeEnabled) {
+    drawPlayerRange();
+    drawPlayerOutline();
+    highlightChunks();
+    drawEntitiesHelper();
+    drawCursor();
+  }
+
   // ui stuff
   drawInventory();
   drawPlayerStats();
-
-  if (debugModeEnabled) {
-    drawPlayerRange();
-    highlightChunks();
-    drawEntitiesCenterpoints();
-    drawCursor();
-  }
 
   requestAnimationFrame(update);
 }
