@@ -9,6 +9,7 @@ import { CHUNK_SIZE, PLAYER_SIZE, TILE_SIZE } from "./constants";
 import { getHitboxDimensions } from "./entities";
 import { gameState } from "./game-state";
 import { pressedKeys } from "./input";
+import { mag } from "./math";
 import { Tile, type ChunkKey } from "./types";
 import { isColliding } from "./utils/is-colliding";
 
@@ -63,6 +64,7 @@ export function updatePlayerAnimationState() {
 
   const animationDirection =
     gameState.player.data.lockedDirection ?? gameState.player.data.direction;
+
   const newKey = `${prefix}-${animationDirection}`;
 
   if (gameState.player.animator.current !== newKey) {
@@ -110,11 +112,9 @@ export function updatePlayer(deltaTime: number) {
     gameState.player.data.moving = false;
   }
 
-  const length = Math.hypot(direction.x, direction.y);
-  if (length > 0) {
-    direction.x /= length;
-    direction.y /= length;
-  }
+  const [normalizedX, normalizedY] = mag(direction.x, direction.y);
+  direction.x = normalizedX;
+  direction.y = normalizedY;
 
   const nextX =
     gameState.player.position.x +

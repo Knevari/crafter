@@ -6,7 +6,11 @@ import {
   generateChunksAround,
 } from "./lib/chunks";
 import { DAY_AND_NIGHT_CYCLE_IN_SECONDS } from "./lib/constants";
-import { updateDroppedItems, updateEntities } from "./lib/entities";
+import {
+  cullDistantEntities,
+  updateDroppedItems,
+  updateEntities,
+} from "./lib/entities";
 import { spawnPlayer, updatePlayer } from "./lib/player";
 import { engine } from "./lib/engine";
 import { gameState, saveGameIntoLocalStorage } from "./lib/game-state";
@@ -65,6 +69,7 @@ function update(now: number) {
   updateCamera(deltaTime);
   updateEntities(deltaTime);
   updateDroppedItems(deltaTime);
+  cullDistantEntities();
 
   // draw stuff
   engine.renderer.draw();

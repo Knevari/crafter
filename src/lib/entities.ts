@@ -1,3 +1,4 @@
+import Alea from "alea";
 import { float, updateAnimator } from "./animation";
 import behaviors from "./behaviors";
 import {
@@ -8,17 +9,20 @@ import {
 import {
   CHUNK_SIZE,
   CHUNK_SIZE_IN_PIXELS,
+  ENTITY_DESPAWN_RANGE,
   ITEM_PICKUP_RANGE,
   PLAYER_RANGE,
+  SEED,
   TILE_SIZE,
 } from "./constants";
 import { ENTITY_DEFINITIONS } from "./entity-defs";
 import { gameState } from "./game-state";
 import { addToInventory } from "./inventory";
-import { distance } from "./math";
+import { distance, map } from "./math";
 import { createId, prng, rand, scaledNoise } from "./random";
 import { EntityType, Tile, type ChunkKey, type Entity } from "./types";
 import { isColliding } from "./utils/is-colliding";
+import { createNoise2D } from "simplex-noise";
 
 export function getEntityTypeAsString(type: EntityType) {
   switch (type) {
@@ -164,6 +168,13 @@ export function canPlaceEntity(
 export function spawnChunkEntities(chunkKey: ChunkKey) {
   const [chunkX, chunkY] = getChunkPositionFromKey(chunkKey);
 
+  const chunkSeed = `${SEED}-${chunkKey}`;
+  const localPrng = Alea(chunkSeed);
+  const localNoise = createNoise2D(localPrng);
+
+  const scaledLocalNoise = (x: number, y: number) =>
+    map(localNoise(x, y), -1, 1, 0, 1);
+
   for (let dx = 0; dx < CHUNK_SIZE; dx++) {
     for (let dy = 0; dy < CHUNK_SIZE; dy++) {
       const entityWorldX = chunkX * CHUNK_SIZE_IN_PIXELS + dx * TILE_SIZE;
@@ -172,23 +183,21 @@ export function spawnChunkEntities(chunkKey: ChunkKey) {
       const tileX = chunkX * TILE_SIZE + dx;
       const tileY = chunkY * TILE_SIZE + dy;
 
-      const randomValue = scaledNoise(tileX / 32, tileY / 32);
+      const n = scaledLocalNoise(tileX / 32, tileY / 32);
 
-      if (randomValue < 0.02) {
+      if (n < 0.02) {
         if (canPlaceEntity(entityWorldX, entityWorldY, 1, 1)) {
           createEntity(EntityType.ROCK, entityWorldX, entityWorldY, 1, 1);
         }
-      }
-      if (randomValue < 0.3) {
+      } else if (n < 0.3) {
         if (canPlaceEntity(entityWorldX, entityWorldY, 4, 5)) {
           createEntity(EntityType.TREE, entityWorldX, entityWorldY, 4, 5);
         }
+      } else if (n < 0.33) {
+        if (canPlaceEntity(entityWorldX, entityWorldY, 4, 5)) {
+          createEntity(EntityType.PIG, entityWorldX, entityWorldY, 1, 1);
+        }
       }
-      // if (randomValue > 0.4 && randomValue < 0.42) {
-      //   if (canPlaceEntity(entityWorldX, entityWorldY, 1, 1)) {
-      //     createEntity(EntityType.PIG, entityWorldX, entityWorldY, 1, 1);
-      //   }
-      // }
     }
   }
 }
@@ -299,4 +308,32 @@ export function getHitboxDimensions(entity: Entity) {
     width: entity.hitbox.xPercentage * TILE_SIZE * entity.dimensions.width,
     height: entity.hitbox.yPercentage * TILE_SIZE * entity.dimensions.height,
   };
+}
+
+export function cullDistantEntities() {
+  const playerChunk = getChunkFromWorldPosition(
+    gameState.player.position.x,
+    gameState.player.position.y,
+  );
+
+  if (!playerChunk) return;
+
+  const playerChunkX = Math.floor(
+    gameState.player.position.x / CHUNK_SIZE_IN_PIXELS,
+  );
+  const playerChunkY = Math.floor(
+    gameState.player.position.y / CHUNK_SIZE_IN_PIXELS,
+  );
+
+  gameState.entities = gameState.entities.filter((entity) => {
+    if (entity.inInventory) return true; // never despawn inventory items
+
+    const entityChunkX = Math.floor(entity.position.x / CHUNK_SIZE_IN_PIXELS);
+    const entityChunkY = Math.floor(entity.position.y / CHUNK_SIZE_IN_PIXELS);
+
+    const dx = Math.abs(entityChunkX - playerChunkX);
+    const dy = Math.abs(entityChunkY - playerChunkY);
+
+    return dx <= ENTITY_DESPAWN_RANGE && dy <= ENTITY_DESPAWN_RANGE;
+  });
 }

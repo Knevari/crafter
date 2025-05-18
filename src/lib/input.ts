@@ -3,6 +3,7 @@ import { engine } from "./engine";
 import { getEntityAtWorldPosition, handleEntityClick } from "./entities";
 import { gameState } from "./game-state";
 import { distance } from "./math";
+import type { Direction } from "./types";
 import { isColliding } from "./utils/is-colliding";
 
 export const pressedKeys = new Set();
@@ -90,5 +91,26 @@ engine.canvas.addEventListener("mousedown", (event) => {
     }
   }
 
+  const clickDirX = clickWorldX - gameState.player.position.x;
+  const clickDirY = clickWorldY - gameState.player.position.y;
+
+  const length = Math.hypot(clickDirX, clickDirY);
+
+  const dirX = clickDirX / length;
+  const dirY = clickDirY / length;
+
+  const absX = Math.abs(dirX);
+  const absY = Math.abs(dirY);
+
+  let direction: Direction = "down";
+
+  if (absX > absY) {
+    direction = clickDirX > 0 ? "right" : "left";
+  } else {
+    direction = clickDirY > 0 ? "down" : "up";
+  }
+
   gameState.player.data.attacking = true;
+  gameState.player.data.direction = direction;
+  gameState.player.data.lockedDirection = direction;
 });

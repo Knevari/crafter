@@ -9,7 +9,7 @@ import {
 } from "../constants";
 import { gameState } from "../game-state";
 import { tileSprites } from "../tiles";
-import type { Entity, Tile } from "../types";
+import { type Entity, type Tile } from "../types";
 
 export class DrawHelper {
   static drawEntity(ctx: CanvasRenderingContext2D, entity: Entity) {
@@ -121,7 +121,10 @@ export class DrawHelper {
     const sx = entity.animator.frame * tileSize;
     const sy = anim.row * tileSize;
 
-    if (entity.data.direction && entity.data.direction === "left") {
+    const animationDirection =
+      gameState.player.data.lockedDirection ?? gameState.player.data.direction;
+
+    if (animationDirection && animationDirection === "left") {
       ctx.save();
       // Translate to the center of the sprite
       ctx.translate(drawX + finalSize / 2, drawY + finalSize / 2);
