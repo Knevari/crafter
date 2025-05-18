@@ -1,4 +1,4 @@
-import { EntityType, Tile } from "./types";
+import { EntityType, Tile } from "./types/";
 
 export const tilesetImg = new Image();
 export const treeTileImg = new Image();

@@ -1,4 +1,4 @@
-import { Tile, type Sprite } from "./types";
+import { Tile, type Sprite } from "./types/";
 
 export const tileSprites: Record<Tile, Sprite> = {
   [Tile.GRASS]: {

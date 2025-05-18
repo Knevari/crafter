@@ -8,7 +8,7 @@ import {
 import { CHUNK_SIZE, PLAYER_SIZE, TILE_SIZE } from "./constants";
 import { gameState } from "./game-state";
 import { pressedKeys } from "./input";
-import { Tile, type ChunkKey, type Entity } from "./types";
+import { Tile, type ChunkKey, type Entity } from "./types/";
 import { isColliding } from "./utils/is-colliding";
 
 export function spawnPlayer() {
@@ -45,9 +45,9 @@ export function updatePlayerAnimationState() {
   if (!gameState.player.animator) {
     return;
   }
-  const prefix = gameState.player.attacking
+  const prefix = gameState.player.data.attacking
     ? "attack"
-    : gameState.player.moving
+    : gameState.player.data.moving
       ? "walk"
       : "idle";
   const newKey = `${prefix}-${gameState.player.direction}`;
@@ -73,19 +73,19 @@ export function updatePlayer(deltaTime: number) {
 
   if (direction.x === 1) {
     gameState.player.direction = "right";
-    gameState.player.moving = true;
+    gameState.player.data.moving = true;
   } else if (direction.x === -1) {
     gameState.player.direction = "left";
-    gameState.player.moving = true;
+    gameState.player.data.moving = true;
   } else if (direction.y === -1) {
     gameState.player.direction = "up";
-    gameState.player.moving = true;
+    gameState.player.data.moving = true;
   } else if (direction.y === 1) {
     gameState.player.direction = "down";
-    gameState.player.moving = true;
+    gameState.player.data.moving = true;
   } else {
     gameState.player.direction = "down";
-    gameState.player.moving = false;
+    gameState.player.data.moving = false;
   }
 
   const length = Math.hypot(direction.x, direction.y);
@@ -96,10 +96,10 @@ export function updatePlayer(deltaTime: number) {
 
   const nextX =
     gameState.player.position.x +
-    gameState.player.speed * direction.x * deltaTime;
+    gameState.player.data.speed * direction.x * deltaTime;
   const nextY =
     gameState.player.position.y +
-    gameState.player.speed * direction.y * deltaTime;
+    gameState.player.data.speed * direction.y * deltaTime;
 
   if (playerCanMoveThere(nextX, nextY)) {
     gameState.player.position.x = nextX;

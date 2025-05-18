@@ -24,7 +24,7 @@ import {
   type Entity,
   type HitBox,
   type Sprite,
-} from "./types";
+} from "./types/";
 import { isColliding } from "./utils/is-colliding";
 
 export function getEntityHealth(type: EntityType) {
@@ -390,17 +390,6 @@ export function getEntityCenter(entity: Entity) {
 
 export function updateEntities(deltaTime: number) {
   for (const entity of gameState.entities) {
-    if (entity.type === EntityType.PIG) {
-      // move randomly
-      const chanceOfMoving = prng();
-      if (chanceOfMoving < 0.2) {
-        const dx = rand(-1, 2);
-        const dy = rand(-1, 2);
-        entity.position.x += dx;
-        entity.position.y += dy;
-      }
-    }
-
     if (entity.animator) {
       updateAnimator(entity.animator, deltaTime);
     }
@@ -422,9 +411,9 @@ export function updateDroppedItems(deltaTime: number) {
         const dy = gameState.player.position.y - entity.position.y;
 
         entity.position.x +=
-          (dx / distanceFromPlayer) * gameState.player.speed * deltaTime;
+          (dx / distanceFromPlayer) * gameState.player.data.speed * deltaTime;
         entity.position.y +=
-          (dy / distanceFromPlayer) * gameState.player.speed * deltaTime;
+          (dy / distanceFromPlayer) * gameState.player.data.speed * deltaTime;
       } else {
         float(entity);
       }

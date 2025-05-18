@@ -11,7 +11,7 @@ import { spawnChunkEntities } from "./entities";
 import { gameState } from "./game-state";
 import { ceil, distance, floor } from "./math";
 import { prng, rand, scaledNoise } from "./random";
-import { type ChunkKey, Tile } from "./types";
+import { type ChunkKey, Tile } from "./types/";
 
 export function createChunkKey(x: number, y: number): ChunkKey {
   return `${x},${y}`;
@@ -152,8 +152,8 @@ export function disposeOfDistantChunks() {
     const chunkDistance = distance(
       chunkX,
       chunkY,
-      gameState.player.x,
-      gameState.player.y,
+      gameState.player.position.x,
+      gameState.player.position.y,
     );
 
     if (chunkDistance > CHUNK_DISPOSE_DISTANCE_IN_PIXELS) {

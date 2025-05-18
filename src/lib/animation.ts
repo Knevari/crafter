@@ -31,5 +31,5 @@ export function float(
   amplitude: number = 0.5,
 ) {
   const now = Date.now() / 1000;
-  entity.y += Math.cos(now * speed) * amplitude;
+  entity.position.y += Math.cos(now * speed) * amplitude;
 }

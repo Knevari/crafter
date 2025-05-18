@@ -1,5 +1,5 @@
 import { PLAYER_SIZE } from "../constants";
-import { EntityType, type Player } from "../types";
+import { EntityType, type Player } from "../types/";
 
 export function createPlayer(): Player {
   const player: Player = {
@@ -67,7 +67,6 @@ export function createPlayer(): Player {
       elapsed: 0,
       startTime: 0,
     },
-    direction: "down",
     health: {
       max: 10,
       current: 10,
@@ -77,9 +76,12 @@ export function createPlayer(): Player {
       width: PLAYER_SIZE,
       height: PLAYER_SIZE,
     },
-    speed: 400,
-    moving: false,
-    attacking: false,
+    data: {
+      speed: 400,
+      moving: false,
+      attacking: false,
+      direction: "down",
+    },
   };
   return player;
 }

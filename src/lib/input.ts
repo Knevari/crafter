@@ -90,5 +90,5 @@ engine.canvas.addEventListener("mousedown", (event) => {
     }
   }
 
-  gameState.player.attacking = true;
+  gameState.player.data.attacking = true;
 });
