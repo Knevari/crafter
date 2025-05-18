@@ -12,142 +12,13 @@ import {
   PLAYER_RANGE,
   TILE_SIZE,
 } from "./constants";
+import { ENTITY_DEFINITIONS } from "./entity-defs";
 import { gameState } from "./game-state";
 import { addToInventory } from "./inventory";
 import { distance } from "./math";
 import { createId, prng, rand, scaledNoise } from "./random";
-import {
-  EntityType,
-  Tile,
-  type Animator,
-  type ChunkKey,
-  type DropItem,
-  type Entity,
-  type HitBox,
-  type Sprite,
-} from "./types";
+import { EntityType, Tile, type ChunkKey, type Entity } from "./types";
 import { isColliding } from "./utils/is-colliding";
-
-export function getEntityHealth(type: EntityType) {
-  switch (type) {
-    case EntityType.PIG: {
-      return {
-        current: 3,
-        max: 3,
-      };
-    }
-    default: {
-      return {
-        current: 1,
-        max: 1,
-      };
-    }
-  }
-}
-
-export function getEntityDrops(type: EntityType) {
-  const drops: DropItem[] = [];
-  switch (type) {
-    case EntityType.TREE: {
-      drops.push({
-        type: EntityType.ITEM_TREE,
-        quantity: rand(1, 5),
-      });
-      break;
-    }
-    case EntityType.ROCK: {
-      drops.push({
-        type: EntityType.ITEM_ROCK,
-        quantity: rand(1, 5),
-      });
-      break;
-    }
-    case EntityType.PIG: {
-      drops.push({
-        type: 1,
-        quantity: EntityType.ITEM_ROCK,
-      });
-      break;
-    }
-  }
-  return drops;
-}
-
-export function getEntitySprite(type: EntityType): Sprite | null {
-  switch (type) {
-    case EntityType.TREE: {
-      return {
-        sourceX: 0,
-        sourceY: 0,
-        sourceW: 4,
-        sourceH: 5,
-      };
-    }
-    case EntityType.ITEM_TREE: {
-      return {
-        sourceX: 10,
-        sourceY: 8,
-        sourceW: 1,
-        sourceH: 1,
-      };
-    }
-    case EntityType.ROCK:
-      return {
-        sourceX: 9,
-        sourceY: 7,
-        sourceW: 1,
-        sourceH: 1,
-      };
-    case EntityType.ITEM_ROCK:
-      return {
-        sourceX: 9,
-        sourceY: 7,
-        sourceW: 1,
-        sourceH: 1,
-      };
-    case EntityType.PIG: {
-      return {
-        sourceX: 0,
-        sourceY: 0,
-        sourceW: 1,
-        sourceH: 1,
-      };
-    }
-    default: {
-      return null;
-    }
-  }
-}
-
-function getEntityHitbox(type: EntityType): HitBox {
-  switch (type) {
-    case EntityType.PLAYER: {
-      return {
-        xPercentage: 0.4,
-        yPercentage: 0.6,
-      };
-    }
-    case EntityType.TREE: {
-      return {
-        xPercentage: 0.2,
-        yPercentage: 0.2,
-        yOffset: 0.2,
-      };
-    }
-    case EntityType.PIG: {
-      return {
-        xPercentage: 0.6,
-        yPercentage: 0.4,
-      };
-    }
-    default: {
-      return {
-        xPercentage: 0.8,
-        yPercentage: 0.8,
-      };
-    }
-  }
-}
 
 export function getEntityTypeAsString(type: EntityType) {
   switch (type) {
@@ -172,34 +43,6 @@ export function getEntityTypeAsString(type: EntityType) {
   }
 }
 
-export function getEntityAnimator(type: EntityType): Animator | null {
-  switch (type) {
-    case EntityType.PIG: {
-      return {
-        animations: {
-          idle: {
-            row: 0,
-            frames: 2,
-            frameDuration: 0.15,
-          },
-          walk: {
-            row: 1,
-            frames: 2,
-            frameDuration: 0.15,
-          },
-        },
-        current: "idle",
-        elapsed: 0,
-        frame: 0,
-        startTime: 0,
-      };
-    }
-    default: {
-      return null;
-    }
-  }
-}
-
 export function createEntity(
   type: EntityType,
   worldX: number,
@@ -208,18 +51,17 @@ export function createEntity(
   height: number,
 ) {
   const id = createId();
-  const drops = getEntityDrops(type);
-  const health = getEntityHealth(type);
-  const sprite = getEntitySprite(type);
-  const animator = getEntityAnimator(type);
-  const hitbox = getEntityHitbox(type);
+  const def = ENTITY_DEFINITIONS[type];
+
+  const drops = typeof def.drops === "function" ? def.drops() : def.drops;
 
   const entity: Entity = {
     id,
     type,
-    sprite,
-    animator,
-    hitbox,
+    sprite: def.sprite ?? null,
+    animator: def.animator ?? null,
+    hitbox: def.hitbox,
+    behaviors: def.behaviors,
     position: {
       x: worldX,
       y: worldY,
@@ -228,15 +70,11 @@ export function createEntity(
       width,
       height,
     },
-    health,
+    health: def.health,
     drops,
     data: {},
     inInventory: false,
   };
-
-  if (entity.type === EntityType.PIG) {
-    entity.behaviors = ["wander"];
-  }
 
   gameState.entities.push(entity);
 }
@@ -277,16 +115,31 @@ export function canPlaceEntity(
   height: number,
 ) {
   const newEntityCenterX = worldX + (width * TILE_SIZE) / 2;
-  const newEntityCenterY = worldY + (width * TILE_SIZE) / 2;
+  const newEntityCenterY = worldY + (height * TILE_SIZE) / 2;
 
   const chunk = getChunkFromWorldPosition(worldX, worldY);
   const [tileX, tileY] = getChunkTileIndexFromWorldPosition(worldX, worldY);
+
+  if (!chunk) {
+    return false;
+  }
+
+  for (let dx = 0; dx < width; dx++) {
+    for (let dy = 0; dy < height; dy++) {
+      const tile = chunk[tileX + dx]?.[tileY + dx];
+      if (tile !== Tile.GRASS) return false;
+    }
+  }
 
   for (const entity of gameState.entities) {
     const entityCenterX =
       entity.position.x + (entity.dimensions.width * TILE_SIZE) / 2;
     const entityCenterY =
       entity.position.y + (entity.dimensions.height * TILE_SIZE) / 2;
+
+    const hitboxDimensions = getHitboxDimensions(entity);
+    const hitboxOffsetY =
+      (entity.hitbox.yOffset ?? 0) * entity.dimensions.height * TILE_SIZE;
 
     if (
       isColliding(
@@ -295,26 +148,19 @@ export function canPlaceEntity(
         width * TILE_SIZE,
         height * TILE_SIZE,
         entityCenterX,
-        entityCenterY,
+        entityCenterY + hitboxOffsetY,
         entity.dimensions.width * TILE_SIZE,
         entity.dimensions.height * TILE_SIZE,
       )
     ) {
       return false;
     }
-
-    for (let dx = 0; dx < entity.dimensions.width; dx++) {
-      for (let dy = 0; dy < entity.dimensions.height; dy++) {
-        if (chunk && chunk[tileX][tileY] !== Tile.GRASS) {
-          return false;
-        }
-      }
-    }
   }
 
   return true;
 }
 
+// TODO: REFACTOR THIS INTO SOMETHING MINIMALLY DECENT FOR FUCK SAKE
 export function spawnChunkEntities(chunkKey: ChunkKey) {
   const [chunkX, chunkY] = getChunkPositionFromKey(chunkKey);
 
@@ -333,16 +179,16 @@ export function spawnChunkEntities(chunkKey: ChunkKey) {
           createEntity(EntityType.ROCK, entityWorldX, entityWorldY, 1, 1);
         }
       }
-      if (randomValue < 0.2) {
+      if (randomValue < 0.3) {
         if (canPlaceEntity(entityWorldX, entityWorldY, 4, 5)) {
           createEntity(EntityType.TREE, entityWorldX, entityWorldY, 4, 5);
         }
       }
-      if (randomValue > 0.4 && randomValue < 0.42) {
-        if (canPlaceEntity(entityWorldX, entityWorldY, 1, 1)) {
-          createEntity(EntityType.PIG, entityWorldX, entityWorldY, 1, 1);
-        }
-      }
+      // if (randomValue > 0.4 && randomValue < 0.42) {
+      //   if (canPlaceEntity(entityWorldX, entityWorldY, 1, 1)) {
+      //     createEntity(EntityType.PIG, entityWorldX, entityWorldY, 1, 1);
+      //   }
+      // }
     }
   }
 }
@@ -446,4 +292,11 @@ export function updateDroppedItems(deltaTime: number) {
       }
     }
   }
+}
+
+export function getHitboxDimensions(entity: Entity) {
+  return {
+    width: entity.hitbox.xPercentage * TILE_SIZE * entity.dimensions.width,
+    height: entity.hitbox.yPercentage * TILE_SIZE * entity.dimensions.height,
+  };
 }

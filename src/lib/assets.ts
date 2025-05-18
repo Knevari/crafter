@@ -5,6 +5,7 @@ export const treeTileImg = new Image();
 export const grassTileImg = new Image();
 export const waterTileGroupImg = new Image();
 export const playerTileImg = new Image();
+export const outdoorDecoTileImg = new Image();
 export const pigTileImg = new Image();
 
 tilesetImg.src = "/tilemap_packed.png";
@@ -13,6 +14,7 @@ grassTileImg.src = "/Grass_Middle.png";
 waterTileGroupImg.src = "/Water_Tile.png";
 playerTileImg.src = "/Player.png";
 pigTileImg.src = "/Pig.png";
+outdoorDecoTileImg.src = "/Outdoor_Decor_Free.png";
 
 export function loadAssets() {
   const assets = [
@@ -22,6 +24,7 @@ export function loadAssets() {
     playerTileImg,
     pigTileImg,
     waterTileGroupImg,
+    outdoorDecoTileImg,
   ];
 
   return new Promise((resolve) => {
@@ -42,6 +45,10 @@ export function getTilesetReferenceByEntityType(type?: EntityType) {
   switch (type) {
     case EntityType.TREE: {
       return treeTileImg;
+    }
+    case EntityType.ROCK:
+    case EntityType.ITEM_ROCK: {
+      return outdoorDecoTileImg;
     }
     case EntityType.PIG: {
       return pigTileImg;

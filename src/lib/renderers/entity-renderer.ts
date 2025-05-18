@@ -5,6 +5,9 @@ export class EntityRenderer {
   drawEntities(ctx: CanvasRenderingContext2D) {
     for (let i = 0; i < gameState.entities.length; i++) {
       const entity = gameState.entities[i];
+      if (entity.data.hidden) {
+        continue;
+      }
 
       if (entity.animator && !entity.inInventory) {
         DrawHelper.drawAnimatedEntity(ctx, entity);

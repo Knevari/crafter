@@ -149,6 +149,7 @@ export function generateChunksAround(screenX: number, screenY: number) {
 export function disposeOfDistantChunks() {
   for (const chunkKey of Object.keys(gameState.chunks)) {
     const [chunkX, chunkY] = getChunkTopLeftCorner(chunkKey as ChunkKey);
+
     const chunkDistance = distance(
       chunkX,
       chunkY,
