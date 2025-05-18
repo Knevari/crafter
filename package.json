@@ -13,6 +13,7 @@
     "vite": "^6.3.5"
   },
   "dependencies": {
+    "@paralleldrive/cuid2": "^2.2.2",
     "alea": "^1.0.1",
     "simplex-noise": "^4.0.3"
   }
