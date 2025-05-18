@@ -1,5 +1,6 @@
 export function mag(x: number, y: number) {
-  const length = Math.hypot(x, y);
+  let length = Math.hypot(x, y);
+  length = length === 0 ? 1 : length;
   return [x / length, y / length];
 }
 export function floor(value: number) {

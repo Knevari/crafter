@@ -39,7 +39,7 @@ export type Health = {
   max: number;
 };
 
-export type HitBox = {
+export type CollisionBox = {
   xPercentage: number;
   yPercentage: number;
   yOffset?: number;
@@ -55,7 +55,7 @@ export interface Entity {
   type: EntityType;
   sprite: Sprite | null;
   position: Position;
-  hitbox: HitBox;
+  collisionBox: CollisionBox;
   animator: Animator | null;
   direction?: Direction;
   health: Health;

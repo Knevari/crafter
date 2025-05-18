@@ -19,7 +19,7 @@ import { ENTITY_DEFINITIONS } from "./entity-defs";
 import { gameState } from "./game-state";
 import { addToInventory } from "./inventory";
 import { distance, map } from "./math";
-import { createId, prng, rand, scaledNoise } from "./random";
+import { createId, prng } from "./random";
 import { EntityType, Tile, type ChunkKey, type Entity } from "./types";
 import { isColliding } from "./utils/is-colliding";
 import { createNoise2D } from "simplex-noise";
@@ -64,7 +64,7 @@ export function createEntity(
     type,
     sprite: def.sprite ?? null,
     animator: def.animator ?? null,
-    hitbox: def.hitbox,
+    collisionBox: def.collisionBox,
     behaviors: def.behaviors,
     position: {
       x: worldX,
@@ -141,9 +141,8 @@ export function canPlaceEntity(
     const entityCenterY =
       entity.position.y + (entity.dimensions.height * TILE_SIZE) / 2;
 
-    const hitboxDimensions = getHitboxDimensions(entity);
-    const hitboxOffsetY =
-      (entity.hitbox.yOffset ?? 0) * entity.dimensions.height * TILE_SIZE;
+    const collisionBoxOffsetY =
+      (entity.collisionBox.yOffset ?? 0) * entity.dimensions.height * TILE_SIZE;
 
     if (
       isColliding(
@@ -152,7 +151,7 @@ export function canPlaceEntity(
         width * TILE_SIZE,
         height * TILE_SIZE,
         entityCenterX,
-        entityCenterY + hitboxOffsetY,
+        entityCenterY + collisionBoxOffsetY,
         entity.dimensions.width * TILE_SIZE,
         entity.dimensions.height * TILE_SIZE,
       )
@@ -303,10 +302,12 @@ export function updateDroppedItems(deltaTime: number) {
   }
 }
 
-export function getHitboxDimensions(entity: Entity) {
+export function getCollisionBoxDimensions(entity: Entity) {
   return {
-    width: entity.hitbox.xPercentage * TILE_SIZE * entity.dimensions.width,
-    height: entity.hitbox.yPercentage * TILE_SIZE * entity.dimensions.height,
+    width:
+      entity.collisionBox.xPercentage * TILE_SIZE * entity.dimensions.width,
+    height:
+      entity.collisionBox.yPercentage * TILE_SIZE * entity.dimensions.height,
   };
 }
 

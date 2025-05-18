@@ -6,7 +6,7 @@ export function createPlayer(): Player {
     id: "player",
     type: EntityType.PLAYER,
     sprite: null,
-    hitbox: {
+    collisionBox: {
       xPercentage: 0.4,
       yPercentage: 0.6,
     },

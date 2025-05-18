@@ -6,7 +6,7 @@ import {
   getRandomChunkKey,
 } from "./chunks";
 import { CHUNK_SIZE, PLAYER_SIZE, TILE_SIZE } from "./constants";
-import { getHitboxDimensions } from "./entities";
+import { getCollisionBoxDimensions } from "./entities";
 import { gameState } from "./game-state";
 import { pressedKeys } from "./input";
 import { mag } from "./math";
@@ -158,19 +158,19 @@ function playerCanMoveThere(worldX: number, worldY: number) {
     const entityCenterY =
       entity.position.y + (entity.dimensions.height * TILE_SIZE) / 2;
 
-    const hitboxDimensions = getHitboxDimensions(entity);
-    const hitboxOffsetY =
-      (entity.hitbox.yOffset ?? 0) * entity.dimensions.height * TILE_SIZE;
+    const collisionBoxDimensions = getCollisionBoxDimensions(entity);
+    const collisionBoxOffsetY =
+      (entity.collisionBox.yOffset ?? 0) * entity.dimensions.height * TILE_SIZE;
 
     const entityCollides = isColliding(
       worldX,
       worldY,
-      hitboxDimensions.width,
-      hitboxDimensions.height,
+      collisionBoxDimensions.width,
+      collisionBoxDimensions.height,
       entityCenterX,
-      entityCenterY + hitboxOffsetY,
-      hitboxDimensions.width,
-      hitboxDimensions.height,
+      entityCenterY + collisionBoxOffsetY,
+      collisionBoxDimensions.width,
+      collisionBoxDimensions.height,
     );
 
     if (entityCollides) {

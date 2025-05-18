@@ -86,8 +86,8 @@ export class DrawHelper {
       sprite.sourceH * TILESET_TILE_SIZE,
       x,
       y,
-      sprite.sourceW * TILE_SIZE,
-      sprite.sourceH * TILE_SIZE,
+      sprite.sourceW * TILE_SIZE + 1,
+      sprite.sourceH * TILE_SIZE + 1,
     );
   }
 

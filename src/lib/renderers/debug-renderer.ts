@@ -90,24 +90,26 @@ export class DebugRenderer {
       );
 
       ctx.strokeStyle = "purple";
-      const remainingXPercentage = 1 - entity.hitbox.xPercentage;
-      const remainingYPercentage = 1 - entity.hitbox.yPercentage;
+      const remainingXPercentage = 1 - entity.collisionBox.xPercentage;
+      const remainingYPercentage = 1 - entity.collisionBox.yPercentage;
 
       const xOffset =
         (remainingXPercentage * entity.dimensions.width * TILE_SIZE) / 2;
       const yOffset =
         (remainingYPercentage * entity.dimensions.height * TILE_SIZE) / 2;
 
-      const hitboxStartX = entity.position.x + xOffset;
-      const hitboxStartY = entity.position.y + yOffset;
-      const hitboxOffsetY =
-        (entity.hitbox.yOffset ?? 0) * entity.dimensions.height * TILE_SIZE;
+      const collisionBoxStartX = entity.position.x + xOffset;
+      const collisionBoxStartY = entity.position.y + yOffset;
+      const collisionBoxOffsetY =
+        (entity.collisionBox.yOffset ?? 0) *
+        entity.dimensions.height *
+        TILE_SIZE;
 
       ctx.strokeRect(
-        hitboxStartX - gameState.camera.position.x,
-        hitboxStartY - gameState.camera.position.y + hitboxOffsetY,
-        entity.hitbox.xPercentage * TILE_SIZE * entity.dimensions.width,
-        entity.hitbox.yPercentage * TILE_SIZE * entity.dimensions.height,
+        collisionBoxStartX - gameState.camera.position.x,
+        collisionBoxStartY - gameState.camera.position.y + collisionBoxOffsetY,
+        entity.collisionBox.xPercentage * TILE_SIZE * entity.dimensions.width,
+        entity.collisionBox.yPercentage * TILE_SIZE * entity.dimensions.height,
       );
 
       ctx.textAlign = "left";
