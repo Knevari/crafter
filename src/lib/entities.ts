@@ -22,6 +22,7 @@ import {
   type ChunkKey,
   type DropItem,
   type Entity,
+  type HitBox,
   type Sprite,
 } from "./types";
 import { isColliding } from "./utils/is-colliding";
@@ -117,6 +118,24 @@ export function getEntitySprite(type: EntityType): Sprite | null {
   }
 }
 
+function getEntityHitbox(type: EntityType): HitBox {
+  switch (type) {
+    case EntityType.TREE: {
+      return {
+        xPercentage: 0.2,
+        yPercentage: 0.2,
+        yOffset: 0.2,
+      };
+    }
+    default: {
+      return {
+        xPercentage: 0.8,
+        yPercentage: 0.8,
+      };
+    }
+  }
+}
+
 export function getEntityTypeAsString(type: EntityType) {
   switch (type) {
     case EntityType.TREE: {
@@ -180,11 +199,13 @@ export function createEntity(
   const health = getEntityHealth(type);
   const sprite = getEntitySprite(type);
   const animator = getEntityAnimator(type);
+  const hitbox = getEntityHitbox(type);
   gameState.entities.push({
     id,
     type,
     sprite,
     animator,
+    hitbox,
     position: {
       x: worldX,
       y: worldY,
@@ -357,6 +378,17 @@ export function getEntityCenter(entity: Entity) {
 
 export function updateEntities(deltaTime: number) {
   for (const entity of gameState.entities) {
+    if (entity.type === EntityType.PIG) {
+      // move randomly
+      const chanceOfMoving = prng();
+      if (chanceOfMoving < 0.2) {
+        const dx = rand(-1, 2);
+        const dy = rand(-1, 2);
+        entity.position.x += dx;
+        entity.position.y += dy;
+      }
+    }
+
     if (entity.animator) {
       updateAnimator(entity.animator, deltaTime);
     }

@@ -66,11 +66,18 @@ export type Health = {
   max: number;
 };
 
+export type HitBox = {
+  xPercentage: number;
+  yPercentage: number;
+  yOffset?: number;
+};
+
 export interface Entity {
   id: string;
   type: EntityType;
   sprite: Sprite | null;
   position: Position;
+  hitbox: HitBox;
   animator: Animator | null;
   direction?: Direction;
   health: Health;

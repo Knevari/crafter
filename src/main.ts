@@ -43,14 +43,14 @@ function update(now: number) {
 
   gameState.gameTime += deltaTime;
 
-  // if (
-  //   gameState.gameTime - gameState.dayNightCycle.lastCycle >
-  //   DAY_AND_NIGHT_CYCLE_IN_SECONDS
-  // ) {
-  //   gameState.dayNightCycle.daylight = !gameState.dayNightCycle.daylight;
-  //   gameState.dayNightCycle.lastCycle = gameState.gameTime;
-  //   saveGameIntoLocalStorage(gameState);
-  // }
+  if (
+    gameState.gameTime - gameState.dayNightCycle.lastCycle >
+    DAY_AND_NIGHT_CYCLE_IN_SECONDS
+  ) {
+    gameState.dayNightCycle.daylight = !gameState.dayNightCycle.daylight;
+    gameState.dayNightCycle.lastCycle = gameState.gameTime;
+    saveGameIntoLocalStorage(gameState);
+  }
 
   // chunks
   generateChunksAround(

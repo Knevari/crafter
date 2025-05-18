@@ -10,6 +10,8 @@ export const pressedKeys = new Set();
 document.addEventListener("keydown", (event: KeyboardEvent) => {
   if (event.key === "z") gameState.debug = !gameState.debug;
   if (event.key === "x") gameState.profile = !gameState.profile;
+  if (event.key === "c")
+    gameState.dayNightCycle.daylight = !gameState.dayNightCycle.daylight;
   pressedKeys.add(event.key);
 });
 

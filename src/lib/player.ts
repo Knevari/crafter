@@ -8,7 +8,7 @@ import {
 import { CHUNK_SIZE, PLAYER_SIZE, TILE_SIZE } from "./constants";
 import { gameState } from "./game-state";
 import { pressedKeys } from "./input";
-import { Tile, type ChunkKey } from "./types";
+import { Tile, type ChunkKey, type Entity } from "./types";
 import { isColliding } from "./utils/is-colliding";
 
 export function spawnPlayer() {
@@ -136,15 +136,19 @@ function playerCanMoveThere(worldX: number, worldY: number) {
     const entityCenterY =
       entity.position.y + (entity.dimensions.height * TILE_SIZE) / 2;
 
+    const hitboxDimensions = getHitboxDimensions(entity);
+    const hitboxOffsetY =
+      (entity.hitbox.yOffset ?? 0) * entity.dimensions.height * TILE_SIZE;
+
     const entityCollides = isColliding(
       worldX,
       worldY,
       PLAYER_SIZE,
       PLAYER_SIZE,
       entityCenterX,
-      entityCenterY,
-      entity.dimensions.width * TILE_SIZE,
-      entity.dimensions.height * TILE_SIZE,
+      entityCenterY + hitboxOffsetY,
+      hitboxDimensions.width,
+      hitboxDimensions.height,
     );
 
     if (entityCollides) {
@@ -153,4 +157,11 @@ function playerCanMoveThere(worldX: number, worldY: number) {
   }
 
   return true;
+}
+
+function getHitboxDimensions(entity: Entity) {
+  return {
+    width: entity.hitbox.xPercentage * TILE_SIZE * entity.dimensions.width,
+    height: entity.hitbox.yPercentage * TILE_SIZE * entity.dimensions.height,
+  };
 }
