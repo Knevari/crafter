@@ -120,11 +120,23 @@ export function getEntitySprite(type: EntityType): Sprite | null {
 
 function getEntityHitbox(type: EntityType): HitBox {
   switch (type) {
+    case EntityType.PLAYER: {
+      return {
+        xPercentage: 0.4,
+        yPercentage: 0.6,
+      };
+    }
     case EntityType.TREE: {
       return {
         xPercentage: 0.2,
         yPercentage: 0.2,
         yOffset: 0.2,
+      };
+    }
+    case EntityType.PIG: {
+      return {
+        xPercentage: 0.6,
+        yPercentage: 0.4,
       };
     }
     default: {

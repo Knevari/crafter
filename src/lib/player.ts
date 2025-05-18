@@ -143,8 +143,8 @@ function playerCanMoveThere(worldX: number, worldY: number) {
     const entityCollides = isColliding(
       worldX,
       worldY,
-      PLAYER_SIZE,
-      PLAYER_SIZE,
+      hitboxDimensions.width,
+      hitboxDimensions.height,
       entityCenterX,
       entityCenterY + hitboxOffsetY,
       hitboxDimensions.width,

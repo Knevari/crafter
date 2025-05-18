@@ -1,5 +1,5 @@
 import { loadAssets } from "./lib/assets";
-import { updateCamera } from "./lib/camera";
+import { resetCamera, updateCamera } from "./lib/camera";
 import {
   createChunk,
   disposeOfDistantChunks,
@@ -30,6 +30,7 @@ async function main() {
     gameState.player.position.y,
   );
   spawnPlayer();
+  resetCamera();
 
   requestAnimationFrame(update);
 }
