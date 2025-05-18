@@ -6,5 +6,6 @@ export interface Player extends Entity {
     moving: boolean;
     attacking: boolean;
     direction: Direction;
+    lockedDirection: Direction | null;
   };
 }

@@ -6,6 +6,10 @@ export function createPlayer(): Player {
     id: "player",
     type: EntityType.PLAYER,
     sprite: null,
+    hitbox: {
+      xPercentage: 0.4,
+      yPercentage: 0.6,
+    },
     position: {
       x: 0,
       y: 0,
@@ -15,26 +19,26 @@ export function createPlayer(): Player {
         "attack-down": {
           row: 6,
           frames: 4,
-          frameDuration: 0.08,
-          totalDuration: 0.08 * 4,
+          frameDuration: 0.02,
+          totalDuration: 0.02 * 4,
         },
         "attack-right": {
           row: 7,
           frames: 4,
-          frameDuration: 0.08,
-          totalDuration: 0.08 * 4,
+          frameDuration: 0.02,
+          totalDuration: 0.02 * 4,
         },
         "attack-left": {
           row: 7,
           frames: 4,
-          frameDuration: 0.08,
-          totalDuration: 0.08 * 4,
+          frameDuration: 0.02,
+          totalDuration: 0.02 * 4,
         },
         "attack-up": {
           row: 8,
           frames: 4,
-          frameDuration: 0.08,
-          totalDuration: 0.08 * 4,
+          frameDuration: 0.02,
+          totalDuration: 0.02 * 4,
         },
         "idle-down": {
           row: 0,
@@ -81,6 +85,7 @@ export function createPlayer(): Player {
       moving: false,
       attacking: false,
       direction: "down",
+      lockedDirection: null,
     },
   };
   return player;

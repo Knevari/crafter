@@ -2,25 +2,29 @@ import { gameState } from "./game-state";
 import type { Animator, Entity } from "./types";
 
 export function updateAnimator(animator: Animator, deltaTime: number) {
-  const anim = animator.animations[animator.current];
+  const animation = animator.animations[animator.current];
 
   if (gameState.gameTime - animator.startTime === 0) {
-    anim.onStart?.();
+    animation.onStart?.();
   }
 
   if (
-    anim.totalDuration &&
-    gameState.gameTime - animator.startTime >= anim.totalDuration
+    animation.totalDuration &&
+    gameState.gameTime - animator.startTime >= animation.totalDuration
   ) {
-    animator.frame = anim.frames - 1;
-    anim.onComplete?.();
+    animator.frame = animation.frames - 1;
+    if (animation.onComplete) {
+      animation.onComplete();
+      animation.onComplete = undefined;
+    }
+
     return;
   }
 
   animator.elapsed += deltaTime;
 
-  if (animator.elapsed >= anim.frameDuration) {
-    animator.frame = (animator.frame + 1) % anim.frames;
+  if (animator.elapsed >= animation.frameDuration) {
+    animator.frame = (animator.frame + 1) % animation.frames;
     animator.elapsed = 0;
   }
 }

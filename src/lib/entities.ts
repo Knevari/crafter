@@ -1,4 +1,5 @@
 import { float, updateAnimator } from "./animation";
+import behaviors from "./behaviors";
 import {
   getChunkFromWorldPosition,
   getChunkPositionFromKey,
@@ -24,7 +25,7 @@ import {
   type Entity,
   type HitBox,
   type Sprite,
-} from "./types/";
+} from "./types";
 import { isColliding } from "./utils/is-colliding";
 
 export function getEntityHealth(type: EntityType) {
@@ -212,7 +213,8 @@ export function createEntity(
   const sprite = getEntitySprite(type);
   const animator = getEntityAnimator(type);
   const hitbox = getEntityHitbox(type);
-  gameState.entities.push({
+
+  const entity: Entity = {
     id,
     type,
     sprite,
@@ -228,8 +230,15 @@ export function createEntity(
     },
     health,
     drops,
+    data: {},
     inInventory: false,
-  });
+  };
+
+  if (entity.type === EntityType.PIG) {
+    entity.behaviors = ["wander"];
+  }
+
+  gameState.entities.push(entity);
 }
 
 export function destroyEntity(entityId: string) {
@@ -390,6 +399,12 @@ export function getEntityCenter(entity: Entity) {
 
 export function updateEntities(deltaTime: number) {
   for (const entity of gameState.entities) {
+    if (entity.behaviors) {
+      for (const behavior of entity.behaviors) {
+        behaviors[behavior](entity, deltaTime);
+      }
+    }
+
     if (entity.animator) {
       updateAnimator(entity.animator, deltaTime);
     }

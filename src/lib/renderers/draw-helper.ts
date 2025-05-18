@@ -121,7 +121,7 @@ export class DrawHelper {
     const sx = entity.animator.frame * tileSize;
     const sy = anim.row * tileSize;
 
-    if (entity.direction && entity.direction === "left") {
+    if (entity.data.direction && entity.data.direction === "left") {
       ctx.save();
       // Translate to the center of the sprite
       ctx.translate(drawX + finalSize / 2, drawY + finalSize / 2);

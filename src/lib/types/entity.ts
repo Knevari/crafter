@@ -61,5 +61,7 @@ export interface Entity {
   health: Health;
   drops: DropItem[];
   dimensions: Dimensions;
+  behaviors?: string[];
   inInventory?: boolean;
+  data: Record<string, any>;
 }

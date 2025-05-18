@@ -45,18 +45,39 @@ export function updatePlayerAnimationState() {
   if (!gameState.player.animator) {
     return;
   }
+
+  if (gameState.player.data.attacking) {
+    if (!gameState.player.data.lockedDirection) {
+      gameState.player.data.lockedDirection = gameState.player.data.direction;
+    }
+  } else {
+    gameState.player.data.lockedDirection = null;
+  }
+
   const prefix = gameState.player.data.attacking
     ? "attack"
     : gameState.player.data.moving
       ? "walk"
       : "idle";
-  const newKey = `${prefix}-${gameState.player.direction}`;
+
+  const animationDirection =
+    gameState.player.data.lockedDirection ?? gameState.player.data.direction;
+  const newKey = `${prefix}-${animationDirection}`;
 
   if (gameState.player.animator.current !== newKey) {
     gameState.player.animator.current = newKey;
     gameState.player.animator.frame = 0;
     gameState.player.animator.elapsed = 0;
     gameState.player.animator.startTime = gameState.gameTime;
+
+    if (prefix === "attack") {
+      const animation = gameState.player.animator.animations[newKey];
+      if (!animation.onComplete) {
+        animation.onComplete = () => {
+          gameState.player.data.attacking = false;
+        };
+      }
+    }
   }
 }
 
@@ -72,19 +93,19 @@ export function updatePlayer(deltaTime: number) {
   if (pressedKeys.has("d")) direction.x += 1;
 
   if (direction.x === 1) {
-    gameState.player.direction = "right";
+    gameState.player.data.direction = "right";
     gameState.player.data.moving = true;
   } else if (direction.x === -1) {
-    gameState.player.direction = "left";
+    gameState.player.data.direction = "left";
     gameState.player.data.moving = true;
   } else if (direction.y === -1) {
-    gameState.player.direction = "up";
+    gameState.player.data.direction = "up";
     gameState.player.data.moving = true;
   } else if (direction.y === 1) {
-    gameState.player.direction = "down";
+    gameState.player.data.direction = "down";
     gameState.player.data.moving = true;
   } else {
-    gameState.player.direction = "down";
+    gameState.player.data.direction = "down";
     gameState.player.data.moving = false;
   }
 
