@@ -16,7 +16,7 @@ export const CHUNK_LOADING_DISTANCE = 7;
 export const CHUNK_DISPOSE_DISTANCE_IN_PIXELS = CHUNK_SIZE * TILE_SIZE * 4;
 
 // RANDOM STUFF
-export const SEED = 9410894;
+export const SEED = 821312984;
 export const NOISE_SCALE = 100;
 export const WATER_THRESHOLD = 0.3;
 

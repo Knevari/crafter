@@ -1,4 +1,8 @@
-import { Tile, type Sprite } from "./types/";
+import { createChunkKey } from "./chunks";
+import { CHUNK_SIZE_IN_PIXELS, TILE_SIZE } from "./constants";
+import { gameState } from "./game-state";
+import { floor } from "./math";
+import { Tile, type Sprite } from "./types";
 
 export const tileSprites: Record<Tile, Sprite> = {
   [Tile.GRASS]: {
@@ -104,3 +108,26 @@ export const tileSprites: Record<Tile, Sprite> = {
     sourceH: 1,
   },
 };
+
+export function getTileIsWalkable(tile: Tile) {
+  return [Tile.GRASS].indexOf(tile) > -1;
+}
+
+export function getTileFromWorldPosition(worldX: number, worldY: number) {
+  const chunkX = floor(worldX / CHUNK_SIZE_IN_PIXELS);
+  const chunkY = floor(worldY / CHUNK_SIZE_IN_PIXELS);
+
+  const chunkTileX = floor(
+    (worldX - chunkX * CHUNK_SIZE_IN_PIXELS) / TILE_SIZE,
+  );
+  const chunkTileY = floor(
+    (worldY - chunkY * CHUNK_SIZE_IN_PIXELS) / TILE_SIZE,
+  );
+
+  const tile =
+    gameState.chunks[createChunkKey(chunkX, chunkY)]?.[chunkTileX]?.[
+      chunkTileY
+    ];
+
+  return tile;
+}

@@ -19,6 +19,9 @@ export enum EntityType {
   ITEM_TREE,
   ITEM_ROCK,
   PIG,
+  SLIME,
+  SLIME_GREEN,
+  SKELETON,
 }
 
 export type DropItem = {

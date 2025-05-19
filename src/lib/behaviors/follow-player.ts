@@ -1,7 +1,8 @@
-import { getEntityCenter } from "../entities";
-import { gameState } from "../game-state";
 import { distance, mag } from "../math";
-import type { Entity } from "../types";
+import { gameState } from "../game-state";
+import { getEntityCenter } from "../entities";
+import { getPath } from "../pathfinding/a-star";
+import { type Entity } from "../types";
 
 export function updateFollowPlayerBehavior(entity: Entity, deltaTime: number) {
   const followPlayer = (entity.data.followPlayer ??= {
@@ -17,18 +18,32 @@ export function updateFollowPlayerBehavior(entity: Entity, deltaTime: number) {
     entityCenterY,
   );
 
-  if (distanceFromPlayer < 100) {
+  if (distanceFromPlayer < 50) {
     followPlayer.state = "idle";
+    entity.data.moving = false;
   } else {
     followPlayer.state = "following";
+    entity.data.moving = true;
   }
 
   if (followPlayer.state === "following") {
-    const dx = gameState.player.position.x - entity.position.x;
-    const dy = gameState.player.position.y - entity.position.y;
-    const [nx, ny] = mag(dx, dy);
+    const path = getPath(
+      entity.position.x,
+      entity.position.y,
+      gameState.player.position.x,
+      gameState.player.position.y,
+    );
 
-    entity.position.x += nx * followPlayer.speed * deltaTime;
-    entity.position.y += ny * followPlayer.speed * deltaTime;
+    if (path && path.length) {
+      const nextPosition = path[path.length - 2];
+      if (nextPosition) {
+        const dx = nextPosition.x - entity.position.x;
+        const dy = nextPosition.y - entity.position.y;
+        const [nx, ny] = mag(dx, dy);
+
+        entity.position.x += nx * followPlayer.speed * deltaTime;
+        entity.position.y += ny * followPlayer.speed * deltaTime;
+      }
+    }
   }
 }

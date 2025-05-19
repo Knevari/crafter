@@ -7,6 +7,9 @@ export const waterTileGroupImg = new Image();
 export const playerTileImg = new Image();
 export const outdoorDecoTileImg = new Image();
 export const pigTileImg = new Image();
+export const slimeTileImg = new Image();
+export const slimeGreenTileImg = new Image();
+export const skeletonTileImg = new Image();
 
 tilesetImg.src = "/tilemap_packed.png";
 treeTileImg.src = "/Oak_Tree.png";
@@ -15,6 +18,9 @@ waterTileGroupImg.src = "/Water_Tile.png";
 playerTileImg.src = "/Player.png";
 pigTileImg.src = "/Pig.png";
 outdoorDecoTileImg.src = "/Outdoor_Decor_Free.png";
+slimeTileImg.src = "/Slime.png";
+slimeGreenTileImg.src = "/Slime_Green.png";
+skeletonTileImg.src = "/Skeleton.png";
 
 export function loadAssets() {
   const assets = [
@@ -25,6 +31,8 @@ export function loadAssets() {
     pigTileImg,
     waterTileGroupImg,
     outdoorDecoTileImg,
+    slimeTileImg,
+    skeletonTileImg,
   ];
 
   return new Promise((resolve) => {
@@ -55,6 +63,15 @@ export function getTilesetReferenceByEntityType(type?: EntityType) {
     }
     case EntityType.PLAYER: {
       return playerTileImg;
+    }
+    case EntityType.SLIME: {
+      return slimeTileImg;
+    }
+    case EntityType.SLIME_GREEN: {
+      return slimeGreenTileImg;
+    }
+    case EntityType.SKELETON: {
+      return skeletonTileImg;
     }
     default: {
       return tilesetImg;

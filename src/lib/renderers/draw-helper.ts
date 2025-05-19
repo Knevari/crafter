@@ -12,7 +12,11 @@ import { tileSprites } from "../tiles";
 import { type Entity, type Tile } from "../types";
 
 export class DrawHelper {
-  static drawEntity(ctx: CanvasRenderingContext2D, entity: Entity) {
+  static drawEntity(
+    ctx: CanvasRenderingContext2D,
+    entity: Entity,
+    tileSize = TILESET_TILE_SIZE,
+  ) {
     ctx.save();
 
     if (gameState.hoveredEntityId === entity.id) {
@@ -22,10 +26,10 @@ export class DrawHelper {
     if (entity.sprite) {
       ctx.drawImage(
         getTilesetReferenceByEntityType(entity.type),
-        entity.sprite.sourceX * TILESET_TILE_SIZE,
-        entity.sprite.sourceY * TILESET_TILE_SIZE,
-        entity.sprite.sourceW * TILESET_TILE_SIZE,
-        entity.sprite.sourceH * TILESET_TILE_SIZE,
+        entity.sprite.sourceX * tileSize,
+        entity.sprite.sourceY * tileSize,
+        entity.sprite.sourceW * tileSize,
+        entity.sprite.sourceH * tileSize,
         entity.position.x - gameState.camera.position.x,
         entity.position.y - gameState.camera.position.y,
         entity.dimensions.width * TILE_SIZE,
@@ -36,8 +40,12 @@ export class DrawHelper {
     ctx.restore();
   }
 
-  static drawAnimatedEntity(ctx: CanvasRenderingContext2D, entity: Entity) {
-    return this.drawAnimatedSprite(ctx, entity, PIG_TILESET_TILE_SIZE);
+  static drawAnimatedEntity(
+    ctx: CanvasRenderingContext2D,
+    entity: Entity,
+    tileSize = 32,
+  ) {
+    return this.drawAnimatedSprite(ctx, entity, tileSize);
   }
 
   static drawEntityAt(
@@ -122,7 +130,7 @@ export class DrawHelper {
     const sy = anim.row * tileSize;
 
     const animationDirection =
-      gameState.player.data.lockedDirection ?? gameState.player.data.direction;
+      entity.data.lockedDirection ?? entity.data.direction;
 
     if (animationDirection && animationDirection === "left") {
       ctx.save();

@@ -15,6 +15,7 @@ type EntityDefinition = {
   behaviors: string[];
   health: Health;
   drops: DropItem[] | (() => DropItem[]);
+  tileSize?: number;
 };
 
 export const ENTITY_DEFINITIONS: Record<number, EntityDefinition> = {
@@ -59,8 +60,63 @@ export const ENTITY_DEFINITIONS: Record<number, EntityDefinition> = {
       startTime: 0,
     },
     collisionBox: { xPercentage: 0.6, yPercentage: 0.4 },
+    behaviors: ["follow-player"],
+    health: { current: 3, max: 3 },
+    drops: [],
+    tileSize: 32,
+  },
+  [EntityType.SLIME]: {
+    sprite: { sourceX: 0, sourceY: 0, sourceW: 1, sourceH: 1 },
+    animator: {
+      animations: {
+        idle: { row: 0, frames: 2, frameDuration: 0.15 },
+        walk: { row: 1, frames: 2, frameDuration: 0.15 },
+      },
+      current: "idle",
+      elapsed: 0,
+      frame: 0,
+      startTime: 0,
+    },
+    collisionBox: { xPercentage: 0.6, yPercentage: 0.4 },
     behaviors: ["wander"],
     health: { current: 3, max: 3 },
     drops: [],
+    tileSize: 32,
+  },
+  [EntityType.SLIME_GREEN]: {
+    sprite: { sourceX: 0, sourceY: 0, sourceW: 1, sourceH: 1 },
+    animator: {
+      animations: {
+        idle: { row: 0, frames: 2, frameDuration: 0.15 },
+        walk: { row: 1, frames: 2, frameDuration: 0.15 },
+      },
+      current: "idle",
+      elapsed: 0,
+      frame: 0,
+      startTime: 0,
+    },
+    collisionBox: { xPercentage: 0.6, yPercentage: 0.4 },
+    behaviors: ["wander"],
+    health: { current: 3, max: 3 },
+    drops: [],
+    tileSize: 64,
+  },
+  [EntityType.SKELETON]: {
+    sprite: { sourceX: 0, sourceY: 0, sourceW: 1, sourceH: 1 },
+    animator: {
+      animations: {
+        idle: { row: 0, frames: 2, frameDuration: 0.15 },
+        walk: { row: 1, frames: 2, frameDuration: 0.15 },
+      },
+      current: "idle",
+      elapsed: 0,
+      frame: 0,
+      startTime: 0,
+    },
+    collisionBox: { xPercentage: 0.6, yPercentage: 0.4 },
+    behaviors: ["wander"],
+    health: { current: 3, max: 3 },
+    drops: [],
+    tileSize: 32,
   },
 };

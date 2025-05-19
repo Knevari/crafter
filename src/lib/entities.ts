@@ -41,6 +41,15 @@ export function getEntityTypeAsString(type: EntityType) {
     case EntityType.PIG: {
       return "PIG";
     }
+    case EntityType.SLIME: {
+      return "SLIME";
+    }
+    case EntityType.SLIME_GREEN: {
+      return "SLIME_GREEN";
+    }
+    case EntityType.SKELETON: {
+      return "SKELETON";
+    }
     default: {
       return "UNKNOWN";
     }
@@ -192,10 +201,6 @@ export function spawnChunkEntities(chunkKey: ChunkKey) {
         if (canPlaceEntity(entityWorldX, entityWorldY, 4, 5)) {
           createEntity(EntityType.TREE, entityWorldX, entityWorldY, 4, 5);
         }
-      } else if (n < 0.33) {
-        if (canPlaceEntity(entityWorldX, entityWorldY, 4, 5)) {
-          createEntity(EntityType.PIG, entityWorldX, entityWorldY, 1, 1);
-        }
       }
     }
   }
@@ -263,6 +268,27 @@ export function updateEntities(deltaTime: number) {
       updateAnimator(entity.animator, deltaTime);
     }
   }
+
+  updatePigAnimation(deltaTime);
+}
+
+function updatePigAnimation(deltaTime: number) {
+  for (const entity of gameState.entities) {
+    if (
+      entity.type === EntityType.PIG &&
+      entity.data.moving &&
+      entity.animator
+    ) {
+      entity.animator.current = "walk";
+    }
+    if (
+      entity.type == EntityType.PIG &&
+      !entity.data.moving &&
+      entity.animator
+    ) {
+      entity.animator.current = "idle";
+    }
+  }
 }
 
 export function updateDroppedItems(deltaTime: number) {
@@ -280,9 +306,15 @@ export function updateDroppedItems(deltaTime: number) {
         const dy = gameState.player.position.y - entity.position.y;
 
         entity.position.x +=
-          (dx / distanceFromPlayer) * gameState.player.data.speed * deltaTime;
+          (dx / distanceFromPlayer) *
+          gameState.player.data.speed *
+          1.2 *
+          deltaTime;
         entity.position.y +=
-          (dy / distanceFromPlayer) * gameState.player.data.speed * deltaTime;
+          (dy / distanceFromPlayer) *
+          gameState.player.data.speed *
+          1.2 *
+          deltaTime;
       } else {
         float(entity);
       }
