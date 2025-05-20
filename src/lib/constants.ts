@@ -24,7 +24,7 @@ export const NOISE_SCALE = 100;
 export const WATER_THRESHOLD = 0.3;
 
 // DAY AND NIGHT
-export const DAY_AND_NIGHT_CYCLE_IN_SECONDS = Infinity;
+export const DAY_AND_NIGHT_CYCLE_IN_SECONDS = 10;
 
 // DESPAWN
 export const ENTITY_DESPAWN_RANGE = 3;

@@ -38,11 +38,15 @@ async function main() {
     gameState.player.position.x,
     gameState.player.position.y,
   );
-  spawnPlayer();
-  spawnDebugStuff();
+
+  if (!gameState.loadedFromStorage) {
+    spawnPlayer();
+    spawnDebugStuff();
+  }
 
   resetCamera();
 
+  saveGameIntoLocalStorage(gameState);
   // gameState.player.health.current = 5;
   requestAnimationFrame(update);
 }
@@ -60,8 +64,8 @@ function update(now: number) {
     gameState.gameTime - gameState.dayNightCycle.lastCycle >
     DAY_AND_NIGHT_CYCLE_IN_SECONDS
   ) {
-    gameState.dayNightCycle.daylight = !gameState.dayNightCycle.daylight;
-    gameState.dayNightCycle.lastCycle = gameState.gameTime;
+    // gameState.dayNightCycle.daylight = !gameState.dayNightCycle.daylight;
+    // gameState.dayNightCycle.lastCycle = gameState.gameTime;
     saveGameIntoLocalStorage(gameState);
   }
 

@@ -79,9 +79,20 @@ body {
   border-radius: 4px;
   transition: scale .1s ease-out;
   position: relative;
+  pointer-events: auto;
+
+  &.active {
+    background-color: red;
+    border: 1px solid black;
+  }
+}
+
+.inventory-item > img {
+  pointer-events: none;
 }
 
 .inventory-item-amount {
+  pointer-events: none;
   position: absolute;
   top: 0;
   right: 0;
@@ -96,4 +107,8 @@ body {
 
 .inventory-item:hover {
   scale: 1.1;
+}
+
+.inventory-item:active {
+  scale: 0.98;
 }

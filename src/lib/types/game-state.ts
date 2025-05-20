@@ -10,6 +10,7 @@ export interface GameState {
   entities: Entity[];
   hoveredEntityId: string;
   inventory: InventoryItem[];
+  selectedItemIndex: number;
   dayNightCycle: {
     daylight: boolean;
     lastCycle: number;
@@ -17,4 +18,5 @@ export interface GameState {
   gameTime: number;
   debug: boolean;
   profile: boolean;
+  loadedFromStorage: boolean;
 }

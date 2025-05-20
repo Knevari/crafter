@@ -1,5 +1,7 @@
+import { TILE_SIZE } from "../constants";
 import { engine } from "../engine";
 import { gameState } from "../game-state";
+import { cursor } from "../input";
 import { DrawHelper } from "./draw-helper";
 
 export class UIRenderer {
@@ -91,8 +93,23 @@ export class UIRenderer {
     }
   }
 
+  drawSelectedInventoryItem(ctx: CanvasRenderingContext2D) {
+    if (gameState.selectedItemIndex === -1) return;
+    const selectedItem = gameState.inventory[gameState.selectedItemIndex];
+    if (!selectedItem) return;
+    DrawHelper.drawEntityAt(
+      ctx,
+      selectedItem.entity,
+      cursor.x,
+      cursor.y,
+      TILE_SIZE,
+      TILE_SIZE,
+    );
+  }
+
   draw(ctx: CanvasRenderingContext2D) {
-    this.drawInventory(ctx);
-    this.drawPlayerStats(ctx);
+    // this.drawInventory(ctx);
+    this.drawSelectedInventoryItem(ctx);
+    // this.drawPlayerStats(ctx);
   }
 }

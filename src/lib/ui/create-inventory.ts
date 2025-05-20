@@ -1,5 +1,6 @@
 import { getTilesetReferenceByEntityType } from "../assets";
 import { TILESET_TILE_SIZE } from "../constants";
+import { engine } from "../engine";
 import { ENTITY_DEFINITIONS } from "../entity-defs";
 import { gameState } from "../game-state";
 
@@ -21,11 +22,27 @@ export function createInventory() {
 
   document.querySelector("#ui")?.appendChild(wrapper);
 
+  const handleSlotClick = (index: number) => () => {
+    if (gameState.selectedItemIndex !== -1) {
+      slots[gameState.selectedItemIndex].classList.remove("active");
+    }
+    slots[index].classList.add("active");
+    gameState.selectedItemIndex = index;
+  };
+
+  window.addEventListener("keydown", (event) => {
+    if (["1", "2", "3", "4", "5"].indexOf(event.key) > -1) {
+      const index = parseInt(event.key);
+      const toggleSlotFunction = handleSlotClick(index - 1);
+      toggleSlotFunction();
+    }
+  });
+
   return {
     update() {
       const inventoryItems = gameState.inventory;
 
-      for (const index in inventoryItems) {
+      for (let index = 0; index < inventoryItems.length; index++) {
         const item = inventoryItems[index];
         const imgCanvas = document.createElement("canvas") as HTMLCanvasElement;
         const imgCtx = imgCanvas.getContext("2d") as CanvasRenderingContext2D;
@@ -62,6 +79,7 @@ export function createInventory() {
           slotText.textContent = `x${item.amount}`;
 
           slots[index].appendChild(slotText);
+          slots[index].onclick = handleSlotClick(index);
         }
       }
     },
