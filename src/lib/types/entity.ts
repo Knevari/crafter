@@ -22,6 +22,8 @@ export enum EntityType {
   SLIME,
   SLIME_GREEN,
   SKELETON,
+  AXE,
+  ITEM_AXE,
 }
 
 export type DropItem = {

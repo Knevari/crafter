@@ -23,7 +23,7 @@ export const ENTITY_DEFINITIONS: Record<number, EntityDefinition> = {
     sprite: { sourceX: 0, sourceY: 0, sourceW: 4, sourceH: 5 },
     collisionBox: { xPercentage: 0.2, yPercentage: 0.2, yOffset: 0.2 },
     behaviors: [],
-    health: { current: 1, max: 1 },
+    health: { current: 5, max: 5 },
     drops: () => [{ type: EntityType.ITEM_TREE, quantity: rand(1, 5) }],
   },
   [EntityType.ITEM_TREE]: {
@@ -119,5 +119,19 @@ export const ENTITY_DEFINITIONS: Record<number, EntityDefinition> = {
     health: { current: 3, max: 3 },
     drops: [],
     tileSize: 32,
+  },
+  [EntityType.AXE]: {
+    sprite: { sourceX: 7, sourceY: 10, sourceW: 1, sourceH: 1 },
+    collisionBox: { xPercentage: 0.6, yPercentage: 0.8 },
+    behaviors: [],
+    health: { current: 1, max: 1 },
+    drops: [],
+  },
+  [EntityType.ITEM_AXE]: {
+    sprite: { sourceX: 7, sourceY: 10, sourceW: 1, sourceH: 1 },
+    collisionBox: { xPercentage: 0.6, yPercentage: 0.8 },
+    behaviors: [],
+    health: { current: 1, max: 1 },
+    drops: [],
   },
 };

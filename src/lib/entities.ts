@@ -50,6 +50,12 @@ export function getEntityTypeAsString(type: EntityType) {
     case EntityType.SKELETON: {
       return "SKELETON";
     }
+    case EntityType.AXE: {
+      return "AXE";
+    }
+    case EntityType.ITEM_AXE: {
+      return "ITEM_AXE";
+    }
     default: {
       return "UNKNOWN";
     }
@@ -71,10 +77,10 @@ export function createEntity(
   const entity: Entity = {
     id,
     type,
-    sprite: def.sprite ?? null,
-    animator: def.animator ?? null,
-    collisionBox: def.collisionBox,
-    behaviors: def.behaviors,
+    sprite: def.sprite ? { ...def.sprite } : null,
+    animator: def.animator ? { ...def.animator } : null,
+    collisionBox: { ...def.collisionBox },
+    behaviors: [...def.behaviors],
     position: {
       x: worldX,
       y: worldY,
@@ -83,7 +89,10 @@ export function createEntity(
       width,
       height,
     },
-    health: def.health,
+    health: {
+      max: def.health.max,
+      current: def.health.current,
+    },
     drops,
     data: {},
     inInventory: false,
@@ -139,7 +148,7 @@ export function canPlaceEntity(
 
   for (let dx = 0; dx < width; dx++) {
     for (let dy = 0; dy < height; dy++) {
-      const tile = chunk[tileX + dx]?.[tileY + dx];
+      const tile = chunk[tileX + dx]?.[tileY + dy];
       if (tile !== Tile.GRASS) return false;
     }
   }

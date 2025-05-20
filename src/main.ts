@@ -66,7 +66,7 @@ function update(now: number) {
   ) {
     // gameState.dayNightCycle.daylight = !gameState.dayNightCycle.daylight;
     // gameState.dayNightCycle.lastCycle = gameState.gameTime;
-    saveGameIntoLocalStorage(gameState);
+    // saveGameIntoLocalStorage(gameState);
   }
 
   // chunks
@@ -135,4 +135,16 @@ function spawnDebugStuff() {
     1,
     1,
   );
+  createEntity(
+    EntityType.ITEM_AXE,
+    gameState.player.position.x - 200,
+    gameState.player.position.y,
+    1,
+    1,
+  );
 }
+
+// @ts-ignore
+window.saveProgress = () => saveGameIntoLocalStorage(gameState);
+// @ts-ignore
+window.resetProgress = () => localStorage.removeItem("save");
