@@ -8,7 +8,28 @@ import {
   type Sprite,
 } from "./types";
 
-type EntityDefinition = {
+type WeaponEntityData = {
+  baseDamage: number;
+  extraDamagePercent: number;
+  extraDamageTo: EntityType[];
+};
+
+type EntityDataMap = {
+  [EntityType.TREE]: {};
+  [EntityType.ITEM_TREE]: {};
+  [EntityType.ROCK]: {};
+  [EntityType.ITEM_ROCK]: {};
+  [EntityType.PIG]: {};
+  [EntityType.SLIME]: {};
+  [EntityType.SLIME_GREEN]: {};
+  [EntityType.SKELETON]: {};
+  [EntityType.PLAYER]: {};
+  [EntityType.AXE]: WeaponEntityData;
+};
+
+type EntityDataDefaults = { item?: boolean; inventory?: boolean };
+
+type EntityDefinition<T extends EntityType> = {
   sprite?: Sprite;
   animator?: Animator;
   collisionBox: CollisionBox;
@@ -16,42 +37,46 @@ type EntityDefinition = {
   health: Health;
   drops: DropItem[] | (() => DropItem[]);
   tileSize?: number;
-  data?: Record<string, any>;
+  data?: EntityDataDefaults & EntityDataMap[T];
 };
 
-export const ENTITY_DEFINITIONS: Record<number, EntityDefinition> = {
-  [EntityType.TREE]: {
+function defineEntity<T extends EntityType>(type: T, def: EntityDefinition<T>) {
+  return [type, def];
+}
+
+export const ENTITY_DEFINITIONS = Object.fromEntries([
+  defineEntity(EntityType.TREE, {
     sprite: { sourceX: 0, sourceY: 0, sourceW: 4, sourceH: 5 },
     collisionBox: { xPercentage: 0.2, yPercentage: 0.2, yOffset: 0.2 },
     behaviors: [],
     health: { current: 5, max: 5 },
     drops: () => [{ type: EntityType.ITEM_TREE, quantity: rand(1, 5) }],
-  },
-  [EntityType.ITEM_TREE]: {
+  }),
+  defineEntity(EntityType.ITEM_TREE, {
     sprite: { sourceX: 10, sourceY: 8, sourceW: 1, sourceH: 1 },
     collisionBox: { xPercentage: 0.8, yPercentage: 0.8 },
     behaviors: [],
     health: { current: 1, max: 1 },
     data: { item: true },
     drops: [],
-  },
-  [EntityType.ROCK]: {
+  }),
+  defineEntity(EntityType.ROCK, {
     sprite: { sourceX: 0, sourceY: 3, sourceW: 1, sourceH: 1 },
     collisionBox: { xPercentage: 0.8, yPercentage: 0.8 },
     behaviors: [],
     health: { current: 1, max: 1 },
     drops: () => [{ type: EntityType.ITEM_ROCK, quantity: rand(1, 5) }],
     tileSize: 16,
-  },
-  [EntityType.ITEM_ROCK]: {
+  }),
+  defineEntity(EntityType.ITEM_ROCK, {
     sprite: { sourceX: 0, sourceY: 4, sourceW: 1, sourceH: 1 },
     collisionBox: { xPercentage: 0.8, yPercentage: 0.8 },
     behaviors: [],
     health: { current: 1, max: 1 },
     data: { item: true },
     drops: [],
-  },
-  [EntityType.PIG]: {
+  }),
+  defineEntity(EntityType.PIG, {
     sprite: { sourceX: 0, sourceY: 0, sourceW: 1, sourceH: 1 },
     animator: {
       animations: {
@@ -68,8 +93,8 @@ export const ENTITY_DEFINITIONS: Record<number, EntityDefinition> = {
     health: { current: 3, max: 3 },
     drops: [],
     tileSize: 32,
-  },
-  [EntityType.SLIME]: {
+  }),
+  defineEntity(EntityType.SLIME, {
     sprite: { sourceX: 0, sourceY: 0, sourceW: 1, sourceH: 1 },
     animator: {
       animations: {
@@ -86,8 +111,8 @@ export const ENTITY_DEFINITIONS: Record<number, EntityDefinition> = {
     health: { current: 3, max: 3 },
     drops: [],
     tileSize: 32,
-  },
-  [EntityType.SLIME_GREEN]: {
+  }),
+  defineEntity(EntityType.SLIME_GREEN, {
     sprite: { sourceX: 0, sourceY: 0, sourceW: 1, sourceH: 1 },
     animator: {
       animations: {
@@ -104,8 +129,8 @@ export const ENTITY_DEFINITIONS: Record<number, EntityDefinition> = {
     health: { current: 3, max: 3 },
     drops: [],
     tileSize: 64,
-  },
-  [EntityType.SKELETON]: {
+  }),
+  defineEntity(EntityType.SKELETON, {
     sprite: { sourceX: 0, sourceY: 0, sourceW: 1, sourceH: 1 },
     animator: {
       animations: {
@@ -122,8 +147,8 @@ export const ENTITY_DEFINITIONS: Record<number, EntityDefinition> = {
     health: { current: 3, max: 3 },
     drops: [],
     tileSize: 32,
-  },
-  [EntityType.AXE]: {
+  }),
+  defineEntity(EntityType.AXE, {
     sprite: { sourceX: 7, sourceY: 10, sourceW: 1, sourceH: 1 },
     collisionBox: { xPercentage: 0.6, yPercentage: 0.8 },
     behaviors: [],
@@ -135,5 +160,5 @@ export const ENTITY_DEFINITIONS: Record<number, EntityDefinition> = {
       item: true,
     },
     drops: [],
-  },
-};
+  }),
+]) as Record<EntityType, EntityDefinition<EntityType>>;

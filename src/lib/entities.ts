@@ -92,7 +92,7 @@ export function createEntity(
       current: def.health.current,
     },
     drops,
-    data: def.data ? { ...def.data, inventory: false } : { inventory: false },
+    data: def.data ? { ...def.data } : { inventory: false },
   };
 
   gameState.entities.push(entity);

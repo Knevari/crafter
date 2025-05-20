@@ -1,7 +1,7 @@
 import { PLAYER_RANGE, TILE_SIZE } from "./constants";
 import { engine } from "./engine";
 import { getEntityAtWorldPosition, handleEntityClick } from "./entities";
-import { gameState } from "./game-state";
+import { gameState, saveGameIntoLocalStorage } from "./game-state";
 import { distance } from "./math";
 import type { Direction } from "./types";
 import { isColliding } from "./utils/is-colliding";
@@ -13,6 +13,15 @@ document.addEventListener("keydown", (event: KeyboardEvent) => {
   if (event.key === "x") gameState.profile = !gameState.profile;
   if (event.key === "c")
     gameState.dayNightCycle.daylight = !gameState.dayNightCycle.daylight;
+  if (event.key === "F5") {
+    event.preventDefault();
+    saveGameIntoLocalStorage(gameState);
+  }
+  if (event.key === "F6") {
+    event.preventDefault();
+    localStorage.removeItem("save");
+    window.location.reload();
+  }
   pressedKeys.add(event.key);
 });
 

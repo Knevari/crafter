@@ -143,10 +143,3 @@ function spawnDebugStuff() {
     0.7,
   );
 }
-
-// @ts-ignore
-window.saveProgress = () => saveGameIntoLocalStorage(gameState);
-// @ts-ignore
-window.resetProgress = () => {
-  localStorage.removeItem("save");
-};
