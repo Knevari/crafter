@@ -1,6 +1,5 @@
 import { getTilesetReferenceByEntityType } from "../assets";
 import { TILESET_TILE_SIZE } from "../constants";
-import { engine } from "../engine";
 import { ENTITY_DEFINITIONS } from "../entity-defs";
 import { gameState } from "../game-state";
 
@@ -23,11 +22,28 @@ export function createInventory() {
   document.querySelector("#ui")?.appendChild(wrapper);
 
   const handleSlotClick = (index: number) => () => {
-    if (gameState.selectedItemIndex !== -1) {
+    gameState.selectedItemIndex = index;
+
+    if (gameState.selectedItemIndex > -1) {
       slots[gameState.selectedItemIndex].classList.remove("active");
+      const selectedItem = gameState.inventory[gameState.selectedItemIndex];
+      if (selectedItem) {
+        document.body.classList.add("selected-item");
+        document.body.classList.remove("hover");
+      } else {
+        document.body.classList.remove("selected-item");
+      }
     }
+
     slots[index].classList.add("active");
     gameState.selectedItemIndex = index;
+
+    for (let i = 0; i < 5; i++) {
+      if (i !== index) {
+        const slot = slots[i];
+        slot.classList.remove("active");
+      }
+    }
   };
 
   window.addEventListener("keydown", (event) => {

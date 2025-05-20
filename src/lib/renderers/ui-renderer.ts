@@ -97,13 +97,14 @@ export class UIRenderer {
     if (gameState.selectedItemIndex === -1) return;
     const selectedItem = gameState.inventory[gameState.selectedItemIndex];
     if (!selectedItem) return;
+    const size = TILE_SIZE / 1.5;
     DrawHelper.drawEntityAt(
       ctx,
       selectedItem.entity,
       cursor.x,
       cursor.y,
-      TILE_SIZE,
-      TILE_SIZE,
+      size,
+      size,
     );
   }
 

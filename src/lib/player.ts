@@ -147,7 +147,7 @@ function playerCanMoveThere(worldX: number, worldY: number) {
   );
 
   // Verify if tile is walkable
-  if (chunk[chunkTileX][chunkTileY] !== Tile.GRASS) {
+  if (chunk[chunkTileX]?.[chunkTileY] !== Tile.GRASS) {
     return false;
   }
 

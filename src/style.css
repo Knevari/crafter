@@ -16,6 +16,16 @@ body {
   padding: 0;
 }
 
+body {
+  cursor: url(/arrowhead-rounded-outline.svg), auto;
+  &.hover {
+    cursor: url(/hand-pointer.svg), pointer;
+  }
+  &.selected-item {
+    cursor: none !important;
+  }
+}
+
 #ui {
   position: fixed;
   top: 0;
@@ -27,10 +37,6 @@ body {
 }
 
 .health-bar {
-  display: grid;
-  place-items: center;
-  color: white;
-  font-weight: 600;
   height: 100%;
   background-image: repeating-linear-gradient(
     -45deg,
@@ -52,6 +58,15 @@ body {
   overflow: hidden;
 }
 
+.health-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: 600;
+}
+
 .inventory-wrapper {
   position: absolute;
   bottom: 98px;
@@ -66,7 +81,7 @@ body {
   flex-direction: row;
   padding: 8px;
   gap: 8px;
-  filter: drop-shadow: 0 0 2px rgba(0, 0, 0, 0.04);
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.04));
 }
 
 .inventory-item {
@@ -77,12 +92,12 @@ body {
   height: 100%;
   width: 60px;
   border-radius: 4px;
-  transition: scale .1s ease-out;
+  transition: scale 0.1s ease-out;
   position: relative;
   pointer-events: auto;
 
   &.active {
-    background-color: red;
+    background-color: rgba(255, 0, 0, 0.5);
     border: 1px solid black;
   }
 }

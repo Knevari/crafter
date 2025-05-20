@@ -16,6 +16,7 @@ type EntityDefinition = {
   health: Health;
   drops: DropItem[] | (() => DropItem[]);
   tileSize?: number;
+  data?: Record<string, any>;
 };
 
 export const ENTITY_DEFINITIONS: Record<number, EntityDefinition> = {
@@ -31,6 +32,7 @@ export const ENTITY_DEFINITIONS: Record<number, EntityDefinition> = {
     collisionBox: { xPercentage: 0.8, yPercentage: 0.8 },
     behaviors: [],
     health: { current: 1, max: 1 },
+    data: { item: true },
     drops: [],
   },
   [EntityType.ROCK]: {
@@ -46,6 +48,7 @@ export const ENTITY_DEFINITIONS: Record<number, EntityDefinition> = {
     collisionBox: { xPercentage: 0.8, yPercentage: 0.8 },
     behaviors: [],
     health: { current: 1, max: 1 },
+    data: { item: true },
     drops: [],
   },
   [EntityType.PIG]: {
@@ -125,13 +128,12 @@ export const ENTITY_DEFINITIONS: Record<number, EntityDefinition> = {
     collisionBox: { xPercentage: 0.6, yPercentage: 0.8 },
     behaviors: [],
     health: { current: 1, max: 1 },
-    drops: [],
-  },
-  [EntityType.ITEM_AXE]: {
-    sprite: { sourceX: 7, sourceY: 10, sourceW: 1, sourceH: 1 },
-    collisionBox: { xPercentage: 0.6, yPercentage: 0.8 },
-    behaviors: [],
-    health: { current: 1, max: 1 },
+    data: {
+      baseDamage: 2,
+      extraDamagePercent: 0.5,
+      extraDamageTo: [EntityType.TREE],
+      item: true,
+    },
     drops: [],
   },
 };

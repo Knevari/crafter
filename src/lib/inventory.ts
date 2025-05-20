@@ -12,7 +12,7 @@ export function addToInventory(entity: Entity) {
   }
 
   if (!itemInIventory) {
-    entity.inInventory = true;
+    entity.data.inventory = true;
     gameState.inventory.push({
       amount: 1,
       entity,

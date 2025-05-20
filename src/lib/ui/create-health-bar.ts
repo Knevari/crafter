@@ -10,8 +10,8 @@ export function createHealthBar() {
   const text = document.createElement("span");
   text.classList.add("health-text");
 
-  bar.appendChild(text);
   wrapper.appendChild(bar);
+  wrapper.appendChild(text);
 
   document.querySelector("#ui")?.appendChild(wrapper);
 

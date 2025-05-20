@@ -58,9 +58,9 @@ engine.canvas.addEventListener("mousemove", (event) => {
   });
 
   if (hoveringAnyEntity) {
-    document.body.style.cursor = "pointer";
-  } else if (!hoveringAnyEntity && document.body.style.cursor === "pointer") {
-    document.body.style.cursor = "auto";
+    document.body.classList.add("hover");
+  } else {
+    document.body.classList.remove("hover");
     gameState.hoveredEntityId = "";
   }
 });

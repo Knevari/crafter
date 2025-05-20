@@ -124,7 +124,7 @@ export class DebugRenderer {
       );
 
       // Pickup range
-      if (getEntityTypeAsString(entity.type).startsWith("ITEM")) {
+      if (entity.data.item) {
         ctx.strokeStyle = "red";
         ctx.fillStyle = "red";
 

@@ -23,6 +23,7 @@ import { createId, prng } from "./random";
 import { EntityType, Tile, type ChunkKey, type Entity } from "./types";
 import { isColliding } from "./utils/is-colliding";
 import { createNoise2D } from "simplex-noise";
+import { UI } from "./ui";
 
 export function getEntityTypeAsString(type: EntityType) {
   switch (type) {
@@ -52,9 +53,6 @@ export function getEntityTypeAsString(type: EntityType) {
     }
     case EntityType.AXE: {
       return "AXE";
-    }
-    case EntityType.ITEM_AXE: {
-      return "ITEM_AXE";
     }
     default: {
       return "UNKNOWN";
@@ -94,8 +92,7 @@ export function createEntity(
       current: def.health.current,
     },
     drops,
-    data: {},
-    inInventory: false,
+    data: def.data ? { ...def.data, inventory: false } : { inventory: false },
   };
 
   gameState.entities.push(entity);
@@ -117,8 +114,8 @@ export function destroyEntity(entityId: string) {
         entity.position.y +
           entity.dimensions.height * TILE_SIZE -
           TILE_SIZE * 2,
-        1,
-        1,
+        0.7,
+        0.7,
       );
     }
   }
@@ -127,7 +124,7 @@ export function destroyEntity(entityId: string) {
   const entityIndex = gameState.entities.findIndex(
     (entity) => entity.id === entityId,
   );
-  if (entityIndex !== -1) gameState.entities.splice(entityIndex, 1);
+  if (entityIndex > -1) gameState.entities.splice(entityIndex, 1);
 }
 
 export function canPlaceEntity(
@@ -238,23 +235,23 @@ export function handleEntityClick(entity: Entity) {
       entity.position.y,
     );
   }
-  switch (entity.type) {
-    case EntityType.TREE: {
-      // destroy tree, drop item
-      entity.health.current -= 1;
-      if (entity.health.current <= 0) {
-        destroyEntity(entity.id);
-      }
-      break;
-    }
-    case EntityType.ROCK: {
-      // destroy tree, drop item
-      entity.health.current -= 1;
-      if (entity.health.current <= 0) {
-        destroyEntity(entity.id);
-      }
-      break;
-    }
+
+  const selectedItemIndex = gameState.selectedItemIndex;
+  const selectedItem =
+    selectedItemIndex > -1 ? gameState.inventory[selectedItemIndex] : null;
+
+  const damage = selectedItem?.entity.data.baseDamage ?? 1;
+  entity.health.current -= damage;
+
+  const extraDamagePercent = selectedItem?.entity.data.extraDamagePercent ?? 0;
+  const extraDamageTo = selectedItem?.entity.data.extraDamageTo ?? [];
+
+  if (Array.isArray(extraDamageTo) && extraDamageTo.indexOf(entity.type) > -1) {
+    entity.health.current -= damage * extraDamagePercent;
+  }
+
+  if (entity.health.current <= 0) {
+    destroyEntity(entity.id);
   }
 }
 
@@ -271,6 +268,10 @@ export function updateEntities(deltaTime: number) {
       for (const behavior of entity.behaviors) {
         behaviors[behavior](entity, deltaTime);
       }
+    }
+
+    if (entity.data.item) {
+      float(entity);
     }
 
     if (entity.animator) {
@@ -302,7 +303,7 @@ function updatePigAnimation(deltaTime: number) {
 
 export function updateDroppedItems(deltaTime: number) {
   for (const entity of gameState.entities) {
-    if (getEntityTypeAsString(entity.type).startsWith("ITEM_")) {
+    if (entity.data.item) {
       const distanceFromPlayer = distance(
         gameState.player.position.x,
         gameState.player.position.y,
@@ -324,8 +325,6 @@ export function updateDroppedItems(deltaTime: number) {
           gameState.player.data.speed *
           1.2 *
           deltaTime;
-      } else {
-        float(entity);
       }
 
       if (distanceFromPlayer < ITEM_PICKUP_RANGE * TILE_SIZE) {
@@ -338,6 +337,7 @@ export function updateDroppedItems(deltaTime: number) {
         }
         addToInventory(entity);
         destroyEntity(entity.id);
+        UI.inventory.update();
       }
     }
   }
@@ -368,7 +368,7 @@ export function cullDistantEntities() {
   );
 
   gameState.entities = gameState.entities.filter((entity) => {
-    if (entity.inInventory) return true; // never despawn inventory items
+    if (entity.data.inventory) return true; // never despawn inventory items
 
     const entityChunkX = Math.floor(entity.position.x / CHUNK_SIZE_IN_PIXELS);
     const entityChunkY = Math.floor(entity.position.y / CHUNK_SIZE_IN_PIXELS);

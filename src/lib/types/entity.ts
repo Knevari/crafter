@@ -23,7 +23,6 @@ export enum EntityType {
   SLIME_GREEN,
   SKELETON,
   AXE,
-  ITEM_AXE,
 }
 
 export type DropItem = {
@@ -67,6 +66,5 @@ export interface Entity {
   drops: DropItem[];
   dimensions: Dimensions;
   behaviors?: string[];
-  inInventory?: boolean;
   data: Record<string, any>;
 }

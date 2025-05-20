@@ -13,8 +13,6 @@ export class EntityRenderer {
     const healthBarWidth =
       maxHealthBarWidth * (entity.health.current / (entity.health.max ?? 1));
 
-    const entityHeight = entity.dimensions.height * TILE_SIZE;
-
     const healthBarX =
       entity.position.x +
       (entity.dimensions.width * TILE_SIZE) / 2 -
@@ -47,13 +45,13 @@ export class EntityRenderer {
       const entity = gameState.entities[i];
       const sourceTileSize = ENTITY_DEFINITIONS[entity.type].tileSize ?? 16;
 
-      if (entity.data.hidden || entity.inInventory) {
+      if (entity.data.hidden || entity.data.inventory) {
         continue;
       }
 
       if (entity.animator) {
         DrawHelper.drawAnimatedEntity(ctx, entity, sourceTileSize);
-      } else if (entity.sprite && !entity.inInventory) {
+      } else if (entity.sprite && !entity.data.inventory) {
         DrawHelper.drawEntity(ctx, entity, sourceTileSize);
       }
 

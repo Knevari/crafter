@@ -24,8 +24,6 @@ engine.canvas.height = window.innerHeight;
 gameState.camera.dimensions.width = engine.canvas.width;
 gameState.camera.dimensions.height = engine.canvas.height;
 
-const ui = new UI();
-
 async function main() {
   try {
     await loadAssets();
@@ -33,6 +31,7 @@ async function main() {
     throw new Error("Unable to load assets, verify if files exist");
   }
 
+  UI.render();
   createChunk(0, 0);
   generateChunksAround(
     gameState.player.position.x,
@@ -46,8 +45,10 @@ async function main() {
 
   resetCamera();
 
-  saveGameIntoLocalStorage(gameState);
-  // gameState.player.health.current = 5;
+  // saveGameIntoLocalStorage(gameState);
+  gameState.player.health.current = 8;
+  UI.healthBar.update();
+
   requestAnimationFrame(update);
 }
 
@@ -70,11 +71,11 @@ function update(now: number) {
   }
 
   // chunks
-  generateChunksAround(
-    gameState.player.position.x,
-    gameState.player.position.y,
-  );
-  disposeOfDistantChunks();
+  // generateChunksAround(
+  //   gameState.player.position.x,
+  //   gameState.player.position.y,
+  // );
+  // disposeOfDistantChunks();
 
   // update stuff
   updatePlayer(deltaTime);
@@ -85,7 +86,6 @@ function update(now: number) {
 
   // draw stuff
   engine.renderer.draw();
-  ui.render();
 
   requestAnimationFrame(update);
 }
@@ -136,15 +136,17 @@ function spawnDebugStuff() {
     1,
   );
   createEntity(
-    EntityType.ITEM_AXE,
+    EntityType.AXE,
     gameState.player.position.x - 200,
     gameState.player.position.y,
-    1,
-    1,
+    0.7,
+    0.7,
   );
 }
 
 // @ts-ignore
 window.saveProgress = () => saveGameIntoLocalStorage(gameState);
 // @ts-ignore
-window.resetProgress = () => localStorage.removeItem("save");
+window.resetProgress = () => {
+  localStorage.removeItem("save");
+};

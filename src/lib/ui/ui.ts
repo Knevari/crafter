@@ -6,22 +6,17 @@ interface BaseUIUpdater {
 }
 
 export class UI {
-  healthBar: BaseUIUpdater;
-  inventory: BaseUIUpdater;
+  static healthBar: BaseUIUpdater = createHealthBar();
+  static inventory: BaseUIUpdater = createInventory();
 
-  constructor() {
-    this.healthBar = createHealthBar();
-    this.inventory = createInventory();
-
-    const uiWrapper = document.querySelector("#ui") as HTMLDivElement;
-
-    uiWrapper.onclick = (event: MouseEvent) => {
-      event.preventDefault();
-    };
-  }
-
-  render() {
+  static render() {
     this.healthBar.update();
     this.inventory.update();
   }
 }
+
+const uiWrapper = document.querySelector("#ui") as HTMLDivElement;
+
+uiWrapper.onclick = (event: MouseEvent) => {
+  event.preventDefault();
+};
