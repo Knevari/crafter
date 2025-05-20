@@ -2,6 +2,7 @@ import { getChunkTopLeftCorner } from "../chunks";
 import {
   CHUNK_SIZE,
   CHUNK_SIZE_IN_PIXELS,
+  ENTITY_VISIBILITY_RANGE,
   ITEM_PICKUP_RANGE,
   PLAYER_RANGE,
   PLAYER_SIZE,
@@ -149,6 +150,19 @@ export class DebugRenderer {
         );
       }
 
+      if (entity.behaviors?.includes("follow-player")) {
+        ctx.strokeStyle = "yellow";
+        ctx.beginPath();
+        ctx.arc(
+          entityCenterX - gameState.camera.position.x,
+          entityCenterY - gameState.camera.position.y,
+          ENTITY_VISIBILITY_RANGE * TILE_SIZE,
+          0,
+          Math.PI * 2,
+        );
+        ctx.closePath();
+        ctx.stroke();
+      }
       ctx.restore();
     }
   }

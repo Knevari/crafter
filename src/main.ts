@@ -16,12 +16,15 @@ import { spawnPlayer, updatePlayer } from "./lib/player";
 import { engine } from "./lib/engine";
 import { gameState, saveGameIntoLocalStorage } from "./lib/game-state";
 import { EntityType } from "./lib/types";
+import { UI } from "./lib/ui";
 
 engine.canvas.width = window.innerWidth;
 engine.canvas.height = window.innerHeight;
 
 gameState.camera.dimensions.width = engine.canvas.width;
 gameState.camera.dimensions.height = engine.canvas.height;
+
+const ui = new UI();
 
 async function main() {
   try {
@@ -40,6 +43,7 @@ async function main() {
 
   resetCamera();
 
+  // gameState.player.health.current = 5;
   requestAnimationFrame(update);
 }
 
@@ -77,6 +81,7 @@ function update(now: number) {
 
   // draw stuff
   engine.renderer.draw();
+  ui.render();
 
   requestAnimationFrame(update);
 }
@@ -87,7 +92,7 @@ function spawnDebugStuff() {
   createEntity(
     EntityType.PIG,
     gameState.player.position.x,
-    gameState.player.position.y,
+    gameState.player.position.y - 600,
     1,
     1,
   );

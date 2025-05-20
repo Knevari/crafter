@@ -31,7 +31,7 @@ export class Renderer {
         this.debugRenderer.draw(this.ctx);
       }
 
-      this.uiRenderer.draw(this.ctx);
+      // this.uiRenderer.draw(this.ctx);
     }
   }
 }

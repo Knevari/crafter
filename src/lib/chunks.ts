@@ -141,7 +141,7 @@ export function generateChunksAround(screenX: number, screenY: number) {
     if (!(neighborKey in gameState.chunks)) {
       const [newChunkX, newChunkY] = getChunkPositionFromKey(neighborKey);
       createChunk(newChunkX, newChunkY);
-      // spawnChunkEntities(neighborKey);
+      spawnChunkEntities(neighborKey);
     }
   }
 }

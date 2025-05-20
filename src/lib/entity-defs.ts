@@ -34,18 +34,19 @@ export const ENTITY_DEFINITIONS: Record<number, EntityDefinition> = {
     drops: [],
   },
   [EntityType.ROCK]: {
-    sprite: { sourceX: 9, sourceY: 7, sourceW: 1, sourceH: 1 },
+    sprite: { sourceX: 0, sourceY: 3, sourceW: 1, sourceH: 1 },
     collisionBox: { xPercentage: 0.8, yPercentage: 0.8 },
     behaviors: [],
     health: { current: 1, max: 1 },
     drops: () => [{ type: EntityType.ITEM_ROCK, quantity: rand(1, 5) }],
+    tileSize: 16,
   },
   [EntityType.ITEM_ROCK]: {
     sprite: { sourceX: 0, sourceY: 4, sourceW: 1, sourceH: 1 },
     collisionBox: { xPercentage: 0.8, yPercentage: 0.8 },
     behaviors: [],
     health: { current: 1, max: 1 },
-    drops: () => [{ type: EntityType.ITEM_ROCK, quantity: rand(1, 5) }],
+    drops: [],
   },
   [EntityType.PIG]: {
     sprite: { sourceX: 0, sourceY: 0, sourceW: 1, sourceH: 1 },

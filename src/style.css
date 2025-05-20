@@ -1,3 +1,10 @@
+* {
+  font-family: "Underdog", system-ui;
+  font-weight: 400;
+  font-style: normal;
+  box-sizing: border-box;
+}
+
 html,
 body {
   display: grid;
@@ -7,4 +14,86 @@ body {
   overflow: hidden;
   margin: 0;
   padding: 0;
+}
+
+#ui {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.health-bar {
+  display: grid;
+  place-items: center;
+  color: white;
+  font-weight: 600;
+  height: 100%;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    #f74d4d,
+    #f74d4d 20px,
+    #f26666 20px,
+    #f26666 40px
+  );
+}
+
+.health-bar-wrapper {
+  position: absolute;
+  bottom: 48px;
+  left: 48px;
+  height: 40px;
+  width: 300px;
+  border-radius: 8px;
+  border: 2px solid white;
+  overflow: hidden;
+}
+
+.inventory-wrapper {
+  position: absolute;
+  bottom: 98px;
+  left: 48px;
+  height: 60px;
+  width: 300px;
+  background-color: #e5d6bb;
+  border: 2px solid #b6a076;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  padding: 8px;
+  gap: 8px;
+  filter: drop-shadow: 0 0 2px rgba(0, 0, 0, 0.04);
+}
+
+.inventory-item {
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  background-color: #b6a076;
+  height: 100%;
+  width: 60px;
+  border-radius: 4px;
+  transition: scale .1s ease-out;
+  position: relative;
+}
+
+.inventory-item-amount {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateX(25%);
+  color: white;
+  background-color: #131313;
+  font-size: 12px;
+  padding-inline: 6px;
+  padding-block: 2px;
+  border-radius: 4px;
+}
+
+.inventory-item:hover {
+  scale: 1.1;
 }

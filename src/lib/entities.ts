@@ -193,7 +193,7 @@ export function spawnChunkEntities(chunkKey: ChunkKey) {
 
       const n = scaledLocalNoise(tileX / 32, tileY / 32);
 
-      if (n < 0.02) {
+      if (n < 0.1) {
         if (canPlaceEntity(entityWorldX, entityWorldY, 1, 1)) {
           createEntity(EntityType.ROCK, entityWorldX, entityWorldY, 1, 1);
         }

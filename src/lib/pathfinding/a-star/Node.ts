@@ -72,7 +72,7 @@ export class Node {
         path.push(current.position);
       }
     }
-    return path;
+    return path.reverse();
   }
 
   getNeighbors(criteria: (n: Node) => boolean): Node[] {
