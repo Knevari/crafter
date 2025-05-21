@@ -1,4 +1,4 @@
-import type { Component } from "../ecs";
+import type { Component } from "./component";
 
 export interface PositionComponent extends Component {
   x: number;

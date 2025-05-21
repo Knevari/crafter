@@ -20,7 +20,9 @@ import { EntityType } from "./lib/types";
 import { UI } from "./lib/ui";
 import { callSouzaSystem, callUpdateSouzaSystem } from "./souza/test";
 
+callSouzaSystem(gameState.player);
 
+  
 engine.canvas.width = window.innerWidth;
 engine.canvas.height = window.innerHeight;
 
@@ -42,7 +44,7 @@ async function main() {
     gameState.player.position.y,
   );
 
-  callSouzaSystem(gameState.player)
+
   if (!gameState.loadedFromStorage) {
     spawnPlayer();
     spawnDebugStuff();

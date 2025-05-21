@@ -4,7 +4,6 @@ export interface AnimationFrame {
 }
 
 export interface AnimationClip {
-  name: string;
   frames: AnimationFrame[];
   loop: boolean;
   frameRate: number;

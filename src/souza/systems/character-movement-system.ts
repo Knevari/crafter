@@ -1,10 +1,10 @@
 import { pressedKeys } from "../../lib/input";
 import { mag } from "../../lib/math";
 import { playerCanMoveThere } from "../../lib/player";
-import type { PositionComponent, CharacterMovementComponent } from "../components/component-position";
-import ECSComponents, { ComponentType } from "../ecs";
+import type { PositionComponent, CharacterMovementComponent } from "../types/component-position";
+import type { ECSComponents } from "../ecs-components";
+import { ComponentType } from "../types/component-type";
 import type { System } from "./system";
-
 
 export default function CharacterMovementSystem(): System {
   return {

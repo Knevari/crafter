@@ -1,14 +1,14 @@
-import { AnimatorComparison } from "../types/animator-comparison";
-import { AnimatorParameterType } from "../types/animator-parameter-type";
-import type { AnimatorCondition } from "../types/animator-condition";
-import type { AnimatorParameters } from "../types/animator-parameters";
+import type { stateMachineCondition } from "../types/machine-state";
+import type { ParameterMap, ParameterType } from "../types/state-machine-parameter";
+import { stateMachineComparison } from "../types/machine-state"; 
 
 export function checkTransitionConditions(
-  conditions: AnimatorCondition[],
-  parameters: AnimatorParameters
+  conditions: stateMachineCondition[],
+  parameters: ParameterMap
 ): boolean {
-  return conditions.every((condition) => {
+  return conditions.every(condition => {
     const { parameter, type, comparison, value } = condition;
+    condition.type
 
     const paramValue = getParameterValue(parameters, type, parameter);
     if (paramValue === undefined) return false;
@@ -18,35 +18,29 @@ export function checkTransitionConditions(
 }
 
 function getParameterValue(
-  parameters: AnimatorParameters,
-  type: AnimatorParameterType,
+  parameters: ParameterMap,
+  type: ParameterType,
   key: string
 ): boolean | number | undefined {
-  switch (type) {
-    case AnimatorParameterType.BOOL:
-      return parameters.bools[key];
-    case AnimatorParameterType.FLOAT:
-      return parameters.floats[key];
-    case AnimatorParameterType.INT:
-      return parameters.ints[key];
-    default:
-      return undefined;
-  }
+  const param = parameters[key];
+  if (!param) return undefined;
+  if (param.type !== type) return undefined;
+  return param.value;
 }
 
 function evaluateComparison(
   paramValue: boolean | number,
-  comparison: AnimatorComparison,
+  comparison: stateMachineComparison,
   targetValue: boolean | number
 ): boolean {
   switch (comparison) {
-    case AnimatorComparison.EQUAL:
+    case stateMachineComparison.EQUAL:
       return paramValue === targetValue;
-    case AnimatorComparison.NOTEQUAL:
+    case stateMachineComparison.NOTEQUAL:
       return paramValue !== targetValue;
-    case AnimatorComparison.GREATER:
+    case stateMachineComparison.GREATER:
       return (paramValue as number) > (targetValue as number);
-    case AnimatorComparison.LESSOREQUAL:
+    case stateMachineComparison.LESSOREQUAL:
       return (paramValue as number) <= (targetValue as number);
     default:
       return false;

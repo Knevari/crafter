@@ -1,40 +1,8 @@
 import type { BaseEntity } from "../lib/types";
-import type { System } from "./systems/system";
+import type { Component } from "./types/component";
+import type { ComponentType } from "./types/component-type";
 
-export interface Component {
-  id?: string;
-  entityId?: BaseEntity;
-}
-
-export enum ComponentType {
-  Animator = "AnimatorComponent",
-  Controller = "AnimatorController",
-  Position = "PositionComponent",
-  CharacterMovement = "CharacterMovementComponent",
-  StaticSprite = "StaticSpriteComponent"
-
-}
-
-export class ECSSystems {
-  private systems: System[] = [];
-  private components: ECSComponents;
-
-  constructor(components: ECSComponents) {
-    this.components = components;
-  }
-
-  addSystem(system: System): void {
-    this.systems.push(system);
-  }
-
-  update(deltaTime: number): void {
-    for (const system of this.systems) {
-      system.update?.(this.components, deltaTime);
-    }
-  }
-}
-
-export default class ECSComponents {
+export class ECSComponents {
   private components: Map<string, Map<BaseEntity, Component>>;
 
   constructor() {

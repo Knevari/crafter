@@ -1,6 +1,8 @@
-import ECSComponents, { ComponentType } from "../ecs";
-import type { AnimatorComponent } from "../types/animator";
-import type { AnimatorControllerComponent } from "../types/animator-controler";
+import type { ECSComponents } from "../ecs-components";
+import { animatorControllerManager } from "../managers/animator-controler-manager";
+import { spriteSheetManager } from "../managers/sprite-sheet-manager";
+import type { AnimatorComponent, AnimatorController } from "../types/animator";
+import { ComponentType } from "../types/component-type";
 import type { System } from "./system";
 
 export default function AnimatorSystem(): System {
@@ -9,26 +11,18 @@ export default function AnimatorSystem(): System {
       const animators = ecs.getComponentsByType<AnimatorComponent>(ComponentType.Animator);
 
       for (const animator of animators) {
-        if (!animator.playing) continue;
+        const controler = animatorControllerManager.get(animator.controllerId);
+        if (!controler) continue;
 
-        const controller = ecs.getComponent<AnimatorControllerComponent>(
-          { id: animator.controllerEntityId },
-          ComponentType.Controller
-        );
-        if (!controller) continue;
+        const animations = animator.animations;
+        const currentAnim = animations[animator.currentAnimation];
+        if (!currentAnim) continue;
 
-        const currentState = controller.stateMachine.states[controller.stateMachine.currentState];
-        const animation = animator.animations[currentState.animation];
-        animator.time += deltaTime;
+  
 
-        const frame = animation.frames[animator.currentFrameIndex];
-        if (animator.time >= (frame.duration ?? 0)) {
-          animator.time = 0;
-          animator.currentFrameIndex = (animator.currentFrameIndex + 1) % animation.frames.length;
-        }
       }
+
     }
   }
-
 };
 
