@@ -1,4 +1,4 @@
-import type { AnimatorParameters } from "../types/animator/animator-parameters";
+import type { AnimatorParameters } from "../types/animator-parameters";
 
 export class AnimatorParameterError extends Error {
   constructor(message: string) {

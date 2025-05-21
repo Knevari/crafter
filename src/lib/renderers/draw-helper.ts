@@ -127,6 +127,7 @@ export class DrawHelper {
       ];
 
     const sx = entity.animator.frame * tileSize;
+    if(!anim) return;
     const sy = anim.row * tileSize;
 
     const animationDirection =

@@ -1,11 +1,14 @@
 export interface AnimationFrame {
-  spriteIndex: number;
+  spriteName: string;
   duration?: number;
 }
 
-export interface SpriteAnimation {
+export interface AnimationClip {
   name: string;
   frames: AnimationFrame[];
   loop: boolean;
   frameRate: number;
 }
+
+
+export type Animations = Record<string, AnimationClip>;

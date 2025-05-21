@@ -1,7 +1,7 @@
-import { AnimatorComparison } from "../types/animator/animator-comparison";
-import { AnimatorParameterType } from "../types/animator/animator-parameter-type";
-import type { AnimatorCondition } from "../types/animator/animator-condition";
-import type { AnimatorParameters } from "../types/animator/animator-parameters";
+import { AnimatorComparison } from "../types/animator-comparison";
+import { AnimatorParameterType } from "../types/animator-parameter-type";
+import type { AnimatorCondition } from "../types/animator-condition";
+import type { AnimatorParameters } from "../types/animator-parameters";
 
 export function checkTransitionConditions(
   conditions: AnimatorCondition[],

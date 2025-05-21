@@ -18,6 +18,8 @@ import { engine } from "./lib/engine";
 import { gameState, saveGameIntoLocalStorage } from "./lib/game-state";
 import { EntityType } from "./lib/types";
 import { UI } from "./lib/ui";
+import { callSouzaSystem, callUpdateSouzaSystem } from "./souza/test";
+
 
 engine.canvas.width = window.innerWidth;
 engine.canvas.height = window.innerHeight;
@@ -40,6 +42,7 @@ async function main() {
     gameState.player.position.y,
   );
 
+  callSouzaSystem(gameState.player)
   if (!gameState.loadedFromStorage) {
     spawnPlayer();
     spawnDebugStuff();
@@ -75,15 +78,19 @@ function update(now: number) {
   // disposeOfDistantChunks();
 
   // update stuff
-  updatePlayer(deltaTime);
+
+
+
   updateCamera(deltaTime);
   updateEntities(deltaTime);
   updateDroppedItems(deltaTime);
   cullDistantEntities();
 
+  updatePlayer(deltaTime)
+
   // draw stuff
   engine.renderer.draw();
-
+  callUpdateSouzaSystem(deltaTime);
   requestAnimationFrame(update);
 }
 

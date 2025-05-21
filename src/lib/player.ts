@@ -136,7 +136,7 @@ export function updatePlayer(deltaTime: number) {
   updateAnimator(gameState.player.animator, deltaTime);
 }
 
-function playerCanMoveThere(worldX: number, worldY: number) {
+export function playerCanMoveThere(worldX: number, worldY: number) {
   const chunk = getChunkFromWorldPosition(worldX, worldY);
 
   if (!chunk) return false;
