@@ -1,24 +1,54 @@
-import { AnimatorComparison, type AnimatorCondition } from "../state-machine";
-import { AnimatorParameterType, type AnimatorParametersComponent } from "../types/animator-parameters";
+import { AnimatorComparison } from "../types/animator/animator-comparison";
+import { AnimatorParameterType } from "../types/animator/animator-parameter-type";
+import type { AnimatorCondition } from "../types/animator/animator-condition";
+import type { AnimatorParameters } from "../types/animator/animator-parameters";
 
-export function checkTransitionConditions(conditions: AnimatorCondition[], parameters: AnimatorParametersComponent): boolean {
-  return conditions.every(cond => {
-    switch (cond.type) {
-      case AnimatorParameterType.BOOL:
-        return compare(parameters.bools[cond.parameter], cond.comparison, cond.value);
-      case AnimatorParameterType.FLOAT:
-        return compare(parameters.floats[cond.parameter], cond.comparison, cond.value);
-      case AnimatorParameterType.INT:
-        return compare(parameters.ints[cond.parameter], cond.comparison, cond.value);
-    }
+export function checkTransitionConditions(
+  conditions: AnimatorCondition[],
+  parameters: AnimatorParameters
+): boolean {
+  return conditions.every((condition) => {
+    const { parameter, type, comparison, value } = condition;
+
+    const paramValue = getParameterValue(parameters, type, parameter);
+    if (paramValue === undefined) return false;
+
+    return evaluateComparison(paramValue, comparison, value);
   });
 }
 
-function compare(paramValue: boolean | number, comparison: AnimatorComparison, targetValue: boolean | number): boolean {
+function getParameterValue(
+  parameters: AnimatorParameters,
+  type: AnimatorParameterType,
+  key: string
+): boolean | number | undefined {
+  switch (type) {
+    case AnimatorParameterType.BOOL:
+      return parameters.bools[key];
+    case AnimatorParameterType.FLOAT:
+      return parameters.floats[key];
+    case AnimatorParameterType.INT:
+      return parameters.ints[key];
+    default:
+      return undefined;
+  }
+}
+
+function evaluateComparison(
+  paramValue: boolean | number,
+  comparison: AnimatorComparison,
+  targetValue: boolean | number
+): boolean {
   switch (comparison) {
-    case AnimatorComparison.EQUAL: return paramValue === targetValue;
-    case AnimatorComparison.NOTEQUAL: return paramValue !== targetValue;
-    case AnimatorComparison.GREATER: return (paramValue as number) > (targetValue as number);
-    case AnimatorComparison.LESSOREQUAL: return (paramValue as number) <= (targetValue as number);
+    case AnimatorComparison.EQUAL:
+      return paramValue === targetValue;
+    case AnimatorComparison.NOTEQUAL:
+      return paramValue !== targetValue;
+    case AnimatorComparison.GREATER:
+      return (paramValue as number) > (targetValue as number);
+    case AnimatorComparison.LESSOREQUAL:
+      return (paramValue as number) <= (targetValue as number);
+    default:
+      return false;
   }
 }

@@ -9,12 +9,3 @@ export interface SpriteAnimation {
   loop: boolean;
   frameRate: number;
 }
-
-
-export interface AnimatorComponent {
-  currentAnimation: string;
-  currentFrameIndex: number;
-  time: number;
-  playing: boolean;
-  animations: Record<string, SpriteAnimation>;
-}
