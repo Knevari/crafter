@@ -55,8 +55,11 @@ export type InventoryItem = {
   entity: Entity;
 };
 
-export interface Entity {
-  id: string;
+export interface BaseEntity {
+id: string;
+}
+
+export interface Entity extends BaseEntity {
   type: EntityType;
   sprite: Sprite | null;
   position: Position;
