@@ -24,6 +24,7 @@ type EntityDataMap = {
   [EntityType.SLIME_GREEN]: {};
   [EntityType.SKELETON]: {};
   [EntityType.PLAYER]: {};
+  [EntityType.CRAFTING_TABLE]: {};
   [EntityType.AXE]: WeaponEntityData;
 };
 
@@ -159,6 +160,14 @@ export const ENTITY_DEFINITIONS = Object.fromEntries([
       extraDamageTo: [EntityType.TREE],
       item: true,
     },
+    drops: [],
+  }),
+  defineEntity(EntityType.CRAFTING_TABLE, {
+    sprite: { sourceX: 9, sourceY: 4, sourceW: 1, sourceH: 1 },
+    collisionBox: { xPercentage: 0.8, yPercentage: 0.8 },
+    behaviors: [],
+    health: { current: 1, max: 1 },
+    data: {},
     drops: [],
   }),
 ]) as Record<EntityType, EntityDefinition<EntityType>>;

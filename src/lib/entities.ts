@@ -12,6 +12,7 @@ import {
   ENTITY_DESPAWN_RANGE,
   ITEM_PICKUP_RANGE,
   PLAYER_RANGE,
+  PLAYER_SIZE,
   SEED,
   TILE_SIZE,
 } from "./constants";
@@ -53,6 +54,9 @@ export function getEntityTypeAsString(type: EntityType) {
     }
     case EntityType.AXE: {
       return "AXE";
+    }
+    case EntityType.CRAFTING_TABLE: {
+      return "CRAFTING_TABLE";
     }
     default: {
       return "UNKNOWN";
@@ -263,6 +267,9 @@ export function getEntityCenter(entity: Entity) {
 }
 
 export function updateEntities(deltaTime: number) {
+  const camera = gameState.camera;
+  const playerPosition = gameState.player.position;
+
   for (const entity of gameState.entities) {
     if (entity.behaviors) {
       for (const behavior of entity.behaviors) {
@@ -276,6 +283,28 @@ export function updateEntities(deltaTime: number) {
 
     if (entity.animator) {
       updateAnimator(entity.animator, deltaTime);
+    }
+
+    if (entity.type === EntityType.CRAFTING_TABLE) {
+      const entityDimensions = entity.dimensions;
+      const [entityCenterX, entityCenterY] = getEntityCenter(entity);
+      const distanceFromPlayer = distance(
+        playerPosition.x,
+        playerPosition.y,
+        entityCenterX,
+        entityCenterY,
+      );
+
+      UI.text.openCraftingTable.setPosition(
+        entityCenterX - camera.position.x,
+        entityCenterY - camera.position.y - entityDimensions.height * TILE_SIZE,
+      );
+
+      if (distanceFromPlayer < PLAYER_RANGE * TILE_SIZE) {
+        UI.text.openCraftingTable.fadeIn();
+      } else {
+        UI.text.openCraftingTable.fadeOut();
+      }
     }
   }
 

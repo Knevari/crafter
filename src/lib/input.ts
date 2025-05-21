@@ -4,6 +4,7 @@ import { getEntityAtWorldPosition, handleEntityClick } from "./entities";
 import { gameState, saveGameIntoLocalStorage } from "./game-state";
 import { distance } from "./math";
 import type { Direction } from "./types";
+import { UI } from "./ui";
 import { isColliding } from "./utils/is-colliding";
 
 export const pressedKeys = new Set();
@@ -16,6 +17,11 @@ document.addEventListener("keydown", (event: KeyboardEvent) => {
   if (event.key === "F5") {
     event.preventDefault();
     saveGameIntoLocalStorage(gameState);
+    UI.text.savedGame.setPosition(130, 24);
+    UI.text.savedGame.fadeIn();
+    setTimeout(() => {
+      UI.text.savedGame.fadeOut();
+    }, 2000);
   }
   if (event.key === "F6") {
     event.preventDefault();

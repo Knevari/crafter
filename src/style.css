@@ -127,3 +127,18 @@ body {
 .inventory-item:active {
   scale: 0.98;
 }
+
+.fade-in-text {
+  position: fixed;
+  color: white;
+  font-size: 24px;
+  opacity: 0;
+  transform: translate(-50%, 50%);
+  transition:
+    transform 0.5s ease-in,
+    opacity 0.6s ease-in-out;
+  &.active {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+}

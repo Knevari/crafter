@@ -32,6 +32,7 @@ async function main() {
   }
 
   UI.render();
+
   createChunk(0, 0);
   generateChunksAround(
     gameState.player.position.x,
@@ -44,11 +45,6 @@ async function main() {
   }
 
   resetCamera();
-
-  // saveGameIntoLocalStorage(gameState);
-  gameState.player.health.current = 8;
-  UI.healthBar.update();
-
   requestAnimationFrame(update);
 }
 
@@ -93,53 +89,14 @@ function update(now: number) {
 main();
 
 function spawnDebugStuff() {
-  createEntity(
-    EntityType.PIG,
-    gameState.player.position.x,
-    gameState.player.position.y - 600,
-    1,
-    1,
-  );
-  createEntity(
-    EntityType.TREE,
-    gameState.player.position.x - 500,
-    gameState.player.position.y - 200,
-    4,
-    5,
-  );
-  createEntity(
-    EntityType.ROCK,
-    gameState.player.position.x - 200,
-    gameState.player.position.y - 200,
-    1,
-    1,
-  );
-  createEntity(
-    EntityType.SLIME,
-    gameState.player.position.x - 300,
-    gameState.player.position.y - 200,
-    1,
-    1,
-  );
-  createEntity(
-    EntityType.SLIME_GREEN,
-    gameState.player.position.x - 300,
-    gameState.player.position.y - 150,
-    1,
-    1,
-  );
-  createEntity(
-    EntityType.SKELETON,
-    gameState.player.position.x - 150,
-    gameState.player.position.y - 150,
-    1,
-    1,
-  );
-  createEntity(
-    EntityType.AXE,
-    gameState.player.position.x - 200,
-    gameState.player.position.y,
-    0.7,
-    0.7,
-  );
+  const refX = gameState.player.position.x;
+  const refY = gameState.player.position.y;
+  createEntity(EntityType.PIG, refX, refY - 600, 1, 1);
+  createEntity(EntityType.TREE, refX - 500, refX - 200, 4, 5);
+  createEntity(EntityType.ROCK, refX - 200, refY - 200, 1, 1);
+  createEntity(EntityType.SLIME, refX - 300, refY - 200, 1, 1);
+  createEntity(EntityType.SLIME_GREEN, refX - 300, refY - 150, 1, 1);
+  createEntity(EntityType.SKELETON, refX - 150, refY - 150, 1, 1);
+  createEntity(EntityType.AXE, refX - 200, refY, 0.7, 0.7);
+  createEntity(EntityType.CRAFTING_TABLE, refX + 50, refY + 50, 1, 1);
 }
