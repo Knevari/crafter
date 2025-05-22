@@ -1,13 +1,15 @@
+import type { Sprite } from "./sprite";
+
 export interface AnimationFrame {
-  spriteName: string;
+  sprite: Sprite;
   duration?: number;
 }
 
 export interface AnimationClip {
+  name: string;
   frames: AnimationFrame[];
   loop: boolean;
-  frameRate: number;
+  frameRate: number; 
 }
 
 
-export type Animations = Record<string, AnimationClip>;

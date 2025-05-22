@@ -9,5 +9,5 @@ export interface CharacterControlerComponent extends Component {
   direction: { x: number; y: number };
   speed: number;
   moving: boolean;
-  facing: "up" | "down" | "left" | "right";
+  lastDirection: "side" | "up" | "down" | "left" | "right";
 }

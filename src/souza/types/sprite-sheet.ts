@@ -1,7 +1,7 @@
 import type { Registable } from "../managers/generic-manager";
 import type { Sprite } from "./sprite";
 
-export type SpriteMap = Record<string, Sprite>;
+export type SpriteMap = Record<string, Sprite[]>;
 export interface SpriteSheet extends Registable {
   imageRef: string;
   sprites: SpriteMap;

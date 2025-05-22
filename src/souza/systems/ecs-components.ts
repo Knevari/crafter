@@ -47,7 +47,10 @@ export class ECSComponents {
     return [...result];
   }
 
+  getEntityByComponent(component: Component): BaseEntity | undefined {
 
+    return component.entityId;
+  }
   getEntitiesWithComponent(componentType: ComponentType): BaseEntity[] {
     return [...(this.components.get(componentType)?.keys() ?? [])];
   }

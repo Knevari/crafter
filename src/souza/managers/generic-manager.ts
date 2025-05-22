@@ -9,13 +9,13 @@ export interface Registable {
   itemId: string;
 }
 
-export class Manager<T extends Registable> {
+export class Manager<T> {
   private items = new Map<string, T>();
 
   constructor(private readonly managerName = "Manager") {}
 
-  register(item: T): void {
-    this.items.set(item.itemId, item);
+  register(id: string, item: T): void {
+    this.items.set(id, item);
   }
 
   get(id: string): T {

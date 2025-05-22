@@ -17,9 +17,10 @@ import { engine } from "./lib/engine";
 import { gameState, saveGameIntoLocalStorage } from "./lib/game-state";
 import { EntityType } from "./lib/types";
 import { UI } from "./lib/ui";
-import { callSouzaSystem, callUpdateSouzaSystem } from "./souza/test";
+import {callUpdateSouzaSystem, start } from "./souza/test";
+import Input from "./souza/input/Input";
 
-callSouzaSystem(gameState.player);
+
 
   
 engine.canvas.width = window.innerWidth;
@@ -56,6 +57,7 @@ async function main() {
 let lastUpdatedAt = performance.now();
 let deltaTime = 0;
 
+start();
 function update(now: number) {
   deltaTime = (now - lastUpdatedAt) / 1000;
   lastUpdatedAt = now;
@@ -87,12 +89,21 @@ function update(now: number) {
   updateDroppedItems(deltaTime);
   cullDistantEntities();
 
-  updatePlayer(deltaTime)
+  // updatePlayer(deltaTime)
 
   // draw stuff
   engine.renderer.draw();
-  callUpdateSouzaSystem(deltaTime);
-  requestAnimationFrame(update);
+
+
+Input.start();
+
+console.time("callUpdateSouzaSystem");
+callUpdateSouzaSystem(deltaTime);
+console.timeEnd("callUpdateSouzaSystem");
+
+Input.clearInputs();
+requestAnimationFrame(update);
+
 }
 
 main();

@@ -1,5 +1,4 @@
 import type { ECSComponents } from "./ecs-components";
-import { animationClipManager } from "../managers/manager";
 import type { AnimatorComponent } from "../types/animator";
 import { ComponentType } from "../types/component-type";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
@@ -15,11 +14,8 @@ export default function AnimatorSystem(): System {
 
         const spriteRender = ecs.getComponent<SpriteRenderComponent>(entity, ComponentType.SpriteRender);
         if (!spriteRender) continue;
-
-      
-        animator.time += deltaTime;
-
-        const animationClip = animationClipManager.get(animator.currentAnimation);
+        animator.time += deltaTime * (animator.playbackSpeed ?? 1);
+        const animationClip = animator.currentClip;
         if (!animationClip) continue;
 
         const frameDuration = 1 / animationClip.frameRate;
@@ -31,13 +27,13 @@ export default function AnimatorSystem(): System {
               animator.currentFrameIndex = 0;
             } else {
               animator.currentFrameIndex = animationClip.frames.length - 1; 
-              animator.playing = false;
+              animator.isPlaying = false;
             }
           }
         }
 
         const frame = animationClip.frames[animator.currentFrameIndex];
-        spriteRender.spriteRef = frame.spriteRef;
+        spriteRender.sprite = frame.sprite;
       }
     }
   }
