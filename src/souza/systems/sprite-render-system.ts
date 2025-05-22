@@ -42,15 +42,23 @@ export default function SpriteRenderSystem(ctx: CanvasRenderingContext2D): Syste
           spriteRender.flipVertical ?? false
         );
 
-        Draw.drawWireCircle(
-          ctx,
-          position.x,
-          position.y,
-          sprite.width * (spriteRender.scale ?? 1),
-          sprite.height * (spriteRender.scale ?? 1),
-          'lime',
-          1     
-        );
+        // Draw.drawWireCircle(
+        //   ctx,
+        //   position.x,
+        //   position.y,
+        //   sprite.width * (spriteRender.scale ?? 1),
+        //   sprite.height * (spriteRender.scale ?? 1),
+        //   'lime',
+        //   1
+        // );
+
+        // Draw.drawText(ctx, ecs.getEntityByComponent(spriteRender)?.id ?? "",  position.x, position.y - sprite.height, {
+        //   font: "20px monospace",
+        //   color: "white",
+        //   outlineColor: "black",
+        //   outlineWidth: 2
+        // });
+
 
       }
     },

@@ -1,27 +1,99 @@
-import type { AnimationClip } from "../types/animation";
+import { createEasyAnimationClip, type AnimationClip } from "../types/animation";
 
-export const SLIME_IDLE_CLIP: AnimationClip = {
-  name: "idle",
-  frames: [
-    { sprite: { textureRef: "slime_img", x: 0, y: 0, width: 32, height: 32 } },
-    { sprite: { textureRef: "slime_img", x: 32, y: 0, width: 32, height: 32 } },
-    { sprite: { textureRef: "slime_img", x: 64, y: 0, width: 32, height: 32 } },
-    { sprite: { textureRef: "slime_img", x: 96, y: 0, width: 32, height: 32 } },
-  ],
-  loop: true,
-  frameRate: 12,
-};
+export const SLIME_IDLE_CLIP: AnimationClip = createEasyAnimationClip(
+  "idle",
+  "slime_img",
+  4,
+  0,
+  0,
+  32,
+  32,
+  12,
+   [
+    { offsetX: 16, offsetY: 20, width: 32, height: 30, enabled: true },
+    { offsetX: 16, offsetY: 20, width: 32, height: 30, enabled: true },
+    { offsetX: 16, offsetY: 20, width: 32, height: 30, enabled: true },
+    { offsetX: 16, offsetY: 20, width: 32, height: 30, enabled: true },
+  ]
+);
 
-export const SLIME_MOVE_CLIP: AnimationClip = {
-  name: "move",
-  frames: [
-    { sprite: { textureRef: "slime_img", x: 0, y: 32, width: 32, height: 32 } },
-    { sprite: { textureRef: "slime_img", x: 32, y: 32, width: 32, height: 32 } },
-    { sprite: { textureRef: "slime_img", x: 64, y: 32, width: 32, height: 32 } },
-    { sprite: { textureRef: "slime_img", x: 96, y: 32, width: 32, height: 32 } },
-    { sprite: { textureRef: "slime_img", x: 128, y: 32, width: 32, height: 32 } },
-    { sprite: { textureRef: "slime_img", x: 160, y: 32, width: 32, height: 32 } },
-  ],
-  loop: true,
-  frameRate: 12,
-};
+export const SLIME_MOVE_CLIP: AnimationClip = createEasyAnimationClip(
+  "move",
+  "slime_img",
+  6,
+  0,
+  32,
+  32,
+  32,
+  12,
+  [
+    { offsetX: 16, offsetY: 16, width: 24, height: 24, enabled: true },
+    { offsetX: 16, offsetY: 16, width: 22, height: 22, enabled: true },
+    { offsetX: 16, offsetY: 16, width: 24, height: 24, enabled: true },
+    { offsetX: 16, offsetY: 16, width: 22, height: 22, enabled: true },
+    { offsetX: 16, offsetY: 16, width: 26, height: 26, enabled: true },
+    { offsetX: 16, offsetY: 16, width: 26, height: 26, enabled: true },
+  ]
+);
+
+export const SLIME_DEAD_CLIP: AnimationClip = createEasyAnimationClip(
+  "dead",
+  "slime_img",
+  5,
+  0,
+  64,
+  32,
+  32,
+  12,
+  [
+    { offsetX: 16, offsetY: 16, width: 24, height: 24, enabled: true },
+    { offsetX: 16, offsetY: 16, width: 22, height: 22, enabled: true },
+    { offsetX: 16, offsetY: 16, width: 24, height: 24, enabled: true },
+    { offsetX: 16, offsetY: 16, width: 22, height: 22, enabled: true },
+    { offsetX: 16, offsetY: 16, width: 26, height: 26, enabled: true },
+    { offsetX: 16, offsetY: 16, width: 26, height: 26, enabled: true },
+  ]
+);
+
+
+
+
+
+
+
+
+
+
+
+export const SLIME_GREEN_IDLE_CLIP: AnimationClip = createEasyAnimationClip(
+  "idle",
+  "slimeGreen_img",
+  4,
+  0,
+  0,
+  64,
+  64,
+  12,
+);
+
+export const SLIME_GREEN_MOVE_CLIP: AnimationClip = createEasyAnimationClip(
+  "move",
+  "slimeGreen_img",
+  8,
+  0,
+  64,
+  64,
+  64,
+  12,
+);
+
+export const SLIME_GREEN_DEAD_CLIP: AnimationClip = createEasyAnimationClip(
+  "dead",
+  "slimeGreen_img",
+  8,
+  0,
+  128,
+  64,
+  64,
+  12
+);

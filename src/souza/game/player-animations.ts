@@ -1,106 +1,81 @@
-import type { AnimationClip } from "../types/animation";
+import { createEasyAnimationClip, type AnimationClip } from "../types/animation";
 
-export const PLAYER_WALK_UP_CLIP: AnimationClip = {
-  name: "walk_back",
-  frames: [
-    { sprite: { textureRef: "player_img", x: 0, y: 96, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 32, y: 96, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 64, y: 96, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 96, y: 96, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 128, y: 96, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 160, y: 96, width: 32, height: 32 } },
-  ],
-  loop: true,
-  frameRate: 12,
-};
+export const PLAYER_IDLE_DOWN_CLIP: AnimationClip = createEasyAnimationClip(
+  "idle",
+  "player_img",
+  6,
+  0,
+  0,
+  32,
+  32,
+  12,
+);
 
-export const PLAYER_WALK_DOWN_CLIP: AnimationClip = {
-  name: "walk_front",
-  frames: [
-    { sprite: { textureRef: "player_img", x: 0, y: 160, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 32, y: 160, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 64, y: 160, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 96, y: 160, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 128, y: 160, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 160, y: 160, width: 32, height: 32 } },
-  ],
-  loop: true,
-  frameRate: 12,
-};
 
-export const PLAYER_WALK_SIDE_CLIP: AnimationClip = {
-  name: "walk_side",
-  frames: [
-    { sprite: { textureRef: "player_img", x: 0, y: 128, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 32, y: 128, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 64, y: 128, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 96, y: 128, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 128, y: 128, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 160, y: 128, width: 32, height: 32 } },
-  ],
-  loop: true,
-  frameRate: 12,
-};
 
-export const PLAYER_IDLE_DOWN_CLIP: AnimationClip = {
-  name: "idle",
-  frames: [
-    { sprite: { textureRef: "player_img", x: 0, y: 0, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 32, y: 0, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 64, y: 0, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 96, y: 0, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 128, y: 0, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 160, y: 0, width: 32, height: 32 } },
-  ],
-  loop: true,
-  frameRate: 12,
-};
+export const PLAYER_WALK_UP_CLIP: AnimationClip = createEasyAnimationClip(
+  "walk_back",
+  "player_img",
+  6,
+  0,
+  96,
+  32,
+  32,
+  12,
+);
 
-export const PLAYER_ATTACK_DOWN_CLIP: AnimationClip = {
-  name: "attack_down",
-  frames: [
-    { sprite: { textureRef: "player_img", x: 0, y: 192, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 32, y: 192, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 64, y: 192, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 96, y: 192, width: 32, height: 32 } },
-  ],
-  loop: false,
-  frameRate: 8,
-};
+export const PLAYER_WALK_SIDE_CLIP: AnimationClip = createEasyAnimationClip(
+  "walk_side",
+  "player_img",
+  6,
+  0,
+  128,
+  32,
+  32,
+  12,
+);
 
-export const PLAYER_ATTACK_UP_CLIP: AnimationClip = {
-  name: "attack_up",
-  frames: [
-    { sprite: { textureRef: "player_img", x: 0, y: 256, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 32, y: 256, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 64, y: 256, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 96, y: 256, width: 32, height: 32 } },
-  ],
-  loop: false,
-  frameRate: 8,
-};
+export const PLAYER_WALK_DOWN_CLIP: AnimationClip = createEasyAnimationClip(
+  "walk_front",
+  "player_img",
+  6,
+  0,
+  160,
+  32,
+  32,
+  12,
+);
 
-export const PLAYER_ATTACK_LEFT_CLIP: AnimationClip = {
-  name: "attack_left",
-  frames: [
-    { sprite: { textureRef: "player_img", x: 0, y: 256, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 32, y: 256, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 64, y: 256, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 96, y: 256, width: 32, height: 32 } },
-  ],
-  loop: false,
-  frameRate: 8,
-};
+export const PLAYER_ATTACK_DOWN_CLIP: AnimationClip = createEasyAnimationClip(
+  "attack_down",
+  "player_img",
+  4,
+  0,
+  192,
+  32,
+  32,
+  12
+);
 
-export const PLAYER_ATTACK_SIDE_CLIP: AnimationClip = {
-  name: "attack_side",
-  frames: [
-    { sprite: { textureRef: "player_img", x: 0, y: 224, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 32, y: 224, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 64, y: 224, width: 32, height: 32 } },
-    { sprite: { textureRef: "player_img", x: 96, y: 224, width: 32, height: 32 } },
-  ],
-  loop: false,
-  frameRate: 8,
-};
+export const PLAYER_ATTACK_UP_CLIP: AnimationClip = createEasyAnimationClip(
+  "attack_up",
+  "player_img",
+  4,
+  0,
+  256,
+  32,
+  32,
+  12
+);
+
+export const PLAYER_ATTACK_SIDE_CLIP: AnimationClip = createEasyAnimationClip(
+  "attack_side",
+  "player_img",
+  4,
+  0,
+  224,
+  32,
+  32,
+  12
+);
 

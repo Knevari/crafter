@@ -1,16 +1,7 @@
 import type { Position } from "../../lib/types";
-import {
-  PLAYER_IDLE_DOWN_CLIP,
-  PLAYER_WALK_UP_CLIP,
-  PLAYER_WALK_DOWN_CLIP,
-  PLAYER_WALK_SIDE_CLIP,
-  PLAYER_ATTACK_DOWN_CLIP,
-  PLAYER_ATTACK_SIDE_CLIP,
-  PLAYER_ATTACK_UP_CLIP,
-} from "../game/player-animations";
 import Input from "../input/Input";
 import { KeyCode } from "../input/KeyCode";
-import { setAnimation, type AnimatorComponent } from "../types/animator";
+import { setAnimatorState, type AnimatorComponent } from "../types/animator";
 import type { CharacterControlerComponent, PositionComponent } from "../types/component-position";
 import { ComponentType } from "../types/component-type";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
@@ -74,24 +65,25 @@ export default function CharacterControllerComponent(): System {
         if (Input.getMouseButtonDown(0)) {
           switch (characterControler.lastDirection) {
             case "up":
-              setAnimation(animator, PLAYER_ATTACK_DOWN_CLIP, true);
+              setAnimatorState(animator, "attack_down", true);
               break;
             case "side":
-              setAnimation(animator, PLAYER_ATTACK_SIDE_CLIP, true);
+              setAnimatorState(animator, "attack_side", true);
               break;
             case "down":
             default:
-              setAnimation(animator, PLAYER_ATTACK_UP_CLIP, true);
+              setAnimatorState(animator, "attack_up", true);
               break;
           }
         } else if (dir.x !== 0) {
-          setAnimation(animator, PLAYER_WALK_SIDE_CLIP);
+          animator.controller
+          setAnimatorState(animator, "walk_side");
         } else if (dir.y > 0) {
-          setAnimation(animator, PLAYER_WALK_UP_CLIP);
+          setAnimatorState(animator, "walk_back");
         } else if (dir.y < 0) {
-          setAnimation(animator, PLAYER_WALK_DOWN_CLIP);
+          setAnimatorState(animator, "walk_front");
         } else {
-          setAnimation(animator, PLAYER_IDLE_DOWN_CLIP);
+          setAnimatorState(animator, "idle");
         }
 
       }

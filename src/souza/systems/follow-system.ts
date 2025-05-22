@@ -1,6 +1,5 @@
 import type { BaseEntity } from "../../lib/types";
-import { SLIME_IDLE_CLIP, SLIME_MOVE_CLIP } from "../game/slime_animations";
-import type { AnimatorComponent } from "../types/animator";
+import { setAnimatorState, type AnimatorComponent } from "../types/animator";
 import type { PositionComponent } from "../types/component-position";
 import { ComponentType } from "../types/component-type";
 import type { System } from "../types/system";
@@ -10,10 +9,21 @@ import PositionMath from "../helpers/position-math";
 export default function FollowSystem(
     playerId: BaseEntity,
     enemyIds: BaseEntity[],
-    speed: number,
+    baseSpeed: number,
     followRange: number = 300,
     stopRange: number = 10
 ): System {
+    const speedVariation = new Map<BaseEntity, number>();
+    const jitterVariation = new Map<BaseEntity, number>();
+
+    for (const enemy of enemyIds) {
+        const speedFactor = 1 + (Math.random() * 0.2 - 0.1); 
+        speedVariation.set(enemy, speedFactor);
+
+        const jitterStrength = Math.random() * 0.2;
+        jitterVariation.set(enemy, jitterStrength);
+    }
+
     return {
         update(ecs: ECSComponents, deltaTime: number) {
             const playerPos = ecs.getComponent<PositionComponent>(playerId, ComponentType.Position);
@@ -26,29 +36,32 @@ export default function FollowSystem(
                 const animator = ecs.getComponent<AnimatorComponent>(slimeId, ComponentType.Animator);
                 if (!animator) continue;
 
-
                 const dist = PositionMath.distance(slimePos, playerPos);
 
                 if (dist <= followRange && dist > stopRange) {
-                    const direction = PositionMath.normalize(PositionMath.subtract(playerPos, slimePos));
-                    slimePos.x += direction.x * speed * deltaTime;
-                    slimePos.y += direction.y * speed * deltaTime;
+                    let direction = PositionMath.normalize(PositionMath.subtract(playerPos, slimePos));
 
-                    if (animator.currentClip !== SLIME_MOVE_CLIP) {
-                        animator.currentClip = SLIME_MOVE_CLIP;
-                        animator.currentFrameIndex = 0;
-                        animator.time = 0;
-                        animator.isPlaying = true;
-                    }
-                }
-                else {
+                    const jitterAmount = jitterVariation.get(slimeId) ?? 0;
+                    const jitter = {
+                        x: (Math.random() - 0.5) * jitterAmount,
+                        y: (Math.random() - 0.5) * jitterAmount,
+                    };
 
-                    if (animator.currentClip !== SLIME_IDLE_CLIP) {
-                        animator.currentClip = SLIME_IDLE_CLIP;
-                        animator.currentFrameIndex = 0;
-                        animator.time = 0;
-                        animator.isPlaying = true;
-                    }
+                    direction = PositionMath.normalize({
+                        x: direction.x + jitter.x,
+                        y: direction.y + jitter.y,
+                    });
+
+                    const speedFactor = speedVariation.get(slimeId) ?? 1;
+                    const effectiveSpeed = baseSpeed * speedFactor;
+
+                    slimePos.x += direction.x * effectiveSpeed * deltaTime;
+                    slimePos.y += direction.y * effectiveSpeed * deltaTime;
+
+                    setAnimatorState(animator, "move");
+                } else {
+                    setAnimatorState(animator, "idle");
+                 
                 }
             }
         },

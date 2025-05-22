@@ -34,18 +34,27 @@ export class ECSComponents {
       map.delete(entityId);
     }
   }
-  queryEntitiesWithComponents(...types: ComponentType[]): BaseEntity[] {
-    if (types.length === 0) return [];
+queryEntitiesWithComponents(...types: ComponentType[]): BaseEntity[] {
+  if (types.length === 0) return [];
 
-    let result = new Set(this.getEntitiesWithComponent(types[0]));
+  types.sort((a, b) =>
+    this.getEntitiesWithComponent(a).length - this.getEntitiesWithComponent(b).length
+  );
 
-    for (let i = 1; i < types.length; i++) {
-      const entities = new Set(this.getEntitiesWithComponent(types[i]));
-      result = new Set([...result].filter(e => entities.has(e)));
+  const result = new Set(this.getEntitiesWithComponent(types[0]));
+
+  for (let i = 1; i < types.length; i++) {
+    const entities = this.getEntitiesWithComponent(types[i]);
+    for (const e of result) {
+      if (!entities.includes(e)) {
+        result.delete(e);
+      }
     }
-
-    return [...result];
   }
+
+  return [...result];
+}
+
 
   getEntityByComponent(component: Component): BaseEntity | undefined {
 

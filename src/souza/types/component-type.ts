@@ -4,5 +4,6 @@ export enum ComponentType {
     Controller = "AnimatorController",
     Position = "PositionComponent",
     CharacterControler = "CharacterControlerComponent",
-    SpriteRender = "SpriteRenderComponent"
+    SpriteRender = "SpriteRenderComponent",
+    BoxCollider = "BoxColliderComponent"
 }

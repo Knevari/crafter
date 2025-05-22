@@ -57,7 +57,7 @@ async function main() {
 let lastUpdatedAt = performance.now();
 let deltaTime = 0;
 
-const timeDebug = document.querySelector("#time-debug") as HTMLElement;
+export const timeDebug = document.querySelector("#time-debug") as HTMLElement;
 
 start();
 function update(now: number) {
@@ -103,7 +103,7 @@ function update(now: number) {
   callUpdateSouzaSystem(deltaTime);
   const end = performance.now();
   const elapsed = end - start;
-  timeDebug.textContent = `Tempo: ${elapsed.toFixed(2)} ms z \n Delta: ${deltaTime.toFixed(3)} Fps: ${(1 / deltaTime).toFixed(0)}`;
+ 
 
 
   Input.clearInputs();
