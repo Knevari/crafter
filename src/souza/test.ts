@@ -8,14 +8,15 @@ import { ECSComponents } from "./systems/ecs-components";
 import { ECSSystems } from "./systems/ecs-system";
 import SpriteRenderSystem from "./systems/sprite-render-system";
 import type { AnimatorComponent } from "./types/animator";
+import type { Component } from "./types/component";
 import type { PositionComponent, CharacterControlerComponent } from "./types/component-position";
 import { ComponentType } from "./types/component-type";
 import type { SpriteRenderComponent } from "./types/sprite-render-component";
 import type { System } from "./types/system";
 
 
-const playerEntity: BaseEntity = {id: crypto.randomUUID()}
- const slimeEntity: BaseEntity = {id: crypto.randomUUID()}
+const playerEntity: BaseEntity = {id: "player"}
+ const slimeEntity: BaseEntity = {id: "slime"}
 
 const ecs = new ECSComponents();
 const systems = new ECSSystems(ecs);
@@ -78,12 +79,9 @@ export default function SlimeFollowSystem(
   };
 }
 
-
-
 export function callUpdateSouzaSystem(deltaTime: number) {
   systems.update(deltaTime);
 }
-
 
 function createPlayer() {
    
@@ -122,7 +120,6 @@ function createPlayer() {
 }
 
 function createSlime() {
-  
 
   ecs.addComponent<SpriteRenderComponent>(slimeEntity, ComponentType.SpriteRender, {
     sprite: SLIME_IDLE_CLIP.frames[0].sprite,
@@ -147,8 +144,36 @@ function createSlime() {
 
 
   });
+  
+function mapToObjectWithEntityId(
+  map: Map<string, Map<BaseEntity, Component>>
+): any {
+  const obj: any = {};
+
+  for (const [componentName, entitiesMap] of map) {
+    obj[componentName] = {};
+    for (const [entity, component] of entitiesMap) {
+      const entityId = (entity as any).id ?? entity.toString();
+      obj[componentName][entityId] = component;
+    }
+  }
+
+  return obj;
+}
+
+console.log(JSON.stringify(mapToObjectWithEntityId(ecs.components), null, 2));
+
+
+
+
+
+
+
 }
 export function start() {
   createPlayer();
   createSlime()
 }
+
+
+

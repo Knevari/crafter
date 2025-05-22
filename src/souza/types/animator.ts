@@ -1,5 +1,4 @@
 import type { Registable } from "../managers/generic-manager";
-import { animationClipManager } from "../managers/manager";
 import type { AnimationClip } from "./animation";
 import type { Component } from "./component";
 
@@ -15,8 +14,6 @@ export interface AnimatorComponent extends Component {
   playbackSpeed: number; 
 }
 
-
-
 export interface AnimatorController extends Registable{
   parameters: ParameterMap;
   stateMachine: StateMachine;
@@ -30,13 +27,4 @@ export function setAnimation(animator: AnimatorComponent, animationClip: Animati
   animator.time = 0;
   animator.isPlaying = true; 
   animator.locked = lock;
-}
-
-
-export function setAnimationByName(animator: AnimatorComponent, animationClipName: string) {
-  const clip = animationClipManager.get(animationClipName);
-  if(animator.currentClip === clip) return;
-  animator.currentClip = clip;
-  animator.currentFrameIndex = 0;
-  animator.time = 0;
 }

@@ -3,7 +3,7 @@ import type { Component } from "../types/component";
 import type { ComponentType } from "../types/component-type";
 
 export class ECSComponents {
-  private components: Map<string, Map<BaseEntity, Component>>;
+  public readonly components: Map<string, Map<BaseEntity, Component>>;
 
   constructor() {
     this.components = new Map();

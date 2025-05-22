@@ -14,7 +14,6 @@ export const PLAYER_WALK_UP_CLIP: AnimationClip = {
   frameRate: 12,
 };
 
-
 export const PLAYER_WALK_DOWN_CLIP: AnimationClip = {
   name: "walk_front",
   frames: [
@@ -28,7 +27,6 @@ export const PLAYER_WALK_DOWN_CLIP: AnimationClip = {
   loop: true,
   frameRate: 12,
 };
-
 
 export const PLAYER_WALK_SIDE_CLIP: AnimationClip = {
   name: "walk_side",
@@ -58,8 +56,6 @@ export const PLAYER_IDLE_DOWN_CLIP: AnimationClip = {
   frameRate: 12,
 };
 
-
-
 export const PLAYER_ATTACK_DOWN_CLIP: AnimationClip = {
   name: "attack_down",
   frames: [
@@ -69,11 +65,9 @@ export const PLAYER_ATTACK_DOWN_CLIP: AnimationClip = {
     { sprite: { textureRef: "player_img", x: 96, y: 192, width: 32, height: 32 } },
   ],
   loop: false,
-  frameRate: 10,
+  frameRate: 8,
 };
 
-
-//atack
 export const PLAYER_ATTACK_UP_CLIP: AnimationClip = {
   name: "attack_up",
   frames: [
@@ -83,7 +77,7 @@ export const PLAYER_ATTACK_UP_CLIP: AnimationClip = {
     { sprite: { textureRef: "player_img", x: 96, y: 256, width: 32, height: 32 } },
   ],
   loop: false,
-  frameRate: 10,
+  frameRate: 8,
 };
 
 export const PLAYER_ATTACK_LEFT_CLIP: AnimationClip = {
@@ -95,7 +89,7 @@ export const PLAYER_ATTACK_LEFT_CLIP: AnimationClip = {
     { sprite: { textureRef: "player_img", x: 96, y: 256, width: 32, height: 32 } },
   ],
   loop: false,
-  frameRate: 10,
+  frameRate: 8,
 };
 
 export const PLAYER_ATTACK_SIDE_CLIP: AnimationClip = {
@@ -107,6 +101,6 @@ export const PLAYER_ATTACK_SIDE_CLIP: AnimationClip = {
     { sprite: { textureRef: "player_img", x: 96, y: 224, width: 32, height: 32 } },
   ],
   loop: false,
-  frameRate: 10,
+  frameRate: 8,
 };
 

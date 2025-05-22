@@ -58,8 +58,8 @@ export default function CharacterControllerComponent(): System {
           position.x += dir.x * characterControler.speed * 1.5 * deltaTime;
           position.y += dir.y * characterControler.speed * 1.5 * deltaTime;
         } else {
-                animator.playbackSpeed = 1.0
-           position.x += dir.x * characterControler.speed * deltaTime;
+          animator.playbackSpeed = 1.0
+          position.x += dir.x * characterControler.speed * deltaTime;
           position.y += dir.y * characterControler.speed * deltaTime;
         }
 
