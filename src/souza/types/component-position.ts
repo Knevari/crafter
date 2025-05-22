@@ -5,7 +5,7 @@ export interface PositionComponent extends Component {
   y: number;
 };
 
-export interface CharacterMovementComponent extends Component {
+export interface CharacterControlerComponent extends Component {
   direction: { x: number; y: number };
   speed: number;
   moving: boolean;

@@ -1,6 +1,6 @@
-import type { BaseEntity } from "../lib/types";
-import type { Component } from "./types/component";
-import type { ComponentType } from "./types/component-type";
+import type { BaseEntity } from "../../lib/types";
+import type { Component } from "../types/component";
+import type { ComponentType } from "../types/component-type";
 
 export class ECSComponents {
   private components: Map<string, Map<BaseEntity, Component>>;

@@ -3,6 +3,6 @@ export enum ComponentType {
     AnimatorController = "AnimatorControllerComponent",
     Controller = "AnimatorController",
     Position = "PositionComponent",
-    CharacterMovement = "CharacterMovementComponent",
+    CharacterControler = "CharacterControlerComponent",
     SpriteRender = "SpriteRenderComponent"
 }

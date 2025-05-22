@@ -88,7 +88,5 @@ export function createPlayer(): Player {
       lockedDirection: null,
     },
   };
-
- 
   return player;
 }

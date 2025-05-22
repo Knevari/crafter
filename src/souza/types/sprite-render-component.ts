@@ -2,7 +2,7 @@ import type { Component } from "./component";
 
 export interface SpriteRenderComponent extends Component {
   spriteSheetId: string; 
-  spriteName: string; 
+  spriteRef: string; 
   scale?: number;
   rotation?: number;
   flipHorizontal?: boolean;

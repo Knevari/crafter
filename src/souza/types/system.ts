@@ -1,4 +1,4 @@
-import type { ECSComponents } from "../ecs-components";
+import type { ECSComponents } from "../systems/ecs-components";
 
 export interface System {
     priority?: number,

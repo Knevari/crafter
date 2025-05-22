@@ -1,10 +1,10 @@
-import type { ECSComponents } from "../ecs-components";
+import type { ECSComponents } from "./ecs-components";
+import { spriteSheetManager } from "../managers/manager";
 import { resourceManager } from "../managers/resources-manager";
-import { spriteSheetManager } from "../managers/sprite-sheet-manager";
 import { ComponentType } from "../types/component-type";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
 
-import type { System } from "./system";
+import type { System } from "../types/system";
 
 export default function SpriteRenderSystem(ctx: CanvasRenderingContext2D): System {
   return {
@@ -17,10 +17,10 @@ export default function SpriteRenderSystem(ctx: CanvasRenderingContext2D): Syste
         const spriteSheet = spriteSheetManager.get(spriteRender.spriteSheetId);
         if (!spriteSheet) continue;
 
-        const image = resourceManager.getImage(spriteSheet.imageId);
+        const image = resourceManager.getImage(spriteSheet.imageRef);
         if (!image.complete) continue;
 
-        const sprite = spriteSheet.sprites[spriteRender.spriteName];
+        const sprite = spriteSheet.sprites[spriteRender.spriteRef];
         if (!sprite) continue;
 
         const x = 100;

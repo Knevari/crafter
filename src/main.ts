@@ -1,5 +1,4 @@
 import { loadAssets } from "./lib/assets";
-import "./souza/test";
 import { resetCamera, updateCamera } from "./lib/camera";
 import {
   createChunk,
