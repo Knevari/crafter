@@ -111,6 +111,7 @@ function createPlayer() {
 
   ecs.addComponent<AnimatorComponent>(playerEntity, ComponentType.Animator, {
     playbackSpeed: 1.0,
+    locked: false,
     currentClip: PLAYER_IDLE_DOWN_CLIP,
     isPlaying: true,
     currentFrameIndex: 0,
@@ -138,6 +139,7 @@ function createSlime() {
 
   ecs.addComponent<AnimatorComponent>(slimeEntity, ComponentType.Animator, {
     playbackSpeed: 1.0,
+    locked: false,
     currentClip: SLIME_IDLE_CLIP,
     isPlaying: true,
     currentFrameIndex: 0,

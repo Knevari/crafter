@@ -10,6 +10,7 @@ export interface AnimatorComponent extends Component {
   currentClip: AnimationClip | null;
   isPlaying: boolean;
   time: number;
+  locked: boolean;
   currentFrameIndex: number;
   playbackSpeed: number; 
 }
@@ -21,13 +22,16 @@ export interface AnimatorController extends Registable{
   stateMachine: StateMachine;
 }
 
-export function setAnimation(animator: AnimatorComponent, animationClip: AnimationClip) {
-
-  if(animator.currentClip === animationClip) return;
+export function setAnimation(animator: AnimatorComponent, animationClip: AnimationClip, lock = false) {
+  if (animator.currentClip === animationClip) return;
+  if (animator.locked) return;
   animator.currentClip = animationClip;
   animator.currentFrameIndex = 0;
   animator.time = 0;
+  animator.isPlaying = true; 
+  animator.locked = lock;
 }
+
 
 export function setAnimationByName(animator: AnimatorComponent, animationClipName: string) {
   const clip = animationClipManager.get(animationClipName);

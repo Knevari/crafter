@@ -28,6 +28,7 @@ export default function AnimatorSystem(): System {
             } else {
               animator.currentFrameIndex = animationClip.frames.length - 1; 
               animator.isPlaying = false;
+              animator.locked = false;
             }
           }
         }

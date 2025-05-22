@@ -1,4 +1,3 @@
-import { pressedKeys } from "../../lib/input";
 import type { Position } from "../../lib/types";
 import {
   PLAYER_IDLE_DOWN_CLIP,
@@ -16,6 +15,7 @@ import type { CharacterControlerComponent, PositionComponent } from "../types/co
 import { ComponentType } from "../types/component-type";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
 import type { System } from "../types/system";
+import { normalize } from "./normalize-position";
 
 export default function CharacterControllerComponent(): System {
   return {
@@ -45,12 +45,13 @@ export default function CharacterControllerComponent(): System {
         if (!animator || !spriteRender || !position || !characterControler) continue;
 
 
-        const dir: Position = { x: 0, y: 0 };
+        let dir: Position = { x: 0, y: 0 };
 
         if (Input.getKey(KeyCode.KeyA)) dir.x -= 1;
         if (Input.getKey(KeyCode.KeyD)) dir.x += 1;
         if (Input.getKey(KeyCode.KeyW)) dir.y -= 1;
         if (Input.getKey(KeyCode.KeyS)) dir.y += 1;
+        dir = normalize(dir);
 
         if (Input.getKey(KeyCode.ShiftLeft)) {
           animator.playbackSpeed = 1.5
@@ -62,14 +63,6 @@ export default function CharacterControllerComponent(): System {
           position.y += dir.y * characterControler.speed * deltaTime;
         }
 
-        const length = Math.hypot(dir.x, dir.y);
-        if (length > 0) {
-          dir.x /= length;
-          dir.y /= length;
-        }
-
-
-
         if (dir.x < 0) spriteRender.flipHorizontal = true;
         else if (dir.x > 0) spriteRender.flipHorizontal = false;
 
@@ -78,17 +71,17 @@ export default function CharacterControllerComponent(): System {
         else if (dir.y < 0) characterControler.lastDirection = "down";
 
 
-        if (Input.getMouseButton(0)) {
+        if (Input.getMouseButtonDown(0)) {
           switch (characterControler.lastDirection) {
             case "up":
-              setAnimation(animator, PLAYER_ATTACK_DOWN_CLIP);
+              setAnimation(animator, PLAYER_ATTACK_DOWN_CLIP, true);
               break;
             case "side":
-              setAnimation(animator, PLAYER_ATTACK_SIDE_CLIP);
+              setAnimation(animator, PLAYER_ATTACK_SIDE_CLIP, true);
               break;
             case "down":
             default:
-              setAnimation(animator, PLAYER_ATTACK_UP_CLIP);
+              setAnimation(animator, PLAYER_ATTACK_UP_CLIP, true);
               break;
           }
         } else if (dir.x !== 0) {
