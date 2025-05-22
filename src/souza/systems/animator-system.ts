@@ -1,4 +1,4 @@
-import type { ECSComponents } from "./ecs-components";
+import type { ECSComponents } from "../ecs/ecs-components";
 import type { AnimatorComponent } from "../types/animator";
 import { ComponentType } from "../types/component-type";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
@@ -32,7 +32,6 @@ export default function AnimatorSystem(): System {
             }
           }
         }
-
         const frame = animationClip.frames[animator.currentFrameIndex];
         spriteRender.sprite = frame.sprite;
       }

@@ -17,12 +17,12 @@ import { engine } from "./lib/engine";
 import { gameState, saveGameIntoLocalStorage } from "./lib/game-state";
 import { EntityType } from "./lib/types";
 import { UI } from "./lib/ui";
-import {callUpdateSouzaSystem, start } from "./souza/test";
+import { callUpdateSouzaSystem, start } from "./souza/test";
 import Input from "./souza/input/Input";
 
 
 
-  
+
 engine.canvas.width = window.innerWidth;
 engine.canvas.height = window.innerHeight;
 
@@ -56,6 +56,8 @@ async function main() {
 
 let lastUpdatedAt = performance.now();
 let deltaTime = 0;
+
+const timeDebug = document.querySelector("#time-debug") as HTMLElement;
 
 start();
 function update(now: number) {
@@ -95,14 +97,17 @@ function update(now: number) {
   engine.renderer.draw();
 
 
-Input.start();
+  Input.start();
 
-console.time("callUpdateSouzaSystem");
-callUpdateSouzaSystem(deltaTime);
-console.timeEnd("callUpdateSouzaSystem");
+  const start = performance.now();
+  callUpdateSouzaSystem(deltaTime);
+  const end = performance.now();
+  const elapsed = end - start;
+  timeDebug.textContent = `Tempo: ${elapsed.toFixed(2)} ms z \n Delta: ${deltaTime.toFixed(3)} Fps: ${(1 / deltaTime).toFixed(0)}`;
 
-Input.clearInputs();
-requestAnimationFrame(update);
+
+  Input.clearInputs();
+  requestAnimationFrame(update);
 
 }
 

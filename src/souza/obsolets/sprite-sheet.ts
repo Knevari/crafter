@@ -1,11 +1,11 @@
-import type { Registable } from "../managers/generic-manager";
-import type { Sprite } from "./sprite";
+// import type { Registable } from "../managers/generic-manager";
+// import type { Sprite } from "./sprite";
 
-export type SpriteMap = Record<string, Sprite[]>;
-export interface SpriteSheet extends Registable {
-  imageRef: string;
-  sprites: SpriteMap;
-}
+// export type SpriteMap = Record<string, Sprite[]>;
+// export interface SpriteSheet extends Registable {
+//   imageRef: string;
+//   sprites: SpriteMap;
+// }
 
 // export function getSpriteForFrame(
 //   spriteSheet: SpriteSheet,

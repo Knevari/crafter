@@ -15,7 +15,7 @@ import type { CharacterControlerComponent, PositionComponent } from "../types/co
 import { ComponentType } from "../types/component-type";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
 import type { System } from "../types/system";
-import { normalize } from "./normalize-position";
+import PositionMath from "../helpers/position-math";
 
 export default function CharacterControllerComponent(): System {
   return {
@@ -51,7 +51,7 @@ export default function CharacterControllerComponent(): System {
         if (Input.getKey(KeyCode.KeyD)) dir.x += 1;
         if (Input.getKey(KeyCode.KeyW)) dir.y -= 1;
         if (Input.getKey(KeyCode.KeyS)) dir.y += 1;
-        dir = normalize(dir);
+        dir = PositionMath.normalize(dir);
 
         if (Input.getKey(KeyCode.ShiftLeft)) {
           animator.playbackSpeed = 1.5
