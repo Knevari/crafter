@@ -6,7 +6,7 @@ import { EntityType, Tile } from "./types/";
 
 await resourceManager.loadImages({
   tilemap_img: "/tilemap.png",
-  tree_img: "/Oak_Tree.png",
+  tree_img: "/Oak_Tree_Small.png",
   grass_img: "/Grass_Middle.png",
   water_img: "/Water_Tile.png",
   player_img: "/Player.png",
@@ -15,6 +15,7 @@ await resourceManager.loadImages({
   slime_img: "/Slime.png",
   slimeGreen_img: "/Slime_Green.png",
   skeleton_img: "/Skeleton.png",
+  base: "[Base]BaseChip_pipo.png",
 });
 
 

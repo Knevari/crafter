@@ -50,5 +50,29 @@ export default function CharacterControlerSystem(): System {
 
       }
     },
+
+    onCollisionEnter(ecs, collisionEvent) {
+      if (!collisionEvent) return;
+      const entity = ecs.getEntityByComponent(collisionEvent.b);
+      if (!entity) return;
+      const spriteRender = ecs.getComponent<SpriteRenderComponent>(entity, ComponentType.SpriteRender);
+      if (!spriteRender) return;
+
+      if (collisionEvent.b.collisionGroup === "tree") {
+        spriteRender.alpha = 0.1
+      }
+    },
+
+    onCollisionExit(ecs, collisionEvent) {
+      if (!collisionEvent) return;
+      const entity = ecs.getEntityByComponent(collisionEvent.b);
+      if (!entity) return;
+      const spriteRender = ecs.getComponent<SpriteRenderComponent>(entity, ComponentType.SpriteRender);
+      if (!spriteRender) return;
+
+      if (collisionEvent.b.collisionGroup === "tree") {
+        spriteRender.alpha = 1.0
+      }
+    },
   };
 }

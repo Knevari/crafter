@@ -38,14 +38,15 @@ export default function SpriteRenderSystem(ctx: CanvasRenderingContext2D): Syste
             sprite.height,
             position.x - camera.x,
             position.y - camera.y,
-            spriteRender.color,
+            spriteRender.color ?? " #ffffff" ,
             spriteRender.scale ?? 1,
             spriteRender.rotation ?? 0,
             spriteRender.flipHorizontal ?? false,
-            spriteRender.flipVertical ?? false
+            spriteRender.flipVertical ?? false,
+            spriteRender.alpha ?? 1.0
           );
         } else {
-          Draw.drawFillRect(ctx, position.x - camera.x, position.y - camera.y, spriteRender.scale ?? 8, spriteRender.scale ?? 8, `rgb(${spriteRender.color.r}, ${spriteRender.color.g}, ${spriteRender.color.b})`)
+          Draw.drawFillRect(ctx, position.x - camera.x, position.y - camera.y, spriteRender.scale ?? 8, spriteRender.scale ?? 8, spriteRender.color ?? " #ffffff")
         }
 
       }

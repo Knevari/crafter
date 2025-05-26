@@ -21,17 +21,17 @@ export function createSlime(ecs: ECSComponents, name: string) {
 
   ecs.addComponent<BoxColliderComponent>(entity, ComponentType.BoxCollider, {
     entity: entity,
-    isStatic: true,
     width: 32,
     height: 40,
     offsetX: 16,
     offsetY: 10,
     enabled: true,
+    trigger: true
   });
 
   ecs.addComponent<SpriteRenderComponent>(entity, ComponentType.SpriteRender, {
     entity: entity,
-    color: { r: 255, g: 255, b: 255, a: 1 },
+    color: "white",
     sprite: null,
     scale: 2,
     rotation: 0,

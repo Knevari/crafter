@@ -1,6 +1,6 @@
 import type { BaseEntity } from "../lib/types";
 import Draw from "./helpers/draw-helper";
-import { TREE_SPRITE } from "./sprites/tree-sprite";
+import { TREE_TRUNK_SPRITE } from "./sprites/tree-sprite";
 import type { System } from "./types/system";
 import { ecs } from "./test";
 import type { BoxColliderComponent } from "./types/collider-box";
@@ -9,7 +9,7 @@ import { ComponentType } from "./types/component-type";
 import type { SpriteRenderComponent } from "./types/sprite-render-component";
 import type { PerlinNoise2D } from "./algorithms/perlin-noise-2d/perlin-noise-2d";
 
-export function generateTerrain(
+export function generateTerrainMatrix(
   perlin: PerlinNoise2D,
   width: number,
   height: number,
@@ -55,13 +55,26 @@ function hexToRgb(hex: string) {
   } : null;
 }
 
+export function getColorFromGradient(colors: string[], t: number): string {
+  if (colors.length === 0) return "#000000";
+  if (colors.length === 1) return colors[0];
+
+  t = Math.max(0, Math.min(1, t));
+
+  const total = colors.length - 1;
+  const scaledT = t * total;
+  const index = Math.floor(scaledT);
+  const localT = scaledT - index;
+
+  const colorA = colors[index];
+  const colorB = colors[index + 1] ?? colorA;
+
+  return lerpColor(colorA, colorB, localT);
+}
+
 export function generateTrees(
   terrain: number[][],
-  treeNoise: PerlinNoise2D,
   tileSize: number,
-  scale: number,
-  octaves: number,
-  persistence: number
 ) {
   const height = terrain.length;
   const width = terrain[0].length;
@@ -84,20 +97,15 @@ export function generateTrees(
         ecs.addComponent<SpriteRenderComponent>(entity, ComponentType.SpriteRender, {
           entity,
           enabled: true,
-          color: {r: 255, g: 255, b: 255, a: 1},
-          sprite: null,
-          scale: 2,
+          color: " white",
+          sprite: TREE_TRUNK_SPRITE,
+          scale: 1,
           rotation: 0,
           flipHorizontal: false,
           flipVertical: false,
-          layer: 2
+          layer: 3,
         });
-        // ecs.addComponent<BoxColliderComponent>(entity, ComponentType.BoxCollider, {
-        //   width: 32,
-        //   height: 32,
-        //   entity: entity,
-        //   enabled: true
-        // });
+       
       }
     }
   }

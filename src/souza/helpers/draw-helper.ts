@@ -9,16 +9,22 @@ function drawSprite(
   sourceHeight: number,
   destX: number,
   destY: number,
-  color: Color = { r: 255, g: 255, b: 255, a: 1 },
+  color: string,
   scale = 1,
   rotation = 0,
   flipH = false,
-  flipV = false
+  flipV = false,
+  alpha = 1 
 ) {
   const destWidth = sourceWidth * scale;
   const destHeight = sourceHeight * scale;
 
   ctx.save();
+  ctx.imageSmoothingEnabled = false;
+  ctx.imageSmoothingQuality = "low";
+
+  ctx.globalAlpha = alpha; 
+
   ctx.translate(Math.floor(destX), Math.floor(destY));
   ctx.rotate(rotation);
   ctx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
@@ -34,6 +40,7 @@ function drawSprite(
     destWidth,
     destHeight
   );
+
   ctx.restore();
 }
 

@@ -14,6 +14,11 @@ export class ECSSystems {
     this.systems.push(system);
   }
 
+  callStart(): void {
+    for (const system of this.systems) {
+      system.start?.(this.components);
+    }
+  }
   callFixedUpdate(): void {
     for (const system of this.systems) {
       system.fixedUpdate?.(this.components);
@@ -37,15 +42,25 @@ export class ECSSystems {
       system.render?.(this.components);
     }
   }
-   callDrawGizmos(): void {
+  callDrawGizmos(): void {
     for (const system of this.systems) {
       system.onDrawGizmos?.(this.components);
     }
   }
 
+  callCollisionEnterEvents(collisionEvent: CollisionEvent) {
+     for (const system of this.systems) {
+      system.onCollisionEnter?.(this.components, collisionEvent);
+    }
+  }
   callCollisionStayEvents(collisionEvent: CollisionEvent) {
     for (const system of this.systems) {
-      system.onCollisionStay?.(collisionEvent);
+      system.onCollisionEnter?.(this.components, collisionEvent);
+    }
+  }
+  callCollisionExitEvents(collisionEvent: CollisionEvent) {
+      for (const system of this.systems) {
+      system.onCollisionExit?.(this.components, collisionEvent);
     }
   }
 }

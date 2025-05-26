@@ -12,7 +12,8 @@ export interface SpriteRenderComponent extends Component {
   sprite: Sprite | null; 
   scale?: number;
   rotation?: number;
-  color: Color;
+  color?: string;
+  alpha?: number;
   flipHorizontal?: boolean;
   flipVertical?: boolean;
   layer: number;
