@@ -5,7 +5,7 @@ import { EntityType, Tile } from "./types/";
 
 
 await resourceManager.loadImages({
-  tileset_img: "/tilemap_packed.png",
+  tilemap_img: "/tilemap.png",
   tree_img: "/Oak_Tree.png",
   grass_img: "/Grass_Middle.png",
   water_img: "/Water_Tile.png",

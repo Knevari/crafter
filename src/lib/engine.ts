@@ -7,7 +7,9 @@ import { PlayerRenderer } from "./renderers/player-renderer";
 import { gameState } from "./game-state";
 
 const canvas = document.querySelector("canvas") as HTMLCanvasElement;
+
 const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+ctx.imageSmoothingEnabled = false;
 
 const mapRenderer = new MapRenderer();
 const debugRenderer = new DebugRenderer();

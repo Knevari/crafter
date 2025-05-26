@@ -1,5 +1,7 @@
 export enum ComponentType {
     Animator = "AnimatorComponent",
+    Velocity = "VelocityComponent",
+    Camera = "CameraComponent",
     AnimatorController = "AnimatorControllerComponent",
     Controller = "AnimatorController",
     Position = "PositionComponent",

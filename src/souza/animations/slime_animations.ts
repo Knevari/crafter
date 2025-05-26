@@ -1,6 +1,7 @@
-import { createEasyAnimationClip, type AnimationClip } from "../types/animation";
+import type { AnimationClip } from "../types/animation";
+import { createAnimationClip } from "../types/create-animation-clip";
 
-export const SLIME_IDLE_CLIP: AnimationClip = createEasyAnimationClip(
+export const SLIME_IDLE_CLIP: AnimationClip = createAnimationClip(
   "idle",
   "slime_img",
   4,
@@ -17,7 +18,7 @@ export const SLIME_IDLE_CLIP: AnimationClip = createEasyAnimationClip(
   ]
 );
 
-export const SLIME_MOVE_CLIP: AnimationClip = createEasyAnimationClip(
+export const SLIME_MOVE_CLIP: AnimationClip = createAnimationClip(
   "move",
   "slime_img",
   6,
@@ -36,7 +37,7 @@ export const SLIME_MOVE_CLIP: AnimationClip = createEasyAnimationClip(
   ]
 );
 
-export const SLIME_DEAD_CLIP: AnimationClip = createEasyAnimationClip(
+export const SLIME_DEAD_CLIP: AnimationClip = createAnimationClip(
   "dead",
   "slime_img",
   5,
@@ -65,7 +66,7 @@ export const SLIME_DEAD_CLIP: AnimationClip = createEasyAnimationClip(
 
 
 
-export const SLIME_GREEN_IDLE_CLIP: AnimationClip = createEasyAnimationClip(
+export const SLIME_GREEN_IDLE_CLIP: AnimationClip = createAnimationClip(
   "idle",
   "slimeGreen_img",
   4,
@@ -76,7 +77,7 @@ export const SLIME_GREEN_IDLE_CLIP: AnimationClip = createEasyAnimationClip(
   12,
 );
 
-export const SLIME_GREEN_MOVE_CLIP: AnimationClip = createEasyAnimationClip(
+export const SLIME_GREEN_MOVE_CLIP: AnimationClip = createAnimationClip(
   "move",
   "slimeGreen_img",
   8,
@@ -87,7 +88,7 @@ export const SLIME_GREEN_MOVE_CLIP: AnimationClip = createEasyAnimationClip(
   12,
 );
 
-export const SLIME_GREEN_DEAD_CLIP: AnimationClip = createEasyAnimationClip(
+export const SLIME_GREEN_DEAD_CLIP: AnimationClip = createAnimationClip(
   "dead",
   "slimeGreen_img",
   8,

@@ -3,14 +3,17 @@ import type { AnimatorComponent } from "../types/animator";
 import type { BoxColliderComponent } from "../types/collider-box";
 import { ComponentType } from "../types/component-type";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
-import type { System } from "../types/system";
+import type { System } from "./system";
+import Time from "./time";
 
 export default function AnimatorSystem(): System {
   return {
-    update(ecs: ECSComponents, deltaTime: number) {
+    latedUpdate(ecs: ECSComponents) {
       const animators = ecs.getComponentsByType<AnimatorComponent>(ComponentType.Animator);
-
+      
       for (const animator of animators) {
+        if(!animator.enabled) return;
+        
         const entity = ecs.getEntityByComponent(animator);
         if (!entity) continue;
 
@@ -22,7 +25,7 @@ export default function AnimatorSystem(): System {
         const spriteRender = ecs.getComponent<SpriteRenderComponent>(entity, ComponentType.SpriteRender);
         if (!spriteRender) continue;
 
-        animator.time += deltaTime * (animator.playbackSpeed ?? 1);
+        animator.time += Time.deltaTime * (animator.playbackSpeed ?? 1);
 
         const stateName = controller.currentState;
         if (!stateName) continue;

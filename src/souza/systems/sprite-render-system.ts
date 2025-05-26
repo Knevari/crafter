@@ -1,66 +1,55 @@
-import type { ECSComponents } from "../ecs/ecs-components";
+import Draw from "../helpers/draw-helper";
 import { resourceManager } from "../managers/resources-manager";
+import type { CameraComponent } from "../types/camera";
+import type { PositionComponent } from "../types/component-position";
 import { ComponentType } from "../types/component-type";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
-
-import type { System } from "../types/system";
-import type { PositionComponent } from "../types/component-position";
-import Draw from "../helpers/draw-helper";
+import type { System } from "./system";
 
 export default function SpriteRenderSystem(ctx: CanvasRenderingContext2D): System {
   return {
-    update(ecs: ECSComponents) {
+    render(ecs) {
+
+      const camera = ecs.getSingletonComponent<CameraComponent>(ComponentType.Camera);
+      if (!camera) return;
+
       const spriteRenderers = ecs.getComponentsByType<SpriteRenderComponent>(ComponentType.SpriteRender);
+      spriteRenderers.sort((a, b) => (a.layer ?? 0) - (b.layer ?? 0));
 
       for (const spriteRender of spriteRenderers) {
-        if (!spriteRender) continue;
-
-        const sprite = spriteRender.sprite;
-        if (!sprite) continue;
-
+        if (!spriteRender || !spriteRender.enabled) continue;
         const entity = ecs.getEntityByComponent(spriteRender);
         if (!entity) continue;
-
         const position = ecs.getComponent<PositionComponent>(entity, ComponentType.Position);
         if (!position) continue;
 
-        const image = resourceManager.getImage(sprite.textureRef);
-        if (!image) continue;
+        const sprite = spriteRender.sprite;
+        if (sprite) {
 
-        Draw.drawSprite(
-          ctx,
-          image,
-          sprite.x,
-          sprite.y,
-          sprite.width,
-          sprite.height,
-          position.x,
-          position.y,
-          spriteRender.scale ?? 1,
-          spriteRender.rotation ?? 0,
-          spriteRender.flipHorizontal ?? false,
-          spriteRender.flipVertical ?? false
-        );
+          const image = resourceManager.getImage(sprite.textureRef);
+          if (!image) continue;
 
-        // Draw.drawWireCircle(
-        //   ctx,
-        //   position.x,
-        //   position.y,
-        //   sprite.width * (spriteRender.scale ?? 1),
-        //   sprite.height * (spriteRender.scale ?? 1),
-        //   'lime',
-        //   1
-        // );
-
-        // Draw.drawText(ctx, ecs.getEntityByComponent(spriteRender)?.id ?? "",  position.x, position.y - sprite.height, {
-        //   font: "20px monospace",
-        //   color: "white",
-        //   outlineColor: "black",
-        //   outlineWidth: 2
-        // });
-
+          Draw.drawSprite(
+            ctx,
+            image,
+            sprite.x,
+            sprite.y,
+            sprite.width,
+            sprite.height,
+            position.x - camera.x,
+            position.y - camera.y,
+            spriteRender.color,
+            spriteRender.scale ?? 1,
+            spriteRender.rotation ?? 0,
+            spriteRender.flipHorizontal ?? false,
+            spriteRender.flipVertical ?? false
+          );
+        } else {
+          Draw.drawFillRect(ctx, position.x - camera.x, position.y - camera.y, spriteRender.scale ?? 8, spriteRender.scale ?? 8, `rgb(${spriteRender.color.r}, ${spriteRender.color.g}, ${spriteRender.color.b})`)
+        }
 
       }
     },
+
   };
 }

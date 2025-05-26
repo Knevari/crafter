@@ -4,6 +4,6 @@ export interface BoxColliderComponent extends Component {
   width: number;     
   height: number;     
   offsetX?: number;    
-  offsetY?: number;    
-  enabled?: boolean;  
+  offsetY?: number;  
+  isStatic?: boolean;  
 }

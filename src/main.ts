@@ -17,17 +17,19 @@ import { engine } from "./lib/engine";
 import { gameState, saveGameIntoLocalStorage } from "./lib/game-state";
 import { EntityType } from "./lib/types";
 import { UI } from "./lib/ui";
-import { callUpdateSouzaSystem, start } from "./souza/test";
-import Input from "./souza/input/Input";
-
-
-
+import { app } from "./souza/test";
 
 engine.canvas.width = window.innerWidth;
 engine.canvas.height = window.innerHeight;
 
 gameState.camera.dimensions.width = engine.canvas.width;
 gameState.camera.dimensions.height = engine.canvas.height;
+window.addEventListener("resize", () => {
+  engine.canvas.width = window.innerWidth;
+  engine.canvas.height = window.innerHeight;
+  gameState.camera.dimensions.width = engine.canvas.width;
+  gameState.camera.dimensions.height = engine.canvas.height;
+});
 
 async function main() {
   try {
@@ -51,7 +53,7 @@ async function main() {
   }
 
   resetCamera();
-  requestAnimationFrame(update);
+  // requestAnimationFrame(update);
 }
 
 let lastUpdatedAt = performance.now();
@@ -59,7 +61,7 @@ let deltaTime = 0;
 
 export const timeDebug = document.querySelector("#time-debug") as HTMLElement;
 
-start();
+
 function update(now: number) {
   deltaTime = (now - lastUpdatedAt) / 1000;
   lastUpdatedAt = now;
@@ -91,27 +93,18 @@ function update(now: number) {
   updateDroppedItems(deltaTime);
   cullDistantEntities();
 
-  // updatePlayer(deltaTime)
+  updatePlayer(deltaTime)
 
   // draw stuff
   engine.renderer.draw();
 
 
-  Input.start();
-
-  const start = performance.now();
-  callUpdateSouzaSystem(deltaTime);
-  const end = performance.now();
-  const elapsed = end - start;
- 
-
-
-  Input.clearInputs();
   requestAnimationFrame(update);
 
 }
 
 main();
+app();
 
 function spawnDebugStuff() {
   const refX = gameState.player.position.x;
@@ -124,4 +117,7 @@ function spawnDebugStuff() {
   createEntity(EntityType.SKELETON, refX - 150, refY - 150, 1, 1);
   createEntity(EntityType.AXE, refX - 200, refY, 0.7, 0.7);
   createEntity(EntityType.CRAFTING_TABLE, refX + 50, refY + 50, 1, 1);
+
+
 }
+

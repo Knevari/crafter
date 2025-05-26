@@ -3,17 +3,20 @@ import type { Component } from "../types/component";
 import type { ComponentType } from "../types/component-type";
 
 export class ECSComponents {
+
   public readonly components: Map<string, Map<BaseEntity, Component>>;
+  public readonly singletons: Map<string, Component>;
 
   constructor() {
     this.components = new Map();
+    this.singletons = new Map();
   }
 
   addComponent<T extends Component>(entityId: BaseEntity, componentType: ComponentType, component: T): void {
     if (!this.components.has(componentType)) {
       this.components.set(componentType, new Map());
     }
-    component.entityId = entityId;
+    component.entity = entityId;
     this.components.get(componentType)!.set(entityId, component);
   }
 
@@ -34,32 +37,32 @@ export class ECSComponents {
       map.delete(entityId);
     }
   }
-queryEntitiesWithComponents(...types: ComponentType[]): BaseEntity[] {
-  if (types.length === 0) return [];
 
-  types.sort((a, b) =>
-    this.getEntitiesWithComponent(a).length - this.getEntitiesWithComponent(b).length
-  );
+  queryEntitiesWithComponents(...types: ComponentType[]): BaseEntity[] {
+    if (types.length === 0) return [];
 
-  const result = new Set(this.getEntitiesWithComponent(types[0]));
+    types.sort((a, b) =>
+      this.getEntitiesWithComponent(a).length - this.getEntitiesWithComponent(b).length
+    );
 
-  for (let i = 1; i < types.length; i++) {
-    const entities = this.getEntitiesWithComponent(types[i]);
-    for (const e of result) {
-      if (!entities.includes(e)) {
-        result.delete(e);
+    const result = new Set(this.getEntitiesWithComponent(types[0]));
+
+    for (let i = 1; i < types.length; i++) {
+      const entities = this.getEntitiesWithComponent(types[i]);
+      for (const e of result) {
+        if (!entities.includes(e)) {
+          result.delete(e);
+        }
       }
     }
+
+    return [...result];
   }
-
-  return [...result];
-}
-
 
   getEntityByComponent(component: Component): BaseEntity | undefined {
-
-    return component.entityId;
+    return component.entity;
   }
+
   getEntitiesWithComponent(componentType: ComponentType): BaseEntity[] {
     return [...(this.components.get(componentType)?.keys() ?? [])];
   }
@@ -67,5 +70,22 @@ queryEntitiesWithComponents(...types: ComponentType[]): BaseEntity[] {
   getComponentsByType<T extends Component>(componentType: ComponentType): T[] {
     const map = this.components.get(componentType);
     return map ? [...map.values()] as T[] : [];
+  }
+
+  addSingleton<T extends Component>(componentType: ComponentType, component: T): void {
+    component.entity = undefined;
+    this.singletons.set(componentType, component);
+  }
+
+  getSingletonComponent<T extends Component>(componentType: ComponentType): T | undefined {
+    return this.singletons.get(componentType) as T | undefined;
+  }
+
+  removeSingleton(componentType: ComponentType): void {
+    this.singletons.delete(componentType);
+  }
+
+  hasSingleton(componentType: ComponentType): boolean {
+    return this.singletons.has(componentType);
   }
 }

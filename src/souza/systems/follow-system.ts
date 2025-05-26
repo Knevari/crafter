@@ -2,7 +2,7 @@ import type { BaseEntity } from "../../lib/types";
 import { setAnimatorState, type AnimatorComponent } from "../types/animator";
 import type { PositionComponent } from "../types/component-position";
 import { ComponentType } from "../types/component-type";
-import type { System } from "../types/system";
+import type { System } from "./system";
 import type { ECSComponents } from "../ecs/ecs-components";
 import PositionMath from "../helpers/position-math";
 
@@ -28,6 +28,7 @@ export default function FollowSystem(
         update(ecs: ECSComponents, deltaTime: number) {
             const playerPos = ecs.getComponent<PositionComponent>(playerId, ComponentType.Position);
             if (!playerPos) return;
+            if(!playerPos.enabled) return;
 
             for (const slimeId of enemyIds) {
                 const slimePos = ecs.getComponent<PositionComponent>(slimeId, ComponentType.Position);
