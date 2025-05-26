@@ -4,7 +4,7 @@ import type { PositionComponent } from "../types/component-position";
 import { ComponentType } from "../types/component-type";
 import type { System } from "./system";
 import type { ECSComponents } from "../ecs/ecs-components";
-import PositionMath from "../helpers/position-math";
+import Vec2 from "../helpers/vec2-math";
 
 export default function FollowSystem(
     playerId: BaseEntity,
@@ -37,10 +37,10 @@ export default function FollowSystem(
                 const animator = ecs.getComponent<AnimatorComponent>(slimeId, ComponentType.Animator);
                 if (!animator) continue;
 
-                const dist = PositionMath.distance(slimePos, playerPos);
+                const dist = Vec2.distance(slimePos, playerPos);
 
                 if (dist <= followRange && dist > stopRange) {
-                    let direction = PositionMath.normalize(PositionMath.subtract(playerPos, slimePos));
+                    let direction = Vec2.normalize(Vec2.subtract(playerPos, slimePos));
 
                     const jitterAmount = jitterVariation.get(slimeId) ?? 0;
                     const jitter = {
@@ -48,7 +48,7 @@ export default function FollowSystem(
                         y: (Math.random() - 0.5) * jitterAmount,
                     };
 
-                    direction = PositionMath.normalize({
+                    direction = Vec2.normalize({
                         x: direction.x + jitter.x,
                         y: direction.y + jitter.y,
                     });

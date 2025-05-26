@@ -6,9 +6,15 @@ export interface PositionComponent extends Vector2, Component{
   previousY?: number;
 };
 
+export type CharacterState = "idle" | "walking" | "attacking";
+export type FacingDirection = "up" | "down" | "side";
+
 export interface CharacterControlerComponent extends Component {
-  direction: { x: number; y: number };
+  direction: Vector2;
   speed: number;
+  runSpeed: number;
   moving: boolean;
-  lastDirection: "side" | "up" | "down" | "left" | "right";
+  state: CharacterState;
+  facing: FacingDirection;
 }
+

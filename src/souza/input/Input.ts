@@ -1,7 +1,7 @@
+import type { Vector2 } from "../types/vector2";
 import { KeyCode } from "./KeyCode";
 import KeyInput from "./KeyInput";
 import MouseInput from "./MouseInput";
-import type { Vector3 } from "./vector3";
 
 export default class Input {
     public static start(): void {
@@ -14,11 +14,11 @@ export default class Input {
         MouseInput.clear();
     }
 
-    public static get mousePosition(): Vector3 {
+    public static get mousePosition(): Vector2 {
         return MouseInput.getPosition();
     }
 
-    public static get mouseDelta(): Vector3 {
+    public static get mouseDelta(): Vector2 {
         return MouseInput.getMovement();
     }
 

@@ -1,5 +1,5 @@
-import type { AnimationClip } from "../types/animation";
-import { createAnimationClip } from "../types/create-animation-clip";
+import type { AnimationClip } from "../../types/animation";
+import { createAnimationClip } from "../../types/create-animation-clip";
 
 export const SLIME_IDLE_CLIP: AnimationClip = createAnimationClip(
   "idle",

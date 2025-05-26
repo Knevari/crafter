@@ -1,13 +1,13 @@
-import type { BaseEntity } from "../../lib/types";
-import Draw from "../helpers/draw-helper";
-import { TREE_SPRITE } from "../sprites/tree-sprite";
-import type { System } from "../systems/system";
-import { ecs } from "../test";
-import type { BoxColliderComponent } from "../types/collider-box";
-import type { PositionComponent } from "../types/component-position";
-import { ComponentType } from "../types/component-type";
-import type { SpriteRenderComponent } from "../types/sprite-render-component";
-import type { PerlinNoise2D } from "./perlin-noise-2d";
+import type { BaseEntity } from "../lib/types";
+import Draw from "./helpers/draw-helper";
+import { TREE_SPRITE } from "./sprites/tree-sprite";
+import type { System } from "./systems/system";
+import { ecs } from "./test";
+import type { BoxColliderComponent } from "./types/collider-box";
+import type { PositionComponent } from "./types/component-position";
+import { ComponentType } from "./types/component-type";
+import type { SpriteRenderComponent } from "./types/sprite-render-component";
+import type { PerlinNoise2D } from "./algorithms/perlin-noise-2d/perlin-noise-2d";
 
 export function generateTerrain(
   perlin: PerlinNoise2D,

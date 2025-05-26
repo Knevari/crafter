@@ -1,5 +1,5 @@
-import type { AnimationClip } from "../types/animation";
-import { createAnimationClip } from "../types/create-animation-clip";
+import type { AnimationClip } from "../../types/animation";
+import { createAnimationClip } from "../../types/create-animation-clip";
 
 export const PLAYER_IDLE_DOWN_CLIP: AnimationClip = createAnimationClip(
   "idle",

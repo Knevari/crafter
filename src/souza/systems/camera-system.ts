@@ -4,15 +4,8 @@ import type { CameraComponent } from "../types/camera";
 import type { PositionComponent } from "../types/component-position";
 import { ComponentType } from "../types/component-type";
 import type { System } from "./system";
-import Time from "./time";
-
-function lerp(start: number, end: number, t: number): number {
-  return start + (end - start) * t;
-}
 
 export function cameraSystem(ctx: CanvasRenderingContext2D, player: BaseEntity): System {
-  const lerpFactor = 2;
-
   return {
     update(ecs: ECSComponents) {
       const camera = ecs.getSingletonComponent<CameraComponent>(ComponentType.Camera);

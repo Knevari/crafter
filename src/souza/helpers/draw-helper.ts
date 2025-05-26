@@ -9,7 +9,7 @@ function drawSprite(
   sourceHeight: number,
   destX: number,
   destY: number,
-  color: { r: number; g: number; b: number; a: number } = { r: 255, g: 255, b: 255, a: 1 },
+  color: Color = { r: 255, g: 255, b: 255, a: 1 },
   scale = 1,
   rotation = 0,
   flipH = false,

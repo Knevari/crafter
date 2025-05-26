@@ -1,5 +1,5 @@
-import type { BoxColliderComponent } from "../types/collider-box";
-import type { PositionComponent } from "../types/component-position";
+import type { BoxColliderComponent } from "../../types/collider-box";
+import type { PositionComponent } from "../../types/component-position";
 const EPSILON = 0.001;
 
 export function checkAABBCollision(

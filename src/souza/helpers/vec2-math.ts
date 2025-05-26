@@ -1,9 +1,9 @@
 import type { Vector2 } from "../types/vector2";
 
 function normalize(v: Vector2): Vector2 {
-  const length = PositionMath.length(v);
+  const length = Vec2.length(v);
   if (length === 0) return { x: 0, y: 0 }; 
-  return PositionMath.divScalar(v, length);
+  return Vec2.divScalar(v, length);
 }
 
 function subtract(
@@ -34,7 +34,7 @@ function distance(a: Vector2, b: Vector2): number {
   return length(subtract(a, b));
 }
 
-const PositionMath = {
+const Vec2 = {
   normalize,
   subtract,
   divScalar,
@@ -42,4 +42,4 @@ const PositionMath = {
   distance
 };
 
-export default PositionMath;
+export default Vec2;

@@ -1,4 +1,4 @@
-import type PCG32 from "./PCG32";
+import type PCG32 from "../PCG32/PCG32";
 
 export class PerlinNoise2D {
     private permutation: number[] = [];

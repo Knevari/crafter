@@ -1,14 +1,14 @@
-import type { Vector3 } from "./vector3";
+import type { Vector2 } from "../types/vector2";
 
-const VECTOR3_ZERO: Vector3 = {x: 0, y: 0, z: 0}
+const VECTOR3_ZERO: Vector2 = { x: 0, y: 0 }
 
 export default class MouseInput {
     private static readonly buttonState = new Map<number, boolean>();
     private static readonly buttonDown = new Map<number, boolean>();
     private static readonly buttonUp = new Map<number, boolean>();
-    private static position: Vector3 = VECTOR3_ZERO;
-    private static movement: Vector3 = VECTOR3_ZERO;
-    private static scrollDelta: Vector3 = VECTOR3_ZERO;
+    private static position: Vector2 = VECTOR3_ZERO;
+    private static movement: Vector2 = VECTOR3_ZERO;
+    private static scrollDelta: Vector2 = VECTOR3_ZERO;
     private static scrollCallback: ((delta: { x: number, y: number }) => void) | null = null;
 
     public static initialize(): void {
@@ -19,9 +19,9 @@ export default class MouseInput {
         document.addEventListener('mousemove', (e) => {
             // const rect = canvas.getBoundingClientRect();
             // MouseInput.position = {x: e.clientX - rect.left, y: e.clientY - rect.top, z: 0};
-            MouseInput.position = {x: e.clientX, y: e.clientY, z: 0};
-            MouseInput.movement = {x: e.movementX, y: e.movementY, z: 0};
-          
+            MouseInput.position = { x: e.clientX, y: e.clientY };
+            MouseInput.movement = { x: e.movementX, y: e.movementY };
+
         });
         document.addEventListener('wheel', this.handleScroll.bind(this));
     }
@@ -58,7 +58,7 @@ export default class MouseInput {
     }
 
     private static handleScroll(e: WheelEvent): void {
-        MouseInput.scrollDelta = {x: e.deltaX, y: e.deltaY, z: 0};
+        MouseInput.scrollDelta = { x: e.deltaX, y: e.deltaY };
         if (MouseInput.scrollCallback) {
             MouseInput.scrollCallback(MouseInput.scrollDelta);
         }

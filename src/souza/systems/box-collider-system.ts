@@ -4,7 +4,7 @@ import type { PositionComponent } from "../types/component-position";
 import { ComponentType } from "../types/component-type";
 import type { BoxColliderComponent } from "../types/collider-box";
 import { systems } from "../test";
-import { checkAABBCollision, resolveAABBCollision } from "../helpers/AABB";
+import { checkAABBCollision, resolveAABBCollision } from "../algorithms/AABB/AABB";
 
 export function createColliderSystem(): System {
   return {
