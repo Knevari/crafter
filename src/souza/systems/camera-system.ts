@@ -3,7 +3,7 @@ import type { ECSComponents } from "../ecs/ecs-components";
 import type { CameraComponent } from "../types/camera";
 import type { PositionComponent } from "../types/component-position";
 import { ComponentType } from "../types/component-type";
-import type { System } from "./system";
+import type { System } from "../types/system";
 
 export function cameraSystem(ctx: CanvasRenderingContext2D, player: BaseEntity): System {
   return {

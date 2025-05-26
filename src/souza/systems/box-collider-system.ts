@@ -1,4 +1,4 @@
-import type { System } from "./system";
+import type { System } from "../types/system";
 import type { ECSComponents } from "../ecs/ecs-components";
 import type { PositionComponent } from "../types/component-position";
 import { ComponentType } from "../types/component-type";
@@ -6,7 +6,7 @@ import type { BoxColliderComponent } from "../types/collider-box";
 import { systems } from "../test";
 import { checkAABBCollision, resolveAABBCollision } from "../algorithms/AABB/AABB";
 
-export function createColliderSystem(): System {
+export function BoxColliderSystem(): System {
   return {
     fixedUpdate(ecs: ECSComponents) {
 

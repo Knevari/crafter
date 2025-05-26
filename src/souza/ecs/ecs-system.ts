@@ -1,5 +1,5 @@
 import type { ECSComponents } from "./ecs-components";
-import type { System } from "../systems/system";
+import type { System } from "../types/system";
 import type { CollisionEvent } from "../types/collision-event";
 
 export class ECSSystems {

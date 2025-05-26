@@ -1,7 +1,7 @@
 import type { BaseEntity } from "../lib/types";
 import Draw from "./helpers/draw-helper";
 import { TREE_SPRITE } from "./sprites/tree-sprite";
-import type { System } from "./systems/system";
+import type { System } from "./types/system";
 import { ecs } from "./test";
 import type { BoxColliderComponent } from "./types/collider-box";
 import type { PositionComponent } from "./types/component-position";

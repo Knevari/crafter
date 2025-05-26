@@ -3,8 +3,8 @@ import type { AnimatorComponent } from "../types/animator";
 import type { BoxColliderComponent } from "../types/collider-box";
 import { ComponentType } from "../types/component-type";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
-import type { System } from "./system";
-import Time from "./time";
+import type { System } from "../types/system";
+import Time from "../time/time";
 
 export default function AnimatorSystem(): System {
   return {

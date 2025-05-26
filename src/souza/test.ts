@@ -7,10 +7,10 @@ import { PerlinNoise2D } from "./algorithms/perlin-noise-2d/perlin-noise-2d";
 import { generateTerrain } from "./terrain";
 import AnimatorSystem from "./systems/animator-system";
 import { cameraSystem } from "./systems/camera-system";
-import { createColliderSystem } from "./systems/box-collider-system";
+import { BoxColliderSystem } from "./systems/box-collider-system";
 import FollowSystem from "./systems/follow-system";
 import SpriteRenderSystem from "./systems/sprite-render-system";
-import Time from "./systems/time";
+import Time from "./time/time";
 import type { CameraComponent } from "./types/camera";
 import type {  PositionComponent } from "./types/component-position";
 import { ComponentType } from "./types/component-type";
@@ -41,17 +41,16 @@ const width = 32;
 const height = 32;
 const persistence = 0.2;
 const octaves = 6;
-const scale = 16;
+const scale = 64;
 const terrainMatrix = generateTerrain(perlin, width, height, octaves, persistence, scale);
 
 const player = createPlayer(ecs, "player");
 const slime = createSlime(ecs, "slime");
 
 systems.addSystem(SpriteRenderSystem(engine.ctx));
-systems.addSystem(createColliderSystem());
+systems.addSystem(BoxColliderSystem());
 systems.addSystem(AnimatorSystem())
 systems.addSystem(CharacterControlerSystem());
-systems.addSystem(createColliderSystem())
 systems.addSystem(CharacterControllerAnimationSystem())
 systems.addSystem(FollowSystem(player, [slime], 40, 200));
 systems.addSystem(cameraSystem(engine.ctx, player));
@@ -77,12 +76,13 @@ export function app() {
     engine.ctx.clearRect(0, 0, engine.canvas.width, engine.canvas.height);
     systems.callRender();
     systems.callDrawGizmos();
+     Input.clearInputs();
 
   });
 
   time.on("update", () => {
     systems.callUpdate(Time.deltaTime);
-    Input.clearInputs();
+   
   });
 
   time.start();

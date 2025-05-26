@@ -4,7 +4,7 @@ import type { CameraComponent } from "../types/camera";
 import type { PositionComponent } from "../types/component-position";
 import { ComponentType } from "../types/component-type";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
-import type { System } from "./system";
+import type { System } from "../types/system";
 
 export default function SpriteRenderSystem(ctx: CanvasRenderingContext2D): System {
   return {

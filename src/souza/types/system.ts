@@ -1,5 +1,5 @@
 import type { ECSComponents } from "../ecs/ecs-components";
-import type { CollisionEvent } from "../types/collision-event";
+import type { CollisionEvent } from "./collision-event";
 
 export interface System {
     priority?: number,

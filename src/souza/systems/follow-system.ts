@@ -2,7 +2,7 @@ import type { BaseEntity } from "../../lib/types";
 import { setAnimatorState, type AnimatorComponent } from "../types/animator";
 import type { PositionComponent } from "../types/component-position";
 import { ComponentType } from "../types/component-type";
-import type { System } from "./system";
+import type { System } from "../types/system";
 import type { ECSComponents } from "../ecs/ecs-components";
 import Vec2 from "../helpers/vec2-math";
 
