@@ -1,7 +1,7 @@
 import { prng, rand } from "../random";
-import type { Entity } from "../types";
+import type { GameEntity } from "../types";
 
-export function updateWanderBehavior(entity: Entity, deltaTime: number) {
+export function updateWanderBehavior(entity: GameEntity, deltaTime: number) {
   const wander = (entity.data.wander ??= {
     speed: 25,
     cooldown: 1,

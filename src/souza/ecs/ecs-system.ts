@@ -1,6 +1,6 @@
 import type { ECSComponents } from "./ecs-components";
 import type { System } from "../types/system";
-import type { CollisionEvent } from "../types/collision-event";
+import type { CollisionEvent, TriggerEvent } from "../types/collision-event";
 
 export class ECSSystems {
   private systems: System[] = [];
@@ -49,18 +49,38 @@ export class ECSSystems {
   }
 
   callCollisionEnterEvents(collisionEvent: CollisionEvent) {
-     for (const system of this.systems) {
+    for (const system of this.systems) {
       system.onCollisionEnter?.(this.components, collisionEvent);
     }
   }
   callCollisionStayEvents(collisionEvent: CollisionEvent) {
     for (const system of this.systems) {
-      system.onCollisionEnter?.(this.components, collisionEvent);
+      system.onCollisionStay?.(this.components, collisionEvent);
     }
   }
   callCollisionExitEvents(collisionEvent: CollisionEvent) {
-      for (const system of this.systems) {
+    for (const system of this.systems) {
       system.onCollisionExit?.(this.components, collisionEvent);
     }
+  }
+
+  callTriggerEnterEvents(triggerEvent: TriggerEvent) {
+    for (const system of this.systems) {
+      system.onTriggerEnter?.(this.components, triggerEvent);
+    }
+
+  }
+  callTriggerExitEvents(triggerEvent: TriggerEvent) {
+
+    for (const system of this.systems) {
+      system.onTriggerExit?.(this.components, triggerEvent);
+    }
+  }
+
+  callTriggerStayEvents(triggerEvent: TriggerEvent) {
+    for (const system of this.systems) {
+      system.onTriggerStay?.(this.components, triggerEvent);
+    }
+
   }
 }

@@ -25,7 +25,7 @@ export default class Time {
   public static realtimeSinceStartup = 0;
   public static fps = 0;
 
-  constructor() {}
+  constructor() { }
 
   public on(event: TimeEvent, callback: EventCallback) {
     this.events.on(event, callback);
@@ -35,13 +35,13 @@ export default class Time {
     this.events.off(event, callback);
   }
 
-public offAll(event?: TimeEvent) {
-  if(event) {
-    this.events.clear(event);
-  } else {
-    this.events.clearAll();
+  public offAll(event?: TimeEvent) {
+    if (event) {
+      this.events.clear(event);
+    } else {
+      this.events.clearAll();
+    }
   }
-}
 
   public start(): void {
     if (this.isRunning || this.initialized) return;
@@ -95,9 +95,10 @@ public offAll(event?: TimeEvent) {
     const now = performance.now();
     const realDelta = (now - Time._time) / 1000;
 
+    Time._time = now;
     Time._deltaTime = realDelta * Time.timeScale;
     Time.realtimeSinceStartup += realDelta;
-    Time._time = now;
+
 
     this.accumulator += Time._deltaTime;
     let steps = 0;

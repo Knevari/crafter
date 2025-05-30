@@ -19,14 +19,14 @@ const stringDictionary = {
 };
 
 export class UI {
-  static healthBar: BaseUIUpdater = createHealthBar();
-  static inventory: BaseUIUpdater = createInventory();
-  static text: Record<string, AnimatedTextUpdater> = stringDictionary;
+  // static healthBar: BaseUIUpdater = createHealthBar();
+  // static inventory: BaseUIUpdater = createInventory();
+  // static text: Record<string, AnimatedTextUpdater> = stringDictionary;
 
-  static render() {
-    this.healthBar.update();
-    this.inventory.update();
-  }
+  // static render() {
+  //   this.healthBar.update();
+  //   this.inventory.update();
+  // }
 }
 
 const uiWrapper = document.querySelector("#ui") as HTMLDivElement;

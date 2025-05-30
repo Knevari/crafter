@@ -1,6 +1,6 @@
-import type { Direction, Entity } from "./entity";
+import type { Direction, GameEntity } from "./entity";
 
-export interface Player extends Entity {
+export interface Player extends GameEntity {
   data: {
     speed: number;
     moving: boolean;

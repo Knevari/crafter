@@ -2,11 +2,11 @@ import { TILE_SIZE } from "../constants";
 import { getCollisionBoxDimensions } from "../entities";
 import { ENTITY_DEFINITIONS } from "../entity-defs";
 import { gameState } from "../game-state";
-import type { Entity } from "../types";
+import type { GameEntity } from "../types";
 import { DrawHelper } from "./draw-helper";
 
 export class EntityRenderer {
-  private drawEntityHealthBar(ctx: CanvasRenderingContext2D, entity: Entity) {
+  private drawEntityHealthBar(ctx: CanvasRenderingContext2D, entity: GameEntity) {
     const cbox = getCollisionBoxDimensions(entity);
 
     const maxHealthBarWidth = cbox.width;

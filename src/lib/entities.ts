@@ -21,7 +21,7 @@ import { gameState } from "./game-state";
 import { addToInventory } from "./inventory";
 import { distance, map } from "./math";
 import { createId, prng } from "./random";
-import { EntityType, Tile, type ChunkKey, type Entity } from "./types";
+import { EntityType, Tile, type ChunkKey, type GameEntity } from "./types";
 import { isColliding } from "./utils/is-colliding";
 import { createNoise2D } from "simplex-noise";
 import { UI } from "./ui";
@@ -64,7 +64,7 @@ export function getEntityTypeAsString(type: EntityType) {
   }
 }
 
-export function createEntity(
+export function createEntityLib(
   type: EntityType,
   worldX: number,
   worldY: number,
@@ -76,7 +76,7 @@ export function createEntity(
 
   const drops = typeof def.drops === "function" ? def.drops() : def.drops;
 
-  const entity: Entity = {
+  const entity: GameEntity = {
     id,
     type,
     sprite: def.sprite ? { ...def.sprite } : null,
@@ -110,7 +110,7 @@ export function destroyEntity(entityId: string) {
   for (const drop of entity.drops) {
     const dropProbability = drop.chance ?? 1;
     if (prng() < dropProbability) {
-      createEntity(
+      createEntityLib(
         drop.type,
         entity.position.x +
           (entity.dimensions.width * TILE_SIZE) / 2 -
@@ -205,11 +205,11 @@ export function spawnChunkEntities(chunkKey: ChunkKey) {
 
       if (n < 0.1) {
         if (canPlaceEntity(entityWorldX, entityWorldY, 1, 1)) {
-          createEntity(EntityType.ROCK, entityWorldX, entityWorldY, 1, 1);
+          createEntityLib(EntityType.ROCK, entityWorldX, entityWorldY, 1, 1);
         }
       } else if (n < 0.3) {
         if (canPlaceEntity(entityWorldX, entityWorldY, 4, 5)) {
-          createEntity(EntityType.TREE, entityWorldX, entityWorldY, 4, 5);
+          createEntityLib(EntityType.TREE, entityWorldX, entityWorldY, 4, 5);
         }
       }
     }
@@ -231,7 +231,7 @@ export function getEntityAtWorldPosition(worldX: number, worldY: number) {
   return null;
 }
 
-export function handleEntityClick(entity: Entity) {
+export function handleEntityClick(entity: GameEntity) {
   if (gameState.debug) {
     console.log(
       `Clicked ${getEntityTypeAsString(entity.type)} at`,
@@ -259,7 +259,7 @@ export function handleEntityClick(entity: Entity) {
   }
 }
 
-export function getEntityCenter(entity: Entity) {
+export function getEntityCenter(entity: GameEntity) {
   return [
     entity.position.x + (entity.dimensions.width * TILE_SIZE) / 2,
     entity.position.y + (entity.dimensions.height * TILE_SIZE) / 2,
@@ -372,7 +372,7 @@ export function updateDroppedItems(deltaTime: number) {
   }
 }
 
-export function getCollisionBoxDimensions(entity: Entity) {
+export function getCollisionBoxDimensions(entity: GameEntity) {
   return {
     width:
       entity.collisionBox.xPercentage * TILE_SIZE * entity.dimensions.width,

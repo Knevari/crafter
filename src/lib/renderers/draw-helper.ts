@@ -9,12 +9,12 @@ import {
 } from "../constants";
 import { gameState } from "../game-state";
 import { tileSprites } from "../tiles";
-import { type Entity, type Tile } from "../types";
+import { type GameEntity, type Tile } from "../types";
 
 export class DrawHelper {
   static drawEntity(
     ctx: CanvasRenderingContext2D,
-    entity: Entity,
+    entity: GameEntity,
     tileSize = TILESET_TILE_SIZE,
   ) {
     ctx.save();
@@ -42,7 +42,7 @@ export class DrawHelper {
 
   static drawAnimatedEntity(
     ctx: CanvasRenderingContext2D,
-    entity: Entity,
+    entity: GameEntity,
     tileSize = 32,
   ) {
     return this.drawAnimatedSprite(ctx, entity, tileSize);
@@ -50,7 +50,7 @@ export class DrawHelper {
 
   static drawEntityAt(
     ctx: CanvasRenderingContext2D,
-    entity: Entity,
+    entity: GameEntity,
     x: number,
     y: number,
     w: number,
@@ -101,7 +101,7 @@ export class DrawHelper {
 
   static drawAnimatedSprite(
     ctx: CanvasRenderingContext2D,
-    entity: Entity,
+    entity: GameEntity,
     tileSize: number,
   ) {
     const drawX = entity.position.x - gameState.camera.position.x;
@@ -111,7 +111,7 @@ export class DrawHelper {
 
   static drawAnimatedSpriteAt(
     ctx: CanvasRenderingContext2D,
-    entity: Entity,
+    entity: GameEntity,
     tileSize: number,
     drawX: number,
     drawY: number,

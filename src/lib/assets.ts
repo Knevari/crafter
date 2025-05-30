@@ -4,21 +4,6 @@ import { EntityType, Tile } from "./types/";
 
 
 
-await resourceManager.loadImages({
-  tilemap_img: "/tilemap.png",
-  tree_img: "/Oak_Tree_Small.png",
-  grass_img: "/Grass_Middle.png",
-  water_img: "/Water_Tile.png",
-  player_img: "/Player.png",
-  pig_img: "/Pig.png",
-  outdoorDeco_img: "/Outdoor_Decor_Free.png",
-  slime_img: "/Slime.png",
-  slimeGreen_img: "/Slime_Green.png",
-  skeleton_img: "/Skeleton.png",
-  base: "[Base]BaseChip_pipo.png",
-});
-
-
 export const tilesetImg = new Image();
 export const treeTileImg = new Image();
 export const grassTileImg = new Image();

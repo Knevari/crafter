@@ -1,5 +1,5 @@
 import { gameState } from "./game-state";
-import type { Animator, Entity } from "./types";
+import type { Animator, GameEntity } from "./types";
 
 export function updateAnimator(animator: Animator, deltaTime: number) {
   const animation = animator.animations[animator.current];
@@ -30,7 +30,7 @@ export function updateAnimator(animator: Animator, deltaTime: number) {
 }
 
 export function float(
-  entity: Entity,
+  entity: GameEntity,
   speed: number = 10,
   amplitude: number = 0.5,
 ) {

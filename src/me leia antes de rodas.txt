@@ -1,3 +1,0 @@
-// requestAnimationFrame(update);
-
-linha 56  no main esta comentada

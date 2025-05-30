@@ -1,7 +1,7 @@
 import { gameState } from "./game-state";
-import type { Entity } from "./types";
+import type { GameEntity } from "./types";
 
-export function addToInventory(entity: Entity) {
+export function addToInventory(entity: GameEntity) {
   let itemInIventory = false;
 
   for (const item of gameState.inventory) {

@@ -1,34 +1,42 @@
-import { engine } from "../../lib/engine";
-import type { BaseEntity } from "../../lib/types";
+import type { Entity } from "../../lib/types";
 import type { ECSComponents } from "../ecs/ecs-components";
 import type { AnimatorComponent } from "../types/animator";
-import type { BoxColliderComponent } from "../types/collider-box";
-import type { CharacterControlerComponent, PositionComponent } from "../types/component-position";
 import { ComponentType } from "../types/component-type";
-import type { SpriteRenderComponent } from "../types/sprite-render-component";
 import { PLAYER_CONTROLLER } from "../animator/controllers/player-controller";
+import { createSpriteRender } from "../builders/createSpriteRender";
+import { createBoxCollider } from "../builders/createBoxCollider";
+import { createAnimator } from "../builders/createAnimator";
+import { createTransform } from "../components/transform";
+import type { CircleColliderComponent } from "../collider/circle-collider";
+import { getId } from "../builders/createId";
+import { createEntity } from "../builders/createEntity";
 
 export function createPlayer(ecs: ECSComponents, name: string) {
 
-  const entity: BaseEntity = { id: name };
+  const entity: Entity = createEntity("player", "player", "player");
 
-  ecs.addComponent<PositionComponent>(entity, ComponentType.Position, {
-    entity: entity,
-    x: engine.canvas.width / 2,
-    y: engine.canvas.height / 2,
-    enabled: true
-  });
+  const transform = createTransform(entity);
+  ecs.addComponent(entity, transform);
 
-  ecs.addComponent<BoxColliderComponent>(entity, ComponentType.BoxCollider, {
-    entity: entity,
-    width: 32,
-    height: 40,
-    offsetX: 16,
-    offsetY: 10,
+  const boxCollider = createBoxCollider(entity,
+    { width: 32, height: 40, offset: { x: 0, y: -4 }, collisionGroup: "player" }
+  )
+  ecs.addComponent(entity, boxCollider);
+
+  ecs.addComponent<CircleColliderComponent>(entity, {
+    instanceId: getId(),
     enabled: true,
-  });
+    ignoreSelfCollisions: true,
+    radius: 32,
+    isTrigger: true,
+    type: ComponentType.CIRCLE_COLLIDER,
+    entityRef: entity
+  })
 
-  ecs.addComponent<CharacterControlerComponent>(entity, ComponentType.CharacterControler, {
+
+  ecs.addComponent(entity, {
+    instanceId: getId(),
+    type: ComponentType.CHARACTER_CONTROLLER,
     enabled: true,
     facing: "side",
     state: "idle",
@@ -38,30 +46,12 @@ export function createPlayer(ecs: ECSComponents, name: string) {
     runSpeed: 100
 
   });
-  
-  ecs.addComponent<SpriteRenderComponent>(entity, ComponentType.SpriteRender, {
-    entity: entity,
-    color: " white",
-    sprite: null,
-    scale: 2,
-    rotation: 0,
-    flipHorizontal: false,
-    flipVertical: false,
-    layer: 10,
-    enabled: true,
-  });
 
-  ecs.addComponent<AnimatorComponent>(entity, ComponentType.Animator, {
-    entity: entity,
-    enabled: true,
-    controller: PLAYER_CONTROLLER,
-    playbackSpeed: 1.0,
-    locked: false,
-    currentClip: null,
-    isPlaying: true,
-    currentFrameIndex: 0,
-    time: 0
-  });
+  const spriteRener = createSpriteRender(entity, { scale: 2, layer: 10 });
+  ecs.addComponent(entity, spriteRener);
+
+  const animator = createAnimator(entity, PLAYER_CONTROLLER);
+  ecs.addComponent<AnimatorComponent>(entity, animator);
 
   return entity;
 }

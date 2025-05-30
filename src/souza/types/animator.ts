@@ -9,9 +9,7 @@ export interface AnimatorComponent extends Component {
   locked: boolean;
   currentFrameIndex: number;
   playbackSpeed: number;
-
 }
-
 
 export interface AnimatorState {
   clip: AnimationClip;

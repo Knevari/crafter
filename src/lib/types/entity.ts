@@ -52,14 +52,16 @@ export type CollisionBox = {
 
 export type InventoryItem = {
   amount: number;
-  entity: Entity;
+  entity: GameEntity;
 };
 
-export interface BaseEntity {
-id: string;
+export interface Entity {
+  id: string;
+  tag: string;
+  name: string;
 }
 
-export interface Entity extends BaseEntity {
+export interface GameEntity extends Entity {
   type: EntityType;
   sprite: Sprite | null;
   position: Position;

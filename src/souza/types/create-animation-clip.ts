@@ -1,5 +1,5 @@
 import type { AnimationClip } from "./animation";
-import type { BoxColliderComponent } from "./collider-box";
+import type { BoxColliderComponent } from "../collider/IBoxCollider";
 
 export function createAnimationClip(
   name: string,
@@ -10,7 +10,8 @@ export function createAnimationClip(
   frameWidth: number,
   frameHeight: number,
   frameRate: number = 12,
-  colliders?: (BoxColliderComponent | null)[]
+  colliders?: (BoxColliderComponent | null)[],
+  frameSpacing: number = 0 
 ): AnimationClip {
   const frames = [];
 
@@ -18,7 +19,7 @@ export function createAnimationClip(
     const frame: any = {
       sprite: {
         textureRef,
-        x: startX + i * frameWidth,
+        x: startX + i * (frameWidth + frameSpacing),
         y: startY,
         width: frameWidth,
         height: frameHeight,

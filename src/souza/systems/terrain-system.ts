@@ -1,223 +1,257 @@
-import type { BaseEntity } from "../../lib/types";
-import PCG32 from "../algorithms/PCG32/PCG32";
-import { PerlinNoise2D } from "../algorithms/perlin-noise-2d/perlin-noise-2d";
+import type { Entity } from "../../lib/types";
+import PCG32 from "../algorithms/PCG32";
+import { PerlinNoise2D } from "../algorithms/perlin-noise-2d";
 import type { ECSComponents } from "../ecs/ecs-components";
-import { DRY_VEGETATION_SPRITE, GRASS_SPRITE } from "../sprites/ground-sprite";
-import { TREE_SPRITE, TREE_TRUNK_SPRITE as TREE_TRUNK_SPRITE } from "../sprites/tree-sprite";
-import { generateTerrainMatrix, generateTrees, getColorFromGradient } from "../terrain";
-import type { BoxColliderComponent } from "../types/collider-box";
-import type { PositionComponent } from "../types/component-position";
+import { getColorFromGradient } from "../terrain";
 import { ComponentType } from "../types/component-type";
-import type { SpriteRenderComponent } from "../types/sprite-render-component";
 import type { System } from "../types/system";
+import { createSpriteRender } from "../builders/createSpriteRender";
+import { createTransform } from "../components/transform";
+import type TransformComponent from "../components/transform";
+import type { Vector2 } from "../types/vector2";
+import { isInRange } from "../algorithms/isInRange";
+import { createBoxCollider } from "../builders/createBoxCollider";
+import { entity_create_dry, entity_create_grass, entity_create_tree, entity_create_trunk } from "../entities/grass-entity";
+import { DRY_VEGETATION_SPRITE, GRASS_SPRITE } from "../sprites/ground-sprite";
+import { TREE_SPRITE, TREE_TRUNK_SPRITE } from "../sprites/tree-sprite";
+import { Mulberry32 } from "../algorithms/mulberry32";
+import { createEntity } from "../builders/createEntity";
+
+const terrainColors = [
+  " #011627", " #02243c", " #03304e", " #03496a", " #03587e", " #047399",
+  " #058caa", " #04a3a5", " #04b39c", " #2ea78f", " #4caf91", " #5cb881",
+  " #6dbb74", " #7ec26b", " #89c663", " #98d05c", " #aad751", " #bfe062",
+  " #c8e36e", " #d6e962", " #dedf60", " #e2d566", " #e7c96b", " #dcba73",
+  " #d2b48c", " #c7aa7d", " #c1a76d", " #b18f60", " #a47551", " #bb8a63",
+  " #d6ae77", " #aa8155", " #855e42", " #6b544a", " #5b5b5b", " #6c6c6c",
+  " #777777", " #888888", " #999999", " #aaaaaa", " #bbbbbb", " #cccccc",
+  " #dddddd", " #eeeeee", " #ffffff"
+];
+
+
+class World {
+  private seed: number;
+  private rgn: Mulberry32;
+  private perlin: PerlinNoise2D;
+  private readonly OCTAVES = 6;
+  private readonly PERSISTENCE = 0.2;
+  private readonly SCALE = 32;
+
+  constructor(seed: number) {
+    this.seed = seed;
+    this.rgn = new Mulberry32(seed);
+    this.perlin = new PerlinNoise2D(this.rgn);
+  }
+
+  public generateChunk(width: number, height: number, chunkX: number, chunkY: number): TerrainCell[] {
+    const terrain: TerrainCell[] = [];
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const worldX = chunkX * width + x;
+        const worldY = chunkY * height + y;
+
+        let value = this.perlin.fractalNoise(worldX / this.SCALE, worldY / this.SCALE, this.OCTAVES, this.PERSISTENCE);
+        value = Math.pow(value, 1.5);
+
+        terrain.push({
+          x: worldX,
+          y: worldY,
+          value,
+          biome: undefined,
+          isWater: value < 0.3,
+        });
+      }
+    }
+
+    this.classifyBiomes(terrain);
+
+    return terrain;
+  }
+
+  private classifyBiomes(cells: TerrainCell[]): void {
+    for (const cell of cells) {
+      if (cell.value < 0.3) {
+        cell.biome = "water";
+      } else if (cell.value < 0.45) {
+        cell.biome = "sand";
+      } else if (cell.value < 0.65) {
+        cell.biome = "grassland";
+      } else {
+        cell.biome = "mountain";
+      }
+    }
+  }
+}
+
+const OBJECT_SIZE = 64;
+const CHUNK_SIZE = 16;
 
 export function TerrainSystem(): System {
 
   return {
     start(ecs) {
-      const seed = new PCG32(1234567890123456789n, 9876543210987654321n);
-      const perlin = new PerlinNoise2D(seed);
-
-      const width = 64;
-      const height = 64;
-      const persistence = 0.2;
-      const octaves = 5;
-      const scale = 32;
-      const terrainMatrix = generateTerrainMatrix(perlin, width, height, octaves, persistence, scale);
-      generateTerrainEntities(ecs, terrainMatrix, scale);
-      generateTreeEntities(ecs, terrainMatrix, scale, 64 + 32)
+      const word = new World(23434);
+      const terrain = word.generateChunk(32, 32, 0, 0);
+      generateTerrainEntities(ecs, terrain, OBJECT_SIZE, 0, 0, 32, 32)
     },
-  }
+    fixedUpdate(ecs) {
+
+    },
+  };
 }
 
-const terrainColors = [
-  "#011627", // mar profundo
-  "#02243c",
-  "#03304e", // mar médio
-  "#03496a",
-  "#03587e", // mar raso
-  "#047399",
-  "#058caa", // enseadas
-  "#04a3a5",
-  "#04b39c", // costa tropical
-  "#2ea78f",
-  "#4caf91", // pradarias costeiras
-  "#5cb881",
-  "#6dbb74", // floresta tropical
-  "#7ec26b",
-  "#89c663", // floresta temperada
-  "#98d05c",
-  "#aad751", // planícies verdes
-  "#bfe062",
-  "#c8e36e", // campos cultiváveis
-  "#d6e962",
-  "#dedf60", // pradarias secas
-  "#e2d566",
-  "#e7c96b", // savana
-  "#dcba73",
-  "#d2b48c", // terra seca
-  "#c7aa7d",
-  "#c1a76d", // semideserto
-  "#b18f60",
-  "#a47551", // deserto rochoso
-  "#bb8a63",
-  "#d6ae77", // areia fofa
-  "#aa8155",
-  "#855e42", // penhascos e ravinas
-  "#6b544a",
-  "#5b5b5b", // pedra
-  "#6c6c6c",
-  "#777777", // montanhas baixas
-  "#888888",
-  "#999999", // montanhas médias
-  "#aaaaaa",
-  "#bbbbbb", // montanhas altas
-  "#cccccc",
-  "#dddddd", // picos de montanhas
-  "#eeeeee", // neve fina
-  "#ffffff"  // neve espessa
-];
+interface TerrainCell {
+  x: number;
+  y: number;
+  value: number;
+  biome?: string;
+  isWater?: boolean;
+}
 
 function generateTerrainEntities(
   ecs: ECSComponents,
-  terrain: number[][],
-  scale: number
-) {
-  const height = terrain.length;
-  const width = terrain[0].length;
+  terrainCells: TerrainCell[],
+  scale: number,
+  chunkX: number,
+  chunkY: number,
+  chunkWidth: number,
+  chunkHeight: number
+): Entity[] {
+  const entities: Entity[] = [];
 
-  const offsetX = (width * scale) / 2;
-  const offsetY = (height * scale) / 2;
+  for (const cell of terrainCells) {
 
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const value = terrain[y][x];
-      const screenX = x * scale - offsetX;
-      const screenY = y * scale - offsetY;
+    const worldX = (cell.x - chunkX * chunkWidth - chunkWidth / 2) * scale;
+    const worldY = (cell.y - chunkY * chunkHeight - chunkHeight / 2) * scale;
 
-      const entity: BaseEntity = { id: `ground_${x}_${y}` };
-      ecs.addComponent<PositionComponent>(entity, ComponentType.Position, {
-        entity: entity,
-        x: screenX,
-        y: screenY,
-        enabled: true
-      });
+    const id = `ground_${cell.x}_${cell.y}`;
+    const entity: Entity = createEntity(id, "ground");
 
-      ecs.addComponent<SpriteRenderComponent>(entity, ComponentType.SpriteRender, {
-        entity: entity,
-        color: getColorFromGradient(terrainColors, value),
-        sprite: null,
-        scale: scale,
-        rotation: 0,
-        flipHorizontal: false,
-        flipVertical: false,
-        layer: -1,
-        enabled: true,
-      });
+    ecs.addComponent(entity,
+      createTransform(entity, {
+        x: worldX,
+        y: worldY,
+      }),
+      false
+    );
+
+    let color: string;
+    switch (cell.biome) {
+      case "water":
+        color = "rgb(7, 151, 207)";
+        break;
+      case "sand":
+        color = " #d2b48c";
+        break;
+      case "grassland":
+        color = " #6dbb74";
+        break;
+      case "mountain":
+        color = " #bbbbbb";
+        break;
+      default:
+        color = getColorFromGradient(terrainColors, cell.value);
+        break;
     }
+
+    ecs.addComponent(entity,
+      createSpriteRender(entity, {
+        color,
+        layer: -1,
+        scale,
+      }),
+      false
+    );
+
+    entities.push(entity);
+
+    generateTreeEntities(ecs, cell.value, worldX, worldY, entities);
   }
+
+  return entities;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+// function generateTerrainEntities(
+//   ecs: ECSComponents,
+//   terrain: number[][],
+//   scale: number,
+//   chunkX: number,
+//   chunkY: number
+// ): Entity[] {
+//   const height = terrain.length;
+//   const width = terrain[0].length;
+
+//   const entities: Entity[] = [];
+
+//   for (let y = 0; y < height; y++) {
+//     for (let x = 0; x < width; x++) {
+//       const value = terrain[y][x];
+
+//       const worldX = (chunkX * width + x - width / 2) * scale;
+//       const worldY = (chunkY * height + y - height / 2) * scale;
+
+//       // generateTreeEntities(ecs, value, worldX, worldY, entities)
+
+//       const id = `ground_${chunkX}_${chunkY}_${x}_${y}`;
+//       const entity: Entity = { id };
+//       ecs.addComponent(entity, ComponentType.TRANSFORM,
+//         createTransform(entity, {
+//           x: worldX,
+//           y: worldY
+//         }),
+//         false
+//       );
+
+//       ecs.addComponent(entity, ComponentType.SPRITE_RENDER,
+//         createSpriteRender(entity, {
+
+//           color: getColorFromGradient(terrainColors, value),
+//           layer: -1,
+//           scale: scale
+//         }),
+//         false
+//       );
+
+//       entities.push(entity);
+//     }
+//   }
+
+//   return entities;
+// }
 function generateTreeEntities(
   ecs: ECSComponents,
-  terrain: number[][],
-  scale: number,
-  minDistance: number = 64 // distância mínima entre árvores
+  value: number,
+  screenX: number,
+  screenY: number,
+  entities: Entity[]
 ) {
-  const height = terrain.length;
-  const width = terrain[0].length;
-
-  const offsetX = (width * scale) / 2;
-  const offsetY = (height * scale) / 2;
-
-  const placedPositions: { x: number; y: number }[] = [];
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const value = terrain[y][x];
-      const screenX = x * scale - offsetX + scale / 2;
-      const screenY = y * scale - offsetY + scale / 2;
-
-      if (value > 0.3 && value < 0.4) 
-        {
-        const tooClose = placedPositions.some(pos => {
-          const dx = pos.x - screenX;
-          const dy = pos.y - screenY;
-          return dx * dx + dy * dy < minDistance * minDistance;
-        });
-
-        if (tooClose) continue;
+  const pos = { x: Math.floor(screenX), y: Math.floor(screenY) };
+  const idPrefix = `${pos.x}_${pos.y}`;
 
 
-        placedPositions.push({ x: screenX, y: screenY });
+  switch (true) {
+    case isInRange(value, 0.3, 0.4) : {
+      const scale = 1;
+      const tree = entity_create_tree(ecs, pos, TREE_SPRITE, 10, scale, `tree_${idPrefix}`);
+      entities.push(tree);
 
-        const tree: BaseEntity = { id: `tree_${x}_${y}` };
-        ecs.addComponent<PositionComponent>(tree, ComponentType.Position, {
-          entity: tree,
-          x: screenX,
-          y: screenY,
-          enabled: true
-        });
-
-        ecs.addComponent<SpriteRenderComponent>(tree, ComponentType.SpriteRender, {
-          entity: tree,
-          sprite: TREE_SPRITE,
-          scale: 5,
-          rotation: 0,
-          flipHorizontal: false,
-          flipVertical: false,
-          layer: 11,
-          enabled: true,
-        });
-
-        ecs.addComponent<BoxColliderComponent>(tree, ComponentType.BoxCollider, {
-          enabled: true,
-          width: 32,
-          height: 80,
-          trigger: true,
-          collisionGroup: "tree"
-        });
-      } else if(value > 0.5 && value < 0.6 && 0.5 < Math.random()) {
-         const tree: BaseEntity = { id: `tree_${x}_${y}` };
-        ecs.addComponent<PositionComponent>(tree, ComponentType.Position, {
-          entity: tree,
-          x: screenX,
-          y: screenY,
-          enabled: true
-        });
-
-        ecs.addComponent<SpriteRenderComponent>(tree, ComponentType.SpriteRender, {
-          entity: tree,
-          sprite: DRY_VEGETATION_SPRITE,
-          scale: 1,
-          rotation: 0,
-          flipHorizontal: false,
-          flipVertical: false,
-          layer: 3,
-          enabled: true,
-        });
-
-       
-      } else if(value > 0.3 && value < 0.5  && 0.5 < Math.random()) {
-         const tree: BaseEntity = { id: `tree_${x}_${y}` };
-        ecs.addComponent<PositionComponent>(tree, ComponentType.Position, {
-          entity: tree,
-          x: screenX,
-          y: screenY,
-          enabled: true
-        });
-
-        ecs.addComponent<SpriteRenderComponent>(tree, ComponentType.SpriteRender, {
-          entity: tree,
-          sprite: GRASS_SPRITE,
-          scale: 3,
-          rotation: 0,
-          flipHorizontal: false,
-          flipVertical: false,
-          layer: 2,
-          enabled: true,
-        });
-      }
+      // const trunk = entity_create_trunk(ecs, pos, TREE_TRUNK_SPRITE, 9, scale, `trunk_${idPrefix}`);
+      // entities.push(trunk);
+      break;
     }
   }
 }
+

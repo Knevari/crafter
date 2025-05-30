@@ -1,5 +1,5 @@
 import type { AnimatorController } from "../../types/animator";
-import { SLIME_DEAD_CLIP, SLIME_IDLE_CLIP, SLIME_MOVE_CLIP } from "../animations/slime_animations";
+import { SLIME_DEAD_CLIP, SLIME_IDLE_CLIP, SLIME_MOVE_CLIP } from "../animations/slime-animations";
 
 export const SLIME_ANIMATOR_CONTROLLER: AnimatorController = {
 

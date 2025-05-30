@@ -1,6 +1,11 @@
-import type { BoxColliderComponent } from "./collider-box";
+import type { Collider } from "../collider/collider";
 
 export interface CollisionEvent {
-    a: BoxColliderComponent;
-    b: BoxColliderComponent;
+    a: Collider;
+    b: Collider;
+}
+
+export interface TriggerEvent {
+    a: Collider;
+    b: Collider;
 }

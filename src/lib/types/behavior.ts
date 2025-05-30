@@ -1,3 +1,3 @@
-import type { Entity } from "./entity";
+import type { GameEntity } from "./entity";
 
-export type Behavior = (entity: Entity, deltaTime: number) => void;
+export type Behavior = (entity: GameEntity, deltaTime: number) => void;

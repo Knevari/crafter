@@ -12,8 +12,6 @@ export const PLAYER_IDLE_DOWN_CLIP: AnimationClip = createAnimationClip(
   12,
 );
 
-
-
 export const PLAYER_WALK_UP_CLIP: AnimationClip = createAnimationClip(
   "walk_back",
   "player_img",
@@ -55,7 +53,7 @@ export const PLAYER_ATTACK_DOWN_CLIP: AnimationClip = createAnimationClip(
   192,
   32,
   32,
-  12
+ 16
 );
 
 export const PLAYER_ATTACK_UP_CLIP: AnimationClip = createAnimationClip(
@@ -66,7 +64,7 @@ export const PLAYER_ATTACK_UP_CLIP: AnimationClip = createAnimationClip(
   256,
   32,
   32,
-  12
+ 16
 );
 
 export const PLAYER_ATTACK_SIDE_CLIP: AnimationClip = createAnimationClip(
@@ -77,6 +75,6 @@ export const PLAYER_ATTACK_SIDE_CLIP: AnimationClip = createAnimationClip(
   224,
   32,
   32,
-  12
+ 16
 );
 

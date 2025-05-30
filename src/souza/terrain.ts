@@ -1,41 +1,3 @@
-import type { BaseEntity } from "../lib/types";
-import Draw from "./helpers/draw-helper";
-import { TREE_TRUNK_SPRITE } from "./sprites/tree-sprite";
-import type { System } from "./types/system";
-import { ecs } from "./test";
-import type { BoxColliderComponent } from "./types/collider-box";
-import type { PositionComponent } from "./types/component-position";
-import { ComponentType } from "./types/component-type";
-import type { SpriteRenderComponent } from "./types/sprite-render-component";
-import type { PerlinNoise2D } from "./algorithms/perlin-noise-2d/perlin-noise-2d";
-
-export function generateTerrainMatrix(
-  perlin: PerlinNoise2D,
-  width: number,
-  height: number,
-  octaves: number,
-  persistence: number,
-  scaleFactor: number
-): number[][] {
-  const terrain: number[][] = [];
-
-  for (let y = 0; y < height; y++) {
-    const row: number[] = [];
-    for (let x = 0; x < width; x++) {
-      const xf = x / scaleFactor;
-      const yf = y / scaleFactor;
-
-      let value = perlin.fractalNoise(xf, yf, octaves, persistence);
-      value = Math.pow(value, 1.5);
-      row.push(value);
-    }
-    terrain.push(row);
-  }
-
-  return terrain;
-}
-
-
 function lerpColor(a: string, b: string, t: number): string {
   const c1 = hexToRgb(a);
   const c2 = hexToRgb(b);
@@ -71,46 +33,4 @@ export function getColorFromGradient(colors: string[], t: number): string {
 
   return lerpColor(colorA, colorB, localT);
 }
-
-export function generateTrees(
-  terrain: number[][],
-  tileSize: number,
-) {
-  const height = terrain.length;
-  const width = terrain[0].length;
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const elevation = terrain[y][x];
-
-
-      if (elevation > 0.4) {
-        const entity: BaseEntity = { id: `tree_${x}_${y}` };
-
-        const position: PositionComponent = {
-          enabled: true,
-          x: x * tileSize + tileSize / 2,
-          y: y * tileSize + tileSize / 2
-        };
-
-        ecs.addComponent<PositionComponent>(entity, ComponentType.Position, position);
-        ecs.addComponent<SpriteRenderComponent>(entity, ComponentType.SpriteRender, {
-          entity,
-          enabled: true,
-          color: " white",
-          sprite: TREE_TRUNK_SPRITE,
-          scale: 1,
-          rotation: 0,
-          flipHorizontal: false,
-          flipVertical: false,
-          layer: 3,
-        });
-       
-      }
-    }
-  }
-}
-
-
-
 

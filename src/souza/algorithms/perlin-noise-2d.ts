@@ -1,10 +1,10 @@
-import type PCG32 from "../PCG32/PCG32";
+import type { Mulberry32 } from "./mulberry32";
 
 export class PerlinNoise2D {
     private permutation: number[] = [];
     private gradients: [number, number][] = [];
 
-    constructor(private rng: PCG32) {
+    constructor(private rng: Mulberry32) {
         this.generatePermutation();
         this.generateGradients();
     }
@@ -12,7 +12,7 @@ export class PerlinNoise2D {
     private generatePermutation() {
         const p = Array.from({ length: 256 }, (_, i) => i);
         for (let i = 255; i > 0; i--) {
-            const j = Math.floor(this.rng.randomFloat() * (i + 1));
+            const j = Math.floor(this.rng.next() * (i + 1));
             [p[i], p[j]] = [p[j], p[i]];
         }
         this.permutation = [...p, ...p];
@@ -20,7 +20,7 @@ export class PerlinNoise2D {
 
     private generateGradients() {
         for (let i = 0; i < 256; i++) {
-            const angle = this.rng.randomFloat() * 2 * Math.PI;
+            const angle = this.rng.next() * 2 * Math.PI;
             this.gradients[i] = [Math.cos(angle), Math.sin(angle)];
         }
     }

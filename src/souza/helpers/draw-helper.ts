@@ -1,5 +1,3 @@
-import type { Color } from "../types/sprite-render-component";
-
 function drawSprite(
   ctx: CanvasRenderingContext2D,
   image: CanvasImageSource,
@@ -14,7 +12,7 @@ function drawSprite(
   rotation = 0,
   flipH = false,
   flipV = false,
-  alpha = 1 
+  alpha = 1
 ) {
   const destWidth = sourceWidth * scale;
   const destHeight = sourceHeight * scale;
@@ -23,7 +21,7 @@ function drawSprite(
   ctx.imageSmoothingEnabled = false;
   ctx.imageSmoothingQuality = "low";
 
-  ctx.globalAlpha = alpha; 
+  ctx.globalAlpha = alpha;
 
   ctx.translate(Math.floor(destX), Math.floor(destY));
   ctx.rotate(rotation);
@@ -54,9 +52,10 @@ function drawWireSquare(
   lineWidth = 1
 ) {
   ctx.save();
+  ctx.translate(Math.floor(x), Math.floor(y));
   ctx.strokeStyle = color;
   ctx.lineWidth = lineWidth;
-  ctx.strokeRect(x, y, width, height);
+  ctx.strokeRect(0, 0, width, height);
   ctx.restore();
 }
 
@@ -85,17 +84,17 @@ function drawWireCircle(
   color = 'red',
   lineWidth = 1
 ) {
-  const radius = Math.min(width, height) / 2;
+  const radius = Math.min(width, height);
 
   ctx.save();
 
 
-  ctx.translate(x , y);
+  ctx.translate(x, y);
 
   ctx.strokeStyle = color;
   ctx.lineWidth = lineWidth;
   ctx.beginPath();
-  ctx.arc(0, 0, radius, 0, Math.PI * 2); 
+  ctx.arc(0, 0, radius, 0, Math.PI * 2);
   ctx.stroke();
 
   ctx.restore();
@@ -140,7 +139,7 @@ function drawText(
   if (options?.outlineColor && options?.outlineWidth) {
     ctx.strokeStyle = options.outlineColor;
     ctx.lineWidth = options.outlineWidth;
-    ctx.strokeText(text, 0, 0); 
+    ctx.strokeText(text, 0, 0);
   }
 
   ctx.fillText(text, 0, 0);
@@ -156,7 +155,7 @@ const Draw = {
   drawWireCircle,
   drawWireSquare,
   drawText,
- drawFillRect
+  drawFillRect
 };
 
 export default Draw;

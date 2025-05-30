@@ -1,7 +1,7 @@
+import type TransformComponent from "../components/transform";
 import Draw from "../helpers/draw-helper";
 import { resourceManager } from "../managers/resources-manager";
 import type { CameraComponent } from "../types/camera";
-import type { PositionComponent } from "../types/component-position";
 import { ComponentType } from "../types/component-type";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
 import type { System } from "../types/system";
@@ -10,18 +10,18 @@ export default function SpriteRenderSystem(ctx: CanvasRenderingContext2D): Syste
   return {
     render(ecs) {
 
-      const camera = ecs.getSingletonComponent<CameraComponent>(ComponentType.Camera);
+      const camera = ecs.getSingletonComponent<CameraComponent>(ComponentType.CAMERA);
       if (!camera) return;
 
-      const spriteRenderers = ecs.getComponentsByType<SpriteRenderComponent>(ComponentType.SpriteRender);
+      const spriteRenderers = ecs.getComponentsByType<SpriteRenderComponent>(ComponentType.SPRITE_RENDER);
       spriteRenderers.sort((a, b) => (a.layer ?? 0) - (b.layer ?? 0));
 
       for (const spriteRender of spriteRenderers) {
         if (!spriteRender || !spriteRender.enabled) continue;
         const entity = ecs.getEntityByComponent(spriteRender);
         if (!entity) continue;
-        const position = ecs.getComponent<PositionComponent>(entity, ComponentType.Position);
-        if (!position) continue;
+        const transform = ecs.getComponent<TransformComponent>(entity, ComponentType.TRANSFORM);
+        if (!transform) continue;
 
         const sprite = spriteRender.sprite;
         if (sprite) {
@@ -36,8 +36,8 @@ export default function SpriteRenderSystem(ctx: CanvasRenderingContext2D): Syste
             sprite.y,
             sprite.width,
             sprite.height,
-            position.x - camera.x,
-            position.y - camera.y,
+            transform.position.x - camera.x,
+            transform.position.y - camera.y,
             spriteRender.color ?? " #ffffff" ,
             spriteRender.scale ?? 1,
             spriteRender.rotation ?? 0,
@@ -46,7 +46,7 @@ export default function SpriteRenderSystem(ctx: CanvasRenderingContext2D): Syste
             spriteRender.alpha ?? 1.0
           );
         } else {
-          Draw.drawFillRect(ctx, position.x - camera.x, position.y - camera.y, spriteRender.scale ?? 8, spriteRender.scale ?? 8, spriteRender.color ?? " #ffffff")
+          Draw.drawFillRect(ctx, transform.position.x - camera.x, transform.position.y - camera.y, spriteRender.scale ?? 8, spriteRender.scale ?? 8, spriteRender.color ?? " #ffffff")
         }
 
       }

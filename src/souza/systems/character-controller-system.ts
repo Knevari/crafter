@@ -1,7 +1,8 @@
+import type TransformComponent from "../components/transform";
 import Vec2 from "../helpers/vec2-math";
 import Input from "../input/Input";
 import { KeyCode } from "../input/KeyCode";
-import type { CharacterControlerComponent, PositionComponent } from "../types/component-position";
+import type { CharacterControlerComponent } from "../types/character-controller";
 import { ComponentType } from "../types/component-type";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
 import type { System } from "../types/system";
@@ -12,20 +13,17 @@ export default function CharacterControlerSystem(): System {
 
   return {
     update(ecs, deltaTime) {
-      const characterControlers = ecs.getComponentsByType<CharacterControlerComponent>(ComponentType.CharacterControler);
+      const characterControlers = ecs.getComponentsByType<CharacterControlerComponent>(ComponentType.CHARACTER_CONTROLLER);
       for (const characterControler of characterControlers) {
 
         const entity = ecs.getEntityByComponent(characterControler);
         if (!entity) continue;
 
-        const spriteRender = ecs.getComponent<SpriteRenderComponent>(entity, ComponentType.SpriteRender);
+        const spriteRender = ecs.getComponent<SpriteRenderComponent>(entity, ComponentType.SPRITE_RENDER);
         if (!spriteRender) continue;
 
-        const position = ecs.getComponent<PositionComponent>(entity, ComponentType.Position);
-        if (!position) continue;
-
-        position.previousX = position.x;
-        position.previousY = position.y;
+        const characterTransform = ecs.getComponent<TransformComponent>(entity, ComponentType.TRANSFORM);
+        if (!characterTransform) continue;
 
         characterControler.direction.x = 0;
         characterControler.direction.y = 0;
@@ -42,8 +40,8 @@ export default function CharacterControlerSystem(): System {
           speed = characterControler.speed;
         }
 
-        position.x += characterControler.direction.x * speed * deltaTime;
-        position.y += characterControler.direction.y * speed * deltaTime;
+        characterTransform.position.x += characterControler.direction.x * speed * deltaTime;
+        characterTransform.position.y += characterControler.direction.y * speed * deltaTime;
 
         if (characterControler.direction.x < 0) spriteRender.flipHorizontal = true;
         else if (characterControler.direction.x > 0) spriteRender.flipHorizontal = false;
@@ -51,28 +49,27 @@ export default function CharacterControlerSystem(): System {
       }
     },
 
-    onCollisionEnter(ecs, collisionEvent) {
-      if (!collisionEvent) return;
-      const entity = ecs.getEntityByComponent(collisionEvent.b);
-      if (!entity) return;
-      const spriteRender = ecs.getComponent<SpriteRenderComponent>(entity, ComponentType.SpriteRender);
+    onTriggerEnter(ecs, collisionEvent) {
+
+      if (collisionEvent.a.entityRef?.tag !== "player") return;
+      if (collisionEvent.b.entityRef?.tag !== "tree") return;
+
+      const spriteRender = ecs.getComponent<SpriteRenderComponent>(collisionEvent.b.entityRef, ComponentType.SPRITE_RENDER);
       if (!spriteRender) return;
 
-      if (collisionEvent.b.collisionGroup === "tree") {
-        spriteRender.alpha = 0.1
-      }
+      spriteRender.alpha = 0.6;
+
     },
 
-    onCollisionExit(ecs, collisionEvent) {
-      if (!collisionEvent) return;
-      const entity = ecs.getEntityByComponent(collisionEvent.b);
-      if (!entity) return;
-      const spriteRender = ecs.getComponent<SpriteRenderComponent>(entity, ComponentType.SpriteRender);
+    onTriggerExit(ecs, collisionEvent) {
+
+      if (collisionEvent.a.entityRef?.tag !== "player") return;
+      if (collisionEvent.b.entityRef?.tag !== "tree") return;
+
+      const spriteRender = ecs.getComponent<SpriteRenderComponent>(collisionEvent.b.entityRef, ComponentType.SPRITE_RENDER);
       if (!spriteRender) return;
 
-      if (collisionEvent.b.collisionGroup === "tree") {
-        spriteRender.alpha = 1.0
-      }
+      spriteRender.alpha = 1.0;
     },
   };
 }

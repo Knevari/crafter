@@ -2,10 +2,10 @@ import { distance, mag } from "../math";
 import { gameState } from "../game-state";
 import { getEntityCenter } from "../entities";
 import { getPath } from "../pathfinding/a-star";
-import { type Entity } from "../types";
+import { type GameEntity } from "../types";
 import { ENTITY_VISIBILITY_RANGE, PLAYER_SIZE, TILE_SIZE } from "../constants";
 
-export function updateFollowPlayerBehavior(entity: Entity, deltaTime: number) {
+export function updateFollowPlayerBehavior(entity: GameEntity, deltaTime: number) {
   const followPlayer = (entity.data.followPlayer ??= {
     state: "following",
     speed: gameState.player.data.speed / 2,
