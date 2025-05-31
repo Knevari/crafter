@@ -1,4 +1,7 @@
+import { ecs } from "../app";
 import Draw from "../helpers/draw-helper";
+import type { CameraComponent } from "../types/camera";
+import { ComponentType } from "../types/component-type";
 
 export type GizmoRect = {
     x: number;
@@ -14,15 +17,25 @@ export type GizmoCircle = {
     radius: number;
     color?: string;
 };
+export type GizmoText = {
+    x: number;
+    y: number;
+    text: string;
+    color?: string;
+    font?: string;
+};
 
 const gizmoRects: GizmoRect[] = [];
 const gizmoCircles: GizmoCircle[] = [];
+const gizmoTexts: GizmoText[] = [];
 
 export const Gizmos = {
     drawRect(rect: GizmoRect) {
         gizmoRects.push(rect);
     },
-
+    drawText(text: GizmoText) {
+        gizmoTexts.push(text);
+    },
     drawCircle(circle: GizmoCircle) {
         gizmoCircles.push(circle);
     },
@@ -30,16 +43,21 @@ export const Gizmos = {
     clear() {
         gizmoRects.length = 0;
         gizmoCircles.length = 0;
+        gizmoTexts.length = 0;
     },
 
     render(ctx: CanvasRenderingContext2D) {
-        ctx.save();
 
+        const camera = ecs.getSingletonComponent<CameraComponent>(ComponentType.CAMERA);
+        if (!camera) return;
+
+        ctx.save();
+     
         for (const rect of gizmoRects) {
             Draw.drawWireSquare(
                 ctx,
-                rect.x,
-                rect.y,
+                rect.x - camera.x,
+                rect.y - camera.y,
                 rect.width,
                 rect.height,
                 rect.color ?? "green"
@@ -49,14 +67,21 @@ export const Gizmos = {
         for (const circle of gizmoCircles) {
             Draw.drawWireCircle(
                 ctx,
-                circle.x,
-                circle.y,
+                circle.x - camera.x,
+                circle.y - camera.y,
                 circle.radius,
                 circle.radius,
                 circle.color ?? "blue"
             );
         }
-
+        for (const txt of gizmoTexts) {
+            Draw.drawText(
+                ctx,
+                txt.text,
+                txt.x - camera.x,
+                txt.y - camera.y,
+            );
+        }
         ctx.restore();
     }
 };

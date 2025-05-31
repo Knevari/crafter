@@ -13,7 +13,7 @@ import { createEntity } from "../builders/createEntity";
 
 export function createPlayer(ecs: ECSComponents, name: string) {
 
-  const entity: Entity = createEntity("player", "player", "player");
+  const entity: Entity = createEntity("player", "player");
 
   const transform = createTransform(entity);
   ecs.addComponent(entity, transform);
@@ -27,7 +27,7 @@ export function createPlayer(ecs: ECSComponents, name: string) {
     instanceId: getId(),
     enabled: true,
     ignoreSelfCollisions: true,
-    radius: 32,
+    radius: 128,
     isTrigger: true,
     type: ComponentType.CIRCLE_COLLIDER,
     entityRef: entity

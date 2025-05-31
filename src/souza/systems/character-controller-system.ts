@@ -49,11 +49,10 @@ export default function CharacterControlerSystem(): System {
       }
     },
 
-    onTriggerEnter(ecs, collisionEvent) {
+    onTriggerStay(ecs, collisionEvent) {
 
-      if (collisionEvent.a.entityRef?.tag !== "player") return;
+      if (collisionEvent.a.entityRef?.tag !== "player" || collisionEvent.a.type !== ComponentType.CIRCLE_COLLIDER) return;
       if (collisionEvent.b.entityRef?.tag !== "tree") return;
-
       const spriteRender = ecs.getComponent<SpriteRenderComponent>(collisionEvent.b.entityRef, ComponentType.SPRITE_RENDER);
       if (!spriteRender) return;
 
@@ -63,8 +62,10 @@ export default function CharacterControlerSystem(): System {
 
     onTriggerExit(ecs, collisionEvent) {
 
-      if (collisionEvent.a.entityRef?.tag !== "player") return;
+       if (collisionEvent.a.entityRef?.tag !== "player" || collisionEvent.a.type !== ComponentType.CIRCLE_COLLIDER) return;
       if (collisionEvent.b.entityRef?.tag !== "tree") return;
+
+   
 
       const spriteRender = ecs.getComponent<SpriteRenderComponent>(collisionEvent.b.entityRef, ComponentType.SPRITE_RENDER);
       if (!spriteRender) return;

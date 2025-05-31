@@ -7,7 +7,6 @@ function drawSprite(
   sourceHeight: number,
   destX: number,
   destY: number,
-  color: string,
   scale = 1,
   rotation = 0,
   flipH = false,
@@ -129,7 +128,7 @@ function drawText(
   ctx.font = options?.font ?? "16px sans-serif";
   ctx.fillStyle = options?.color ?? "black";
   ctx.textAlign = options?.textAlign ?? "center";
-  ctx.textBaseline = options?.textBaseline ?? "middle";
+  ctx.textBaseline = options?.textBaseline ?? "top";
 
   if (options?.shadowColor) {
     ctx.shadowColor = options.shadowColor;

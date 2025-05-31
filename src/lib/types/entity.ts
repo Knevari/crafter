@@ -56,7 +56,7 @@ export type InventoryItem = {
 };
 
 export interface Entity {
-  id: string;
+  id: number;
   tag: string;
   name: string;
 }

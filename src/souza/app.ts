@@ -16,6 +16,9 @@ import { TerrainSystem } from "./systems/terrain-system";
 import { resourceManager } from "./managers/resources-manager";
 import { Gizmos } from "./systems/gizmos";
 import FollowSystem from "./systems/follow-system";
+import Noise from "noise-ts";
+import { PerlinNoise2D } from "./algorithms/perlin-noise-2d";
+import { Mulberry32 } from "./algorithms/mulberry32";
 
 const debug = document.querySelector("#debug") as HTMLElement;
 
@@ -75,7 +78,7 @@ time.on("render", () => {
   engine.ctx.clearRect(0, 0, engine.canvas.width, engine.canvas.height);
 
   systems.callRender();
-  systems.callDrawGizmos();
+  // systems.callDrawGizmos();
   Gizmos.render(engine.ctx);
   Input.clearInputs();
   Gizmos.clear();
@@ -92,3 +95,4 @@ time.on("update", () => {
 time.start();
 
 // console.log(JSON.stringify(ecs.serializePersistentComponents(), null, 2))
+

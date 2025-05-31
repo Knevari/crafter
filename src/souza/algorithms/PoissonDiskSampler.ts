@@ -28,15 +28,15 @@ export class PoissonDiskSampler {
 
   public sample(): Point[] {
     const initial: Point = {
-      x: this.rng.next() * this.width,
-      y: this.rng.next() * this.height,
+      x: this.rng.nextFloat() * this.width,
+      y: this.rng.nextFloat() * this.height,
     };
     this.points.push(initial);
     this.active.push(initial);
     this.insertIntoGrid(initial);
 
     while (this.active.length > 0) {
-      const i = Math.floor(this.rng.next() * this.active.length);
+      const i = Math.floor(this.rng.nextFloat() * this.active.length);
       const point = this.active[i];
       let found = false;
 
@@ -60,8 +60,8 @@ export class PoissonDiskSampler {
   }
 
   private generateRandomAround(p: Point): Point {
-    const r = this.radius * (1 + this.rng.next());
-    const angle = 2 * Math.PI * this.rng.next();
+    const r = this.radius * (1 + this.rng.nextFloat());
+    const angle = 2 * Math.PI * this.rng.nextFloat();
     return {
       x: p.x + r * Math.cos(angle),
       y: p.y + r * Math.sin(angle),

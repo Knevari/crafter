@@ -38,7 +38,6 @@ export default function SpriteRenderSystem(ctx: CanvasRenderingContext2D): Syste
             sprite.height,
             transform.position.x - camera.x,
             transform.position.y - camera.y,
-            spriteRender.color ?? " #ffffff" ,
             spriteRender.scale ?? 1,
             spriteRender.rotation ?? 0,
             spriteRender.flipHorizontal ?? false,

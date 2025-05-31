@@ -14,7 +14,7 @@ import { createEntity } from "../builders/createEntity";
 
 export function createSlime(ecs: ECSComponents, name: string) {
 
-  const entity: Entity = createEntity("slime", "slime");
+  const entity: Entity = createEntity("slime");
 
   ecs.addComponent<TransformComponent>(entity, createTransform(entity));
 

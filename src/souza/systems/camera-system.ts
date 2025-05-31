@@ -13,13 +13,12 @@ export function cameraSystem(ctx: CanvasRenderingContext2D, player: Entity): Sys
     start(ecs) {
       playerTransform = ecs.getComponent<TransformComponent>(player, ComponentType.TRANSFORM) ?? null;
     },
-    
+
     update(ecs: ECSComponents) {
       const camera = ecs.getSingletonComponent<CameraComponent>(ComponentType.CAMERA);
       if (!camera) return;
 
       if (!playerTransform) {
-        console.warn("player mao")
         return;
       };
 

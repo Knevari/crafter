@@ -5,7 +5,6 @@ import type { BoxColliderComponent } from "../collider/IBoxCollider";
 import { systems } from "../app";
 import type { Entity } from "../../lib/types";
 import { Gizmos } from "./gizmos";
-import type { CameraComponent } from "../types/camera";
 import type TransformComponent from "../components/transform";
 import { SpatialHash } from "./SpatialHash";
 import type { ECSSystems } from "../ecs/ecs-system";
@@ -94,9 +93,7 @@ export function BoxColliderSystem(): System {
       detectCollisions(spatialHash, checkedPairs, currentCollisions, previousCollisions, systems);
     },
 
-    onDrawGizmos(ecs) {
-      const camera = ecs.getSingletonComponent<CameraComponent>(ComponentType.CAMERA);
-      if (!camera) return;
+    onDrawGizmos() {
 
       for (const { collider, t } of colliderData) {
         const offset = collider.offset ?? { x: 0, y: 0 };
@@ -104,8 +101,8 @@ export function BoxColliderSystem(): System {
         if (collider.type === ComponentType.BOX_COLLIDER) {
           const box = collider as BoxColliderComponent;
           Gizmos.drawRect({
-            x: t.position.x + offset.x - box.width / 2 - camera.x,
-            y: t.position.y + offset.y - box.height / 2 - camera.y,
+            x: t.position.x + offset.x - box.width / 2,
+            y: t.position.y + offset.y - box.height / 2,
             width: box.width,
             height: box.height,
             color: "rgb(124, 255, 2)",
@@ -113,17 +110,15 @@ export function BoxColliderSystem(): System {
         } else if (collider.type === ComponentType.CIRCLE_COLLIDER) {
           const circle = collider as CircleColliderComponent;
           Gizmos.drawCircle({
-            x: t.position.x + offset.x - camera.x,
-            y: t.position.y + offset.y - camera.y,
+            x: t.position.x + offset.x,
+            y: t.position.y + offset.y,
             radius: circle.radius,
             color: "rgb(255, 196, 0)",
           });
         }
       }
     }
-
   }
-
 }
 
 function detectCollisions(
@@ -183,7 +178,6 @@ function detectCollisions(
     }
   }
 
-
   for (const [pairKey, pair] of previousCollisions.entries()) {
     if (!currentCollisions.has(pairKey)) {
       if (pair.a.isTrigger || pair.b.isTrigger) {
@@ -199,5 +193,3 @@ function detectCollisions(
     previousCollisions.set(pairKey, pair);
   }
 }
-
-

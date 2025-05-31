@@ -1,20 +1,21 @@
-function lerpColor(a: string, b: string, t: number): string {
-  const c1 = hexToRgb(a);
-  const c2 = hexToRgb(b);
-  if (!c1 || !c2) return a;
-  const r = Math.round(c1.r + (c2.r - c1.r) * t);
-  const g = Math.round(c1.g + (c2.g - c1.g) * t);
-  const b_ = Math.round(c1.b + (c2.b - c1.b) * t);
-  return `rgb(${r},${g},${b_})`;
-}
+export function lerpColor(hexA: string, hexB: string, t: number): string {
 
-function hexToRgb(hex: string) {
-  const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
-  return m ? {
-    r: parseInt(m[1], 16),
-    g: parseInt(m[2], 16),
-    b: parseInt(m[3], 16)
-  } : null;
+  hexA = hexA.trim().replace("#", "");
+  hexB = hexB.trim().replace("#", "");
+
+  const aR = parseInt(hexA.substring(0, 2), 16);
+  const aG = parseInt(hexA.substring(2, 4), 16);
+  const aB = parseInt(hexA.substring(4, 6), 16);
+
+  const bR = parseInt(hexB.substring(0, 2), 16);
+  const bG = parseInt(hexB.substring(2, 4), 16);
+  const bB = parseInt(hexB.substring(4, 6), 16);
+
+  const r = Math.round(aR + (bR - aR) * t);
+  const g = Math.round(aG + (bG - aG) * t);
+  const b = Math.round(aB + (bB - aB) * t);
+
+  return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 }
 
 export function getColorFromGradient(colors: string[], t: number): string {
@@ -33,4 +34,3 @@ export function getColorFromGradient(colors: string[], t: number): string {
 
   return lerpColor(colorA, colorB, localT);
 }
-

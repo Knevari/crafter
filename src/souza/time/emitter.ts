@@ -1,29 +1,27 @@
-export type EventCallback = () => void;
+export type EventCallback<T = void> = (payload: T) => void;
 
-export class EventEmitter {
-    private listeners: Map<string, EventCallback[]> = new Map();
+export class EventEmitter<TEvents extends Record<string, any>> {
+    private listeners = new Map<keyof TEvents, Set<EventCallback>>();
 
-    public on(event: string, callback: EventCallback): void {
+    public on<K extends keyof TEvents>(event: K, callback: EventCallback<TEvents[K]>): void {
         if (!this.listeners.has(event)) {
-            this.listeners.set(event, []);
+            this.listeners.set(event, new Set());
         }
-        this.listeners.get(event)!.push(callback);
+        this.listeners.get(event)!.add(callback as EventCallback);
     }
 
-    public off(event: string, callback: EventCallback): void {
-        if (!this.listeners.has(event)) return;
-        const callbacks = this.listeners.get(event)!.filter(cb => cb !== callback);
-        this.listeners.set(event, callbacks);
+    public off<K extends keyof TEvents>(event: K, callback: EventCallback<TEvents[K]>): void {
+        this.listeners.get(event)?.delete(callback as EventCallback);
     }
 
-    public emit(event: string): void {
-        if (!this.listeners.has(event)) return;
-        for (const cb of this.listeners.get(event)!) {
-            cb();
-        }
+    public emit<K extends keyof TEvents>(event: K, payload?: TEvents[K]): void {
+        this.listeners.get(event)?.forEach((cb) => {
+            (cb as EventCallback<TEvents[K]>)(payload!);
+        });
     }
 
-    public clear(event: string): void {
+
+    public clear(event: keyof TEvents): void {
         this.listeners.delete(event);
     }
 
@@ -31,9 +29,9 @@ export class EventEmitter {
         this.listeners.clear();
     }
 
-    public once(event: string, callback: EventCallback): void {
-        const wrapper = () => {
-            callback();
+    public once<K extends keyof TEvents>(event: K, callback: EventCallback<TEvents[K]>): void {
+        const wrapper: EventCallback<TEvents[K]> = (payload: TEvents[K]) => {
+            callback(payload);
             this.off(event, wrapper);
         };
         this.on(event, wrapper);

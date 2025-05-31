@@ -66,7 +66,7 @@ export class ECSComponents {
     }
   }
 
-  getEntityByRef(ref: string): Entity | undefined {
+  getEntityByRef(ref: number): Entity | undefined {
   for (const componentMap of this.persistentComponents.values()) {
     for (const [entity, component] of componentMap.entries()) {
       if (component && component.entityRef?.id === ref) {

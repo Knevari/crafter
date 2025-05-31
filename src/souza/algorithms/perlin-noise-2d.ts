@@ -7,12 +7,13 @@ export class PerlinNoise2D {
     constructor(private rng: Mulberry32) {
         this.generatePermutation();
         this.generateGradients();
+        console.log(this.gradients)
     }
 
     private generatePermutation() {
         const p = Array.from({ length: 256 }, (_, i) => i);
         for (let i = 255; i > 0; i--) {
-            const j = Math.floor(this.rng.next() * (i + 1));
+            const j = Math.floor(this.rng.nextFloat() * (i + 1));
             [p[i], p[j]] = [p[j], p[i]];
         }
         this.permutation = [...p, ...p];
@@ -20,7 +21,7 @@ export class PerlinNoise2D {
 
     private generateGradients() {
         for (let i = 0; i < 256; i++) {
-            const angle = this.rng.next() * 2 * Math.PI;
+            const angle = this.rng.nextFloat() * (2 * Math.PI);
             this.gradients[i] = [Math.cos(angle), Math.sin(angle)];
         }
     }
@@ -59,7 +60,8 @@ export class PerlinNoise2D {
         const ix1 = this.lerp(n2, n3, sx);
 
         const value = this.lerp(ix0, ix1, sy);
-        return (value + 1) / 2;
+       
+        return value;
     }
 
     public fractalNoise(
@@ -80,7 +82,7 @@ export class PerlinNoise2D {
             maxValue += amplitude;
 
             amplitude *= amplitudeGain;
-            frequency *= lacunarity; 
+            frequency *= lacunarity;
         }
 
         return total / maxValue;

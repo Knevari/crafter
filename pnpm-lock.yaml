@@ -11,10 +11,10 @@ importers:
       '@paralleldrive/cuid2':
         specifier: ^2.2.2
         version: 2.2.2
-      PCG32:
-        specifier: https://github.com/Wallisonsouza/PCG32
-        version: pcg32@https://codeload.github.com/Wallisonsouza/PCG32/tar.gz/b40ec76614d39f41a271b468c31677c4fafed8e4
       alea:
+        specifier: ^1.0.1
+        version: 1.0.1
+      noise-ts:
         specifier: ^1.0.1
         version: 1.0.1
       simplex-noise:
@@ -316,9 +316,8 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  pcg32@https://codeload.github.com/Wallisonsouza/PCG32/tar.gz/b40ec76614d39f41a271b468c31677c4fafed8e4:
-    resolution: {tarball: https://codeload.github.com/Wallisonsouza/PCG32/tar.gz/b40ec76614d39f41a271b468c31677c4fafed8e4}
-    version: 1.0.0
+  noise-ts@1.0.1:
+    resolution: {integrity: sha512-CXq1QEnjdEtaJHFkcBLfqHcbF243OSziFgSICNDtYuvli/I8KFRSvLy/zDGfUi6T0lrnYRxy7of4aIAlb1a/mg==}
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -576,7 +575,7 @@ snapshots:
 
   nanoid@3.3.11: {}
 
-  pcg32@https://codeload.github.com/Wallisonsouza/PCG32/tar.gz/b40ec76614d39f41a271b468c31677c4fafed8e4: {}
+  noise-ts@1.0.1: {}
 
   picocolors@1.1.1: {}
 

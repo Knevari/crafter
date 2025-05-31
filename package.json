@@ -15,6 +15,7 @@
   "dependencies": {
     "@paralleldrive/cuid2": "^2.2.2",
     "alea": "^1.0.1",
+    "noise-ts": "^1.0.1",
     "simplex-noise": "^4.0.3"
   }
 }
