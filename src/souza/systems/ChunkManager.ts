@@ -1,22 +1,25 @@
 import type { Entity } from "../../lib/types";
 import { EventEmitter, type EventCallback } from "../time/emitter";
-import type { Vector2 } from "../types/vector2";
+import type { Vec2 } from "../Vec2/Vec2";
 import type { TerrainCell, World } from "./Word";
 
+
+
 interface Chunk {
+    position: Vec2;
     cells: TerrainCell[];
     entities: Entity[];
 }
 
 interface ChunkEvents {
-    chunkLoaded: Vector2;
-    chunkUnloaded: Vector2;
+    chunkLoaded: Vec2;
+    chunkUnloaded: Vec2;
 }
 
 export class ChunkManager {
 
-    public static CHUNK_WIDTH = 8;
-    public static CHUNK_HEIGHT = 8;
+    public static CHUNK_WIDTH = 16;
+    public static CHUNK_HEIGHT = 16;
 
 
     private static loadedChunks = new Map<string, Chunk>();
@@ -28,44 +31,45 @@ export class ChunkManager {
         if (this.loadedChunks.has(key)) return;
 
         const cells = world.generateCells(ChunkManager.CHUNK_WIDTH, ChunkManager.CHUNK_HEIGHT, x, y);
-        this.loadedChunks.set(key, { cells: cells, entities: [] });
+        const chunk: Chunk = { cells: cells, entities: [], position: { x: x, y: y } };
+        this.loadedChunks.set(key, chunk);
         this.events.emit("chunkLoaded", { x: x, y: y });
     }
 
-   public static updateAround(pos: Vector2, radius: number, world: World): void {
-  
-    const halfChunkWidthInTiles = ChunkManager.CHUNK_WIDTH / 2;
-    const halfChunkHeightInTiles = ChunkManager.CHUNK_HEIGHT / 2;
-    
-    const tileX = Math.floor(pos.x / world.TILE_SIZE + halfChunkWidthInTiles);
-    const tileY = Math.floor(pos.y / world.TILE_SIZE + halfChunkHeightInTiles);
+    public static updateAround(pos: Vec2, radius: number, world: World): void {
 
-    const chunkX = Math.floor(tileX / ChunkManager.CHUNK_WIDTH);
-    const chunkY = Math.floor(tileY / ChunkManager.CHUNK_HEIGHT);
+        const halfChunkWidthInTiles = ChunkManager.CHUNK_WIDTH / 2;
+        const halfChunkHeightInTiles = ChunkManager.CHUNK_HEIGHT / 2;
 
-    const keepChunks = new Set<string>();
+        const tileX = Math.floor(pos.x / world.TILE_SIZE + halfChunkWidthInTiles);
+        const tileY = Math.floor(pos.y / world.TILE_SIZE + halfChunkHeightInTiles);
 
-    for (let dx = -radius; dx <= radius; dx++) {
-        for (let dy = -radius; dy <= radius; dy++) {
-            const x = chunkX + dx;
-            const y = chunkY + dy;
-            const key = `${x},${y}`;
-            keepChunks.add(key);
-            if (!this.loadedChunks.has(key)) {
-                this.loadChunk(x, y, world);
+        const chunkX = Math.floor(tileX / ChunkManager.CHUNK_WIDTH);
+        const chunkY = Math.floor(tileY / ChunkManager.CHUNK_HEIGHT);
+
+        const keepChunks = new Set<string>();
+
+        for (let dx = -radius; dx <= radius; dx++) {
+            for (let dy = -radius; dy <= radius; dy++) {
+                const x = chunkX + dx;
+                const y = chunkY + dy;
+                const key = `${x},${y}`;
+                keepChunks.add(key);
+                if (!this.loadedChunks.has(key)) {
+                    this.loadChunk(x, y, world);
+                }
+            }
+        }
+
+        for (const [key] of this.loadedChunks) {
+            if (!keepChunks.has(key)) {
+                const [xStr, yStr] = key.split(",");
+                const x = Number(xStr);
+                const y = Number(yStr);
+                this.unloadChunk(x, y);
             }
         }
     }
-
-    for (const [key] of this.loadedChunks) {
-        if (!keepChunks.has(key)) {
-            const [xStr, yStr] = key.split(",");
-            const x = Number(xStr);
-            const y = Number(yStr);
-            this.unloadChunk(x, y);
-        }
-    }
-}
 
     public static unloadChunk(x: number, y: number): void {
         const key = `${x},${y}`;

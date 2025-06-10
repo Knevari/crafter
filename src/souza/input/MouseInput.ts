@@ -1,14 +1,14 @@
-import type { Vector2 } from "../types/vector2";
+import type { Vec2 } from "../Vec2/Vec2";
 
-const VECTOR3_ZERO: Vector2 = { x: 0, y: 0 }
+const VECTOR3_ZERO: Vec2 = { x: 0, y: 0 }
 
 export default class MouseInput {
     private static readonly buttonState = new Map<number, boolean>();
     private static readonly buttonDown = new Map<number, boolean>();
     private static readonly buttonUp = new Map<number, boolean>();
-    private static position: Vector2 = VECTOR3_ZERO;
-    private static movement: Vector2 = VECTOR3_ZERO;
-    private static scrollDelta: Vector2 = VECTOR3_ZERO;
+    private static position: Vec2 = VECTOR3_ZERO;
+    private static movement: Vec2 = VECTOR3_ZERO;
+    private static scrollDelta: Vec2 = VECTOR3_ZERO;
     private static scrollCallback: ((delta: { x: number, y: number }) => void) | null = null;
 
     public static initialize(): void {

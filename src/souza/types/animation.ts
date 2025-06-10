@@ -1,4 +1,4 @@
-import type { BoxColliderComponent } from "../collider/IBoxCollider";
+import type { BoxColliderComponent } from "../collider/types/BoxCollider";
 import type { Sprite } from "./sprite";
 
 export interface AnimationFrame {

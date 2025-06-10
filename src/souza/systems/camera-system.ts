@@ -5,9 +5,9 @@ import type { CameraComponent } from "../types/camera";
 import { ComponentType } from "../types/component-type";
 import type { System } from "../types/system";
 
-export function cameraSystem(ctx: CanvasRenderingContext2D, player: Entity): System {
+let playerTransform: TransformComponent | null = null;
 
-  let playerTransform: TransformComponent | null = null;
+export function cameraSystem(ctx: CanvasRenderingContext2D, player: Entity): System {
   return {
 
     start(ecs) {
@@ -25,8 +25,8 @@ export function cameraSystem(ctx: CanvasRenderingContext2D, player: Entity): Sys
       const targetX = playerTransform.position.x - ctx.canvas.width / 2;
       const targetY = playerTransform.position.y - ctx.canvas.height / 2;
 
-      camera.x = targetX;
-      camera.y = targetY;
+      camera.transform.position.x = targetX;
+      camera.transform.position.y = targetY;
     }
   };
 }

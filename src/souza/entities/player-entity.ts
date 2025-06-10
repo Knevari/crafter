@@ -7,9 +7,10 @@ import { createSpriteRender } from "../builders/createSpriteRender";
 import { createBoxCollider } from "../builders/createBoxCollider";
 import { createAnimator } from "../builders/createAnimator";
 import { createTransform } from "../components/transform";
-import type { CircleColliderComponent } from "../collider/circle-collider";
+import type { CircleColliderComponent } from "../collider/types/CircleCollider";
 import { getId } from "../builders/createId";
 import { createEntity } from "../builders/createEntity";
+import type { BoxColliderComponent } from "../collider/types/BoxCollider";
 
 export function createPlayer(ecs: ECSComponents, name: string) {
 
@@ -18,19 +19,26 @@ export function createPlayer(ecs: ECSComponents, name: string) {
   const transform = createTransform(entity);
   ecs.addComponent(entity, transform);
 
-  const boxCollider = createBoxCollider(entity,
-    { width: 32, height: 40, offset: { x: 0, y: -4 }, collisionGroup: "player" }
-  )
-  ecs.addComponent(entity, boxCollider);
+  // ecs.addComponent<BoxColliderComponent>(entity, {
+  //   instanceId: getId(),
+  //   type: ComponentType.BOX_COLLIDER,
+  //   ignoreSelfCollisions: true,
+  //   size: { x: 32, y: 32 },
+  //   offset: { x: 0, y: 0 },
+  //   enabled: true,
+  //   isTrigger: false
+  // });
 
   ecs.addComponent<CircleColliderComponent>(entity, {
     instanceId: getId(),
     enabled: true,
     ignoreSelfCollisions: true,
-    radius: 128,
-    isTrigger: true,
+    radius: 12,
+    isTrigger: false,
+    offset: {x: 0, y: -8},
     type: ComponentType.CIRCLE_COLLIDER,
-    entityRef: entity
+    entityRef: entity,
+    collisionGroup: "player"
   })
 
 

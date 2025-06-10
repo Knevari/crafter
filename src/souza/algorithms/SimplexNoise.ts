@@ -1,7 +1,4 @@
-interface Vec2 {
-  x: number;
-  y: number;
-}
+import type { Vec2 } from "../Vec2/Vec2";
 
 interface Vec3 {
   x: number;

@@ -1,30 +1,28 @@
-import type { Vector2 } from "../../types/vector2";
-import { getAABBMinMax } from "../getAABBMinMax";
-import type { BoxColliderComponent } from "../IBoxCollider";
+import Vec2Math from "../../helpers/vec2-math";
+import type { Vec2 } from "../../Vec2/Vec2";
+import type { Bounds } from "../types/Bounds";
+import { getBoundsCenterInto, getBoxOverlapInto, getSeparationDirection } from "../util/getCircleCenter";
+
+const _overlap = Vec2Math.createZero();
+const _centerA = Vec2Math.createZero();
+const _centerB = Vec2Math.createZero();
 
 export function resolveBoxBoxOverlap(
-  aPos: Vector2,
-  aCol: BoxColliderComponent,
-  bPos: Vector2,
-  bCol: BoxColliderComponent
-): { dx: number; dy: number } | null {
-  const a = getAABBMinMax(aPos, aCol);
-  const b = getAABBMinMax(bPos, bCol);
+  a: Bounds,
+  b: Bounds
+): Vec2 | null {
 
-  const overlapX = Math.min(a.max.x, b.max.x) - Math.max(a.min.x, b.min.x);
-  const overlapY = Math.min(a.max.y, b.max.y) - Math.max(a.min.y, b.min.y);
+  getBoxOverlapInto(a, b, _overlap);
 
-  if (overlapX <= 0 || overlapY <= 0) return null;
+  if (_overlap.x <= 0 || _overlap.y <= 0) return null;
 
-  if (overlapX < overlapY) {
-    const aCenterX = (a.min.x + a.max.x) / 2;
-    const bCenterX = (b.min.x + b.max.x) / 2;
-    const dx = aCenterX < bCenterX ? -overlapX : overlapX;
-    return { dx, dy: 0 };
+  getBoundsCenterInto(a, _centerA);
+  getBoundsCenterInto(b, _centerB);
+
+  if (_overlap.x < _overlap.y) {
+    return { x: getSeparationDirection(_centerA.x, _centerB.x, _overlap.x), y: 0 };
   } else {
-    const aCenterY = (a.min.y + a.max.y) / 2;
-    const bCenterY = (b.min.y + b.max.y) / 2;
-    const dy = aCenterY < bCenterY ? -overlapY : overlapY;
-    return { dx: 0, dy };
+    return { x: 0, y: getSeparationDirection(_centerA.y, _centerB.y, _overlap.y) };
   }
 }
+

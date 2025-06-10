@@ -1,4 +1,4 @@
-import type { Vector2 } from "../types/vector2";
+import type { Vec2 } from "../Vec2/Vec2";
 
 export default class Display {
 
@@ -17,7 +17,7 @@ export default class Display {
         this._width = width;
         this._height = height;
     }
-    public static getDimensions(): Vector2 {
+    public static getDimensions(): Vec2 {
         return { x: this._width, y: this._height };
     }
 

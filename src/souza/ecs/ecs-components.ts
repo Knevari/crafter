@@ -37,11 +37,11 @@ export class ECSComponents {
   getComponent<T extends Component>(
     entityId: Entity,
     componentType: ComponentType
-  ): T | undefined {
+  ): T | null {
     return (
       this.persistentComponents.get(componentType)?.get(entityId) ??
       this.transientComponents.get(componentType)?.get(entityId)
-    ) as T | undefined;
+    ) as T | null;
   }
 
   hasComponent(entityId: Entity, componentType: ComponentType): boolean {

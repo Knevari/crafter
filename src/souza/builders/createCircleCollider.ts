@@ -1,5 +1,5 @@
 import type { Entity } from "../../lib/types";
-import type { CircleColliderComponent } from "../collider/circle-collider";
+import type { CircleColliderComponent } from "../collider/types/CircleCollider";
 import { ComponentType } from "../types/component-type";
 import { getId } from "./createId";
 type CircleColliderOptions = Partial<Omit<CircleColliderComponent, "entityRef">>;

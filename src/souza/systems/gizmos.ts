@@ -56,10 +56,9 @@ export const Gizmos = {
         for (const rect of gizmoRects) {
             Draw.drawWireSquare(
                 ctx,
-                rect.x - camera.x,
-                rect.y - camera.y,
-                rect.width,
-                rect.height,
+                {x: rect.x - camera.transform.position.x, y: rect.y - camera.transform.position.y,},
+                { x: rect.width,  y: rect.height},
+                { x: 0.5,  y: 0.5},
                 rect.color ?? "green"
             );
         }
@@ -67,21 +66,20 @@ export const Gizmos = {
         for (const circle of gizmoCircles) {
             Draw.drawWireCircle(
                 ctx,
-                circle.x - camera.x,
-                circle.y - camera.y,
-                circle.radius,
+                circle.x - camera.transform.position.x,
+                circle.y - camera.transform.position.y,
                 circle.radius,
                 circle.color ?? "blue"
             );
         }
-        for (const txt of gizmoTexts) {
-            Draw.drawText(
-                ctx,
-                txt.text,
-                txt.x - camera.x,
-                txt.y - camera.y,
-            );
-        }
+        // for (const txt of gizmoTexts) {
+        //     // Draw.drawText(
+        //     //     ctx,
+        //     //     txt.text,
+        //     //     txt.x - camera.x,
+        //     //     txt.y - camera.y,
+        //     // );
+        // }
         ctx.restore();
     }
 };

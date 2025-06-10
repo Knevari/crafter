@@ -1,3 +1,5 @@
+import type { Vec2 } from "../Vec2/Vec2";
+
 function drawSprite(
   ctx: CanvasRenderingContext2D,
   image: CanvasImageSource,
@@ -5,24 +7,26 @@ function drawSprite(
   sourceY: number,
   sourceWidth: number,
   sourceHeight: number,
-  destX: number,
-  destY: number,
-  scale = 1,
+  position: Vec2,
+  scale: Vec2,
+  origin: Vec2,
   rotation = 0,
   flipH = false,
   flipV = false,
   alpha = 1
 ) {
-  const destWidth = sourceWidth * scale;
-  const destHeight = sourceHeight * scale;
+  const destWidth = sourceWidth * scale.x;
+  const destHeight = sourceHeight * scale.y;
+
+  const offsetX = -destWidth * origin.x;
+  const offsetY = -destHeight * origin.y;
 
   ctx.save();
   ctx.imageSmoothingEnabled = false;
   ctx.imageSmoothingQuality = "low";
-
   ctx.globalAlpha = alpha;
 
-  ctx.translate(Math.floor(destX), Math.floor(destY));
+  ctx.translate(position.x, position.y);
   ctx.rotate(rotation);
   ctx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
 
@@ -32,8 +36,8 @@ function drawSprite(
     sourceY,
     sourceWidth,
     sourceHeight,
-    Math.floor(-destWidth / 2),
-    Math.floor(-destHeight / 2),
+    offsetX,
+    offsetY,
     destWidth,
     destHeight
   );
@@ -41,59 +45,70 @@ function drawSprite(
   ctx.restore();
 }
 
+
+
 function drawWireSquare(
   ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
+  position: Vec2,
+  scale: Vec2,
+  origin: Vec2,
   color = 'red',
   lineWidth = 1
 ) {
   ctx.save();
-  ctx.translate(Math.floor(x), Math.floor(y));
+  ctx.translate(position.x, position.y);
   ctx.strokeStyle = color;
   ctx.lineWidth = lineWidth;
-  ctx.strokeRect(0, 0, width, height);
+
+  const offsetX = -scale.x * origin.x;
+  const offsetY = -scale.y * origin.y;
+
+  ctx.strokeRect(Math.floor(offsetX), Math.floor(offsetY), scale.x, scale.y);
   ctx.restore();
 }
+
 
 function drawFillRect(
   ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
+  position: Vec2,
+  scale: Vec2,
+  origin: Vec2,
   color = 'red'
 ) {
   ctx.save();
-  ctx.translate(Math.floor(x), Math.floor(y));
+  ctx.translate(Math.floor(position.x), Math.floor(position.y));
   ctx.fillStyle = color;
-  ctx.fillRect(0, 0, width, height);
+
+  const offsetX = -scale.x * origin.x;
+  const offsetY = -scale.y * origin.y;
+
+  ctx.fillRect(Math.floor(offsetX), Math.floor(offsetY), scale.x, scale.y);
+
   ctx.restore();
 }
 
+
+
+
+
+const PI_2 = Math.PI * 2;
 
 function drawWireCircle(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
-  width: number,
-  height: number,
+  radius: number,
   color = 'red',
   lineWidth = 1
 ) {
-  const radius = Math.min(width, height);
 
   ctx.save();
-
-
   ctx.translate(x, y);
 
   ctx.strokeStyle = color;
   ctx.lineWidth = lineWidth;
   ctx.beginPath();
-  ctx.arc(0, 0, radius, 0, Math.PI * 2);
+  ctx.arc(0, 0, radius, 0, PI_2);
   ctx.stroke();
 
   ctx.restore();

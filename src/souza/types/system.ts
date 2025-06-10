@@ -4,7 +4,7 @@ import type { CollisionEvent, TriggerEvent } from "./collision-event";
 export interface System {
     priority?: number;
     start?: (ecs: ECSComponents) => void;
-    update?: (ecs: ECSComponents, deltaTime: number) => void;
+    update?: (ecs: ECSComponents) => void;
     fixedUpdate?: (ecs: ECSComponents) => void;
     latedUpdate?: (ecs: ECSComponents) => void;
     render?: (ecs: ECSComponents) => void;
@@ -14,7 +14,7 @@ export interface System {
     onCollisionStay?: (ecs: ECSComponents, collisionEvent: CollisionEvent) => void;
     onCollisionExit?: (ecs: ECSComponents, collisionEvent: CollisionEvent) => void;
 
-    onTriggerEnter?: (ecs: ECSComponents, collisionEvent: TriggerEvent) => void;
-    onTriggerStay?: (ecs: ECSComponents, collisionEvent: TriggerEvent) => void;
-    onTriggerExit?: (ecs: ECSComponents, collisionEvent: TriggerEvent) => void;
+    onTriggerEnter?: (ecs: ECSComponents, triggerEvent: TriggerEvent) => void;
+    onTriggerStay?: (ecs: ECSComponents, triggerEvent: TriggerEvent) => void;
+    onTriggerExit?: (ecs: ECSComponents, triggerEvent: TriggerEvent) => void;
 }

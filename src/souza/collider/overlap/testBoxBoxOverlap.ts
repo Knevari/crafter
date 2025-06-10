@@ -1,25 +1,10 @@
-import type { Vector2 } from "../../types/vector2";
-import { getBounds } from "../getBounds";
-import type { BoxColliderComponent } from "../IBoxCollider";
+import type { Bounds } from "../types/Bounds";
 
-export function testBoxBoxOverlap(
-  aPos: Vector2,
-  aCol: BoxColliderComponent,
-  bPos: Vector2,
-  bCol: BoxColliderComponent
-): boolean {
-  const a = getBounds(aPos, aCol);
-  const b = getBounds(bPos, bCol);
+export function testBoxBoxOverlap(a: Bounds, b: Bounds): boolean {
+  if (a.right <= b.left) return false;
+  if (a.left >= b.right) return false;
+  if (a.bottom <= b.top) return false;
+  if (a.top >= b.bottom) return false;
 
-  const collision =
-    a.left < b.right &&
-    a.right > b.left &&
-    a.top < b.bottom &&
-    a.bottom > b.top;
-
-  return collision;
+  return true;
 }
-
-
-
-

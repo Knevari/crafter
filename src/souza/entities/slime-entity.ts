@@ -1,7 +1,7 @@
 import type { Entity } from "../../lib/types";
 import type { ECSComponents } from "../ecs/ecs-components";
 import type { AnimatorComponent } from "../types/animator";
-import type { BoxColliderComponent } from "../collider/IBoxCollider";
+import type { BoxColliderComponent } from "../collider/types/BoxCollider";
 import { ComponentType } from "../types/component-type";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
 import { SLIME_ANIMATOR_CONTROLLER } from "../animator/controllers/slime-controller";
@@ -9,7 +9,7 @@ import { createTransform } from "../components/transform";
 import type TransformComponent from "../components/transform";
 import { createAnimator } from "../builders/createAnimator";
 import { getId } from "../builders/createId";
-import type { CircleColliderComponent } from "../collider/circle-collider";
+import type { CircleColliderComponent } from "../collider/types/CircleCollider";
 import { createEntity } from "../builders/createEntity";
 
 export function createSlime(ecs: ECSComponents, name: string) {
@@ -18,27 +18,26 @@ export function createSlime(ecs: ECSComponents, name: string) {
 
   ecs.addComponent<TransformComponent>(entity, createTransform(entity));
 
-  ecs.addComponent<BoxColliderComponent>(entity, {
-    instanceId: getId(),
-    type: ComponentType.BOX_COLLIDER,
-    ignoreSelfCollisions: true,
-    width: 32,
-    height: 32,
-    offset: { x: 0, y: 0 },
-    enabled: true,
-    isTrigger: false
-  });
+  // ecs.addComponent<BoxColliderComponent>(entity, {
+  //   instanceId: getId(),
+  //   type: ComponentType.BOX_COLLIDER,
+  //   ignoreSelfCollisions: true,
+  //   size: { x: 32, y: 32 },
+  //   offset: { x: 0, y: 0 },
+  //   enabled: true,
+  //   isTrigger: false
+  // });
 
   ecs.addComponent<CircleColliderComponent>(entity, {
     instanceId: getId(),
     offset: { x: 0, y: 0 },
     enabled: true,
-    isTrigger: true,
+    isTrigger: false,
     ignoreSelfCollisions: true,
-    radius: 128,
+    radius: 32,
     type: ComponentType.CIRCLE_COLLIDER,
     entityRef: entity
-  })
+  });
 
 
   ecs.addComponent<SpriteRenderComponent>(entity, {

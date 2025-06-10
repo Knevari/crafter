@@ -8,30 +8,54 @@ export default class PCG32 {
         this.srandom(initState, initSeq);
     }
 
-    random(): number {
-        const oldstate: bigint = this.state;
-        this.state = (oldstate * 6364136223846793005n + this.inc) & PCG32.MASK_64;
+    private advanceState(oldState: bigint): bigint {
+        return (oldState * 6364136223846793005n + this.inc) & PCG32.MASK_64;
+    }
 
-        const xorshifted: bigint = ((oldstate >> 18n) ^ oldstate) >> 27n;
-        const rot: bigint = oldstate >> 59n;
+    private calculateXorshifted(state: bigint): bigint {
+        return ((state >> 18n) ^ state) >> 27n;
+    }
 
-        const rot32 = Number(rot);
-        const x = xorshifted & PCG32.MASK_32;
+    private calculateRotation(state: bigint): number {
+        return Number(state >> 59n);
+    }
 
-        const result = ((x >> BigInt(rot32)) | (x << BigInt((32 - rot32) & 31))) & PCG32.MASK_32;
+    private rotateRight(x: bigint, rot: number): bigint {
+        return ((x >> BigInt(rot)) | (x << BigInt((32 - rot) & 31))) & PCG32.MASK_32;
+    }
+
+    private random(): number {
+        const oldstate = this.state;
+        this.state = this.advanceState(oldstate);
+
+        const xorshifted = this.calculateXorshifted(oldstate);
+        const rot = this.calculateRotation(oldstate);
+        const result = this.rotateRight(xorshifted & PCG32.MASK_32, rot);
 
         return Number(result);
     }
 
-    srandom(initState: bigint, initSeq: bigint): void {
+    private makeOddIncrement(seq: bigint): bigint {
+        return (seq << 1n) | 1n;
+    }
+
+    private srandom(initState: bigint, initSeq: bigint): void {
         this.state = 0n;
-        this.inc = (initSeq << 1n) | 1n;
+        this.inc =  this.makeOddIncrement(initSeq);
         this.random();
         this.state = (this.state + initState) & PCG32.MASK_64;
         this.random();
     }
 
-    randomFloat(): number {
-        return this.random() / 0xFFFFFFFF;
+    public randomFloat(): number {
+        return this.random() / (0x100000000);
+    }
+
+    public randomInRange(min: number, max: number): number {
+        return min + this.randomFloat() * (max - min);
+    }
+
+    getState(): { state: bigint, inc: bigint } {
+        return { state: this.state, inc: this.inc };
     }
 }

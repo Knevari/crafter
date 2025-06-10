@@ -1,15 +1,15 @@
 import type { System } from "../types/system";
 import type { ECSComponents } from "../ecs/ecs-components";
 import { ComponentType } from "../types/component-type";
-import type { BoxColliderComponent } from "../collider/IBoxCollider";
+import type { BoxColliderComponent } from "../collider/types/BoxCollider";
 import { systems } from "../app";
 import type { Entity } from "../../lib/types";
 import { Gizmos } from "./gizmos";
 import type TransformComponent from "../components/transform";
 import { SpatialHash } from "./SpatialHash";
 import type { ECSSystems } from "../ecs/ecs-system";
-import type { CircleColliderComponent } from "../collider/circle-collider";
-import type { Collider } from "../collider/collider";
+import type { CircleColliderComponent } from "../collider/types/CircleCollider";
+import type { Collider } from "../collider/types/Collider";
 import { testOverlap } from "../collider/overlap/testOverlap";
 import { resolveOverlap } from "../collider/resolution/resolveOverlap";
 
@@ -22,6 +22,7 @@ interface ColliderData {
   collider: Collider;
   entity: Entity;
   t: TransformComponent;
+  debugColor?: string;
 }
 
 interface CollisionPair {
@@ -41,7 +42,7 @@ const checkedPairs = new Set<string>();
 const min = { x: 0, y: 0 };
 const max = { x: 0, y: 0 };
 
-export function BoxColliderSystem(): System {
+export function ColliderSystem(): System {
   return {
     fixedUpdate(ecs: ECSComponents) {
       // Limpeza
@@ -69,10 +70,10 @@ export function BoxColliderSystem(): System {
         if (collider.type === ComponentType.BOX_COLLIDER) {
           const box = collider as BoxColliderComponent;
 
-          min.x = t.position.x + offset.x - box.width / 2;
-          min.y = t.position.y + offset.y - box.height / 2;
-          max.x = t.position.x + offset.x + box.width / 2;
-          max.y = t.position.y + offset.y + box.height / 2;
+          min.x = t.position.x + offset.x - box.size.x / 2;
+          min.y = t.position.y + offset.y - box.size.y / 2;
+          max.x = t.position.x + offset.x + box.size.x / 2;
+          max.y = t.position.y + offset.y + box.size.y / 2;
 
         } else if (collider.type === ComponentType.CIRCLE_COLLIDER) {
           const circle = collider as CircleColliderComponent;
@@ -83,29 +84,26 @@ export function BoxColliderSystem(): System {
           max.y = t.position.y + offset.y + circle.radius;
         }
 
-
-
-        const data = { collider: collider, entity, t };
+        const data: ColliderData = { collider, entity, t, debugColor: "rgb(0, 255, 13)" };
         colliderData.push(data);
         spatialHash.insert(min, max, data);
       }
-
       detectCollisions(spatialHash, checkedPairs, currentCollisions, previousCollisions, systems);
     },
 
     onDrawGizmos() {
 
-      for (const { collider, t } of colliderData) {
+      for (const { collider, t, debugColor } of colliderData) {
         const offset = collider.offset ?? { x: 0, y: 0 };
 
         if (collider.type === ComponentType.BOX_COLLIDER) {
           const box = collider as BoxColliderComponent;
           Gizmos.drawRect({
-            x: t.position.x + offset.x - box.width / 2,
-            y: t.position.y + offset.y - box.height / 2,
-            width: box.width,
-            height: box.height,
-            color: "rgb(124, 255, 2)",
+            x: t.position.x + offset.x,
+            y: t.position.y + offset.y,
+            width: box.size.x,
+            height: box.size.y,
+            color: debugColor,
           });
         } else if (collider.type === ComponentType.CIRCLE_COLLIDER) {
           const circle = collider as CircleColliderComponent;
@@ -113,7 +111,7 @@ export function BoxColliderSystem(): System {
             x: t.position.x + offset.x,
             y: t.position.y + offset.y,
             radius: circle.radius,
-            color: "rgb(255, 196, 0)",
+            color: debugColor,
           });
         }
       }
@@ -147,9 +145,9 @@ function detectCollisions(
         if (checkedPairs.has(pairKey)) continue;
         checkedPairs.add(pairKey);
 
-
         if (!testOverlap(a.t.position, a.collider, b.t.position, b.collider)) continue;
-
+        a.debugColor = "rgb(255, 8, 0)";
+        b.debugColor = "rgb(255, 8, 0)";
         const aIsTrigger = a.collider.isTrigger;
         const bIsTrigger = b.collider.isTrigger;
 
@@ -158,21 +156,19 @@ function detectCollisions(
         currentCollisions.set(pairKey, { a: a.collider, b: b.collider });
         const wasColliding = previousCollisions.has(pairKey);
 
-
         if (isTriggerInteraction) {
           if (!wasColliding) systems.callTriggerEnterEvents({ a: a.collider, b: b.collider });
           systems.callTriggerStayEvents({ a: a.collider, b: b.collider });
           continue;
         }
 
-
         if (!wasColliding) systems.callCollisionEnterEvents({ a: a.collider, b: b.collider });
         systems.callCollisionStayEvents({ a: a.collider, b: b.collider });
 
         const resolution = resolveOverlap(a.t.position, a.collider, b.t.position, b.collider);
         if (resolution) {
-          a.t.position.x += resolution.dx;
-          a.t.position.y += resolution.dy;
+          a.t.position.x += resolution.x;
+          a.t.position.y += resolution.y;
         }
       }
     }

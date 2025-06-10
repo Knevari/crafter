@@ -1,36 +1,61 @@
 import { ComponentType } from "../../types/component-type";
-import type { Vector2 } from "../../types/vector2";
-import type { CircleColliderComponent } from "../circle-collider";
-import type { Collider } from "../collider";
-import type { BoxColliderComponent } from "../IBoxCollider";
+import type { Vec2 } from "../../Vec2/Vec2";
+import type { CircleColliderComponent } from "../types/CircleCollider";
+import type { Collider } from "../types/Collider";
+import type { BoxColliderComponent } from "../types/BoxCollider";
+import { isOfType } from "../util/isOfType";
 import { resolveBoxBoxOverlap } from "./resolveBoxBoxCollision";
 import { resolveBoxCircleOverlap } from "./resolveBoxCircleOverlap";
 import { resolveCircleCircleOverlap } from "./resolveCircleCircleOverlap";
+import Vec2Math from "../../helpers/vec2-math";
+import { getBounds } from "../util/getCircleCenter";
+
 export interface CollisionResolution {
   dx: number;
   dy: number;
 }
 
-export function resolveOverlap(aPos: Vector2, a: Collider, bPos: Vector2, b: Collider): CollisionResolution | null {
-  if (a.type === ComponentType.BOX_COLLIDER && b.type === ComponentType.BOX_COLLIDER) {
-    return resolveBoxBoxOverlap(aPos, a as BoxColliderComponent, bPos, b as BoxColliderComponent);
-  }
-  if (a.type === ComponentType.CIRCLE_COLLIDER && b.type === ComponentType.CIRCLE_COLLIDER) {
-    return resolveCircleCircleOverlap(aPos, a as CircleColliderComponent, bPos, b as CircleColliderComponent);
-  }
-  if (a.type === ComponentType.BOX_COLLIDER && b.type === ComponentType.CIRCLE_COLLIDER) {
-    return resolveBoxCircleOverlap(aPos, a as BoxColliderComponent, bPos, b as CircleColliderComponent);
+export function resolveOverlap(aPos: Vec2, a: Collider, bPos: Vec2, b: Collider): Vec2 | null {
+  // if (isOfType<BoxColliderComponent>(a, ComponentType.BOX_COLLIDER) &&
+  //   isOfType<BoxColliderComponent>(b, ComponentType.BOX_COLLIDER)) {
+
+  //   const offsetA = Vec2Math.add(aPos, a.offset ?? { x: 0, y: 0 });
+  //   const offsetB = Vec2Math.add(bPos, b.offset ?? { x: 0, y: 0 });
+  //   return resolveBoxBoxOverlap(offsetA, a.size, offsetB, b.size);
+  // }
+
+  // if (isOfType<CircleColliderComponent>(a, ComponentType.CIRCLE_COLLIDER) &&
+  //   isOfType<CircleColliderComponent>(b, ComponentType.CIRCLE_COLLIDER)) {
+
+  //   const offsetA = Vec2Math.add(aPos, a.offset ?? { x: 0, y: 0 });
+  //   const offsetB = Vec2Math.add(bPos, b.offset ?? { x: 0, y: 0 });
+  //   return resolveCircleCircleOverlap(offsetA, a.radius, offsetB, b.radius);
+  // }
+
+  if (isOfType<BoxColliderComponent>(a, ComponentType.BOX_COLLIDER) &&
+    isOfType<CircleColliderComponent>(b, ComponentType.CIRCLE_COLLIDER)) {
+
+    const offsetA = Vec2Math.add(aPos, a.offset ?? { x: 0, y: 0 });
+    const offsetB = Vec2Math.add(bPos, b.offset ?? { x: 0, y: 0 });
+
+    const bounds = getBounds(offsetA, a.size);
+    return resolveBoxCircleOverlap(bounds, offsetB, b.radius);
   }
 
-  // atencao ------------> nao testado
-  if (a.type === ComponentType.CIRCLE_COLLIDER && b.type === ComponentType.BOX_COLLIDER) {
-    const res = resolveBoxCircleOverlap(bPos, b as BoxColliderComponent, aPos, a as CircleColliderComponent);
-    if (res) {
-      res.dx *= -1;
-      res.dy *= -1;
-    }
-    return res;
-  }
+  // if (isOfType<CircleColliderComponent>(a, ComponentType.CIRCLE_COLLIDER) &&
+  //   isOfType<BoxColliderComponent>(b, ComponentType.BOX_COLLIDER)) {
+
+  //   const offsetA = Vec2Math.add(aPos, a.offset ?? { x: 0, y: 0 });
+  //   const offsetB = Vec2Math.add(bPos, b.offset ?? { x: 0, y: 0 });
+
+  //   const bounds = getBounds(offsetB, b.size);
+  //   const res = resolveBoxCircleOverlap(bounds, offsetA, a.radius);
+  //   if (res) {
+  //     res.x *= -1;
+  //     res.y *= -1;
+  //   }
+  //   return res;
+  // }
 
   return null;
 }

@@ -1,5 +1,5 @@
 import type { AnimationClip } from "./animation";
-import type { BoxColliderComponent } from "../collider/IBoxCollider";
+import type { BoxColliderComponent } from "../collider/types/BoxCollider";
 
 export function createAnimationClip(
   name: string,

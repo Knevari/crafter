@@ -1,36 +1,33 @@
-import type { Vector2 } from "../../types/vector2";
-import type { CircleColliderComponent } from "../circle-collider";
-import { getAABBMinMax } from "../getAABBMinMax";
-import { getCircleCenter } from "../getCircleCenter";
-import type { BoxColliderComponent } from "../IBoxCollider";
+import Vec2Math from "../../helpers/vec2-math";
+import type { Vec2 } from "../../Vec2/Vec2";
+import type { Bounds } from "../types/Bounds";
+import {  getClosestPoint } from "../util/getCircleCenter";
+
+const closestPointResult: Vec2 = { x: 0, y: 0 };
+const delta: Vec2 = { x: 0, y: 0 };
+const normal: Vec2 = { x: 0, y: 0 };
 
 export function resolveBoxCircleOverlap(
-  boxPos: Vector2,
-  box: BoxColliderComponent,
-  circlePos: Vector2,
-  circle: CircleColliderComponent
-): { dx: number; dy: number } | null {
+  boxBounds: Bounds,
+  circlePos: Vec2,
+  circleRadius: number
+): Vec2 | null {
+  getClosestPoint(boxBounds, circlePos, closestPointResult);
 
-  const bounds = getAABBMinMax(boxPos, box);
-  const circleCenter = getCircleCenter(circlePos, circle);
+  Vec2Math.subtractInto(circlePos, closestPointResult, delta);
+  
+  const distSq = Vec2Math.lengthSquared(delta);
 
-  const closestPoint = {
-    x: Math.max(bounds.min.x, Math.min(circleCenter.x, bounds.max.x)),
-    y: Math.max(bounds.min.y, Math.min(circleCenter.y, bounds.max.y)),
-  };
-
-  const dx = circleCenter.x - closestPoint.x;
-  const dy = circleCenter.y - closestPoint.y;
-  const distSq = dx * dx + dy * dy;
-  const radius = circle.radius;
-
-  if (distSq >= radius * radius) return null;
+  if (distSq >= circleRadius * circleRadius) return null;
 
   const dist = Math.sqrt(distSq) || 0.0001;
-  const overlap = radius - dist;
+
+  Vec2Math.normalizeInto(delta, normal);
+
+  const overlap = circleRadius - dist;
 
   return {
-    dx: -(dx / dist) * overlap,
-    dy: -(dy / dist) * overlap,
+    x: -normal.x * overlap,
+    y: -normal.y * overlap,
   };
 }

@@ -1,8 +1,7 @@
+import type TransformComponent from "../components/transform";
 import type { Component } from "./component";
 
 export interface CameraComponent extends Component {
-  x: number;              
-  y: number;    
+  transform: TransformComponent;   
   zoom: number;
-  rotation: number;
 }

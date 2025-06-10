@@ -1,18 +1,18 @@
 import type TransformComponent from "../components/transform";
-import Vec2 from "../helpers/vec2-math";
+import Vec2Math from "../helpers/vec2-math";
 import Input from "../input/Input";
 import { KeyCode } from "../input/KeyCode";
+import Time from "../time/time";
 import type { CharacterControlerComponent } from "../types/character-controller";
 import { ComponentType } from "../types/component-type";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
 import type { System } from "../types/system";
-
 export default function CharacterControlerSystem(): System {
 
   let speed = 0;
 
   return {
-    update(ecs, deltaTime) {
+    update(ecs) {
       const characterControlers = ecs.getComponentsByType<CharacterControlerComponent>(ComponentType.CHARACTER_CONTROLLER);
       for (const characterControler of characterControlers) {
 
@@ -32,7 +32,7 @@ export default function CharacterControlerSystem(): System {
         if (Input.getKey(KeyCode.KeyD)) characterControler.direction.x += 1;
         if (Input.getKey(KeyCode.KeyW)) characterControler.direction.y -= 1;
         if (Input.getKey(KeyCode.KeyS)) characterControler.direction.y += 1;
-        characterControler.direction = Vec2.normalize(characterControler.direction);
+        characterControler.direction = Vec2Math.normalize(characterControler.direction);
 
         if (Input.getKey(KeyCode.ShiftLeft)) {
           speed = characterControler.runSpeed
@@ -40,37 +40,13 @@ export default function CharacterControlerSystem(): System {
           speed = characterControler.speed;
         }
 
-        characterTransform.position.x += characterControler.direction.x * speed * deltaTime;
-        characterTransform.position.y += characterControler.direction.y * speed * deltaTime;
+        characterTransform.position.x += characterControler.direction.x * speed * Time.deltaTime;
+        characterTransform.position.y += characterControler.direction.y * speed * Time.deltaTime;
 
         if (characterControler.direction.x < 0) spriteRender.flipHorizontal = true;
         else if (characterControler.direction.x > 0) spriteRender.flipHorizontal = false;
 
       }
-    },
-
-    onTriggerStay(ecs, collisionEvent) {
-
-      if (collisionEvent.a.entityRef?.tag !== "player" || collisionEvent.a.type !== ComponentType.CIRCLE_COLLIDER) return;
-      if (collisionEvent.b.entityRef?.tag !== "tree") return;
-      const spriteRender = ecs.getComponent<SpriteRenderComponent>(collisionEvent.b.entityRef, ComponentType.SPRITE_RENDER);
-      if (!spriteRender) return;
-
-      spriteRender.alpha = 0.6;
-
-    },
-
-    onTriggerExit(ecs, collisionEvent) {
-
-       if (collisionEvent.a.entityRef?.tag !== "player" || collisionEvent.a.type !== ComponentType.CIRCLE_COLLIDER) return;
-      if (collisionEvent.b.entityRef?.tag !== "tree") return;
-
-   
-
-      const spriteRender = ecs.getComponent<SpriteRenderComponent>(collisionEvent.b.entityRef, ComponentType.SPRITE_RENDER);
-      if (!spriteRender) return;
-
-      spriteRender.alpha = 1.0;
-    },
+    }
   };
 }

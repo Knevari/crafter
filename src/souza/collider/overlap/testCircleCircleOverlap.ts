@@ -1,24 +1,11 @@
-import type { Vector2 } from "../../types/vector2";
-import type { CircleColliderComponent } from "../circle-collider";
+import type { Vec2 } from "../../Vec2/Vec2";
+import { distanceSq } from "../util/getCircleCenter";
 
-export function testCircleCircleOverlap(
-  aPos: Vector2,
-  aCol: CircleColliderComponent,
-  bPos: Vector2,
-  bCol: CircleColliderComponent
-): boolean {
-  const aOffset = aCol.offset ?? { x: 0, y: 0 };
-  const bOffset = bCol.offset ?? { x: 0, y: 0 };
+export function testCircleCircleOverlap(aPos: Vec2, aRadius: number, bPos: Vec2, bRadius: number): boolean {
+  if (aRadius <= 0 || bRadius <= 0) return false;
 
-  const ax = aPos.x + aOffset.x;
-  const ay = aPos.y + aOffset.y;
-  const bx = bPos.x + bOffset.x;
-  const by = bPos.y + bOffset.y;
+  const distSq = distanceSq(bPos, aPos);
+  const radiusSum = aRadius + bRadius;
 
-  const dx = bx - ax;
-  const dy = by - ay;
-  const distanceSq = dx * dx + dy * dy;
-  const radiusSum = aCol.radius + bCol.radius;
-
-  return distanceSq <= radiusSum * radiusSum;
+  return distSq <= radiusSum * radiusSum;
 }

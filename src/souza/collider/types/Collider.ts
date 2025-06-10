@@ -1,8 +1,8 @@
-import type { Component } from "../types/component";
-import type { Vector2 } from "../types/vector2";
+import type { Component } from "../../types/component";
+import type { Vec2 } from "../../Vec2/Vec2";
 
 export interface Collider extends Component {
-  offset?: Vector2;
+  offset?: Vec2;
   isTrigger?: boolean;
   collisionGroup?: string;
   ignoreGroups?: Set<string>; 

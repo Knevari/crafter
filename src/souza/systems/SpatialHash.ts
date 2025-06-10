@@ -1,4 +1,4 @@
-import type { Vector2 } from "../types/vector2";
+import type { Vec2 } from "../Vec2/Vec2";
 
 export class SpatialHash<T> {
   private readonly cellSize: number;
@@ -12,7 +12,7 @@ export class SpatialHash<T> {
     return `${cx},${cy}`;
   }
 
-  insert(min: Vector2, max: Vector2, item: T) {
+  insert(min: Vec2, max: Vec2, item: T) {
     const minCellX = Math.floor(min.x / this.cellSize);
     const maxCellX = Math.floor(max.x / this.cellSize);
     const minCellY = Math.floor(min.y / this.cellSize);

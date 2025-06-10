@@ -1,12 +1,15 @@
 import type TransformComponent from "../components/transform";
+import { engine2d } from "../Engine2d";
 import Draw from "../helpers/draw-helper";
+import Vec2Math from "../helpers/vec2-math";
 import { resourceManager } from "../managers/resources-manager";
 import type { CameraComponent } from "../types/camera";
 import { ComponentType } from "../types/component-type";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
 import type { System } from "../types/system";
+import type { Vec2 } from "../Vec2/Vec2";
 
-export default function SpriteRenderSystem(ctx: CanvasRenderingContext2D): System {
+export default function SpriteRenderSystem(): System {
   return {
     render(ecs) {
 
@@ -24,6 +27,10 @@ export default function SpriteRenderSystem(ctx: CanvasRenderingContext2D): Syste
         if (!transform) continue;
 
         const sprite = spriteRender.sprite;
+
+        const position = Vec2Math.subtract(transform.position, camera.transform.position);
+        const scale: Vec2 = { x: spriteRender.scale ?? 32, y: spriteRender.scale ?? 32 };
+        const ctx = engine2d.getContext();
         if (sprite) {
 
           const image = resourceManager.getImage(sprite.textureRef);
@@ -36,16 +43,22 @@ export default function SpriteRenderSystem(ctx: CanvasRenderingContext2D): Syste
             sprite.y,
             sprite.width,
             sprite.height,
-            transform.position.x - camera.x,
-            transform.position.y - camera.y,
-            spriteRender.scale ?? 1,
-            spriteRender.rotation ?? 0,
+            position,
+            scale,
+            { x: sprite.originX ?? 0.5, y: sprite.originY ?? 0.5 },
+            0,
             spriteRender.flipHorizontal ?? false,
             spriteRender.flipVertical ?? false,
             spriteRender.alpha ?? 1.0
           );
+
+
+          const origin: Vec2 = { x: sprite.originX, y: sprite.originY };
+          Draw.drawWireSquare(ctx, position, scale, origin, "rgb(255, 0, 0)")
         } else {
-          Draw.drawFillRect(ctx, transform.position.x - camera.x, transform.position.y - camera.y, spriteRender.scale ?? 8, spriteRender.scale ?? 8, spriteRender.color ?? " #ffffff")
+
+          const origin: Vec2 = { x: 0.5, y: 0.5 };
+          Draw.drawFillRect(ctx, position, scale, origin, spriteRender.color ?? " #ffffff")
         }
 
       }

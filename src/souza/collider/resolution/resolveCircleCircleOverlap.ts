@@ -1,28 +1,31 @@
-import type { Vector2 } from "../../types/vector2";
-import type { CircleColliderComponent } from "../circle-collider";
-import { getCircleCenter } from "../getCircleCenter";
+import Vec2Math from "../../helpers/vec2-math";
+import type { Vec2 } from "../../Vec2/Vec2";
+import { EPSILON } from "../util/getCircleCenter";
+
+const _tmp = {
+  delta: { x: 0, y: 0 },
+};
 
 export function resolveCircleCircleOverlap(
-  aPos: Vector2,
-  aCol: CircleColliderComponent,
-  bPos: Vector2,
-  bCol: CircleColliderComponent
-): { dx: number; dy: number } | null {
-  const aCenter = getCircleCenter(aPos, aCol);
-  const bCenter = getCircleCenter(bPos, bCol);
+  aPos: Vec2,
+  aRadius: number,
+  bPos: Vec2,
+  bRadius: number
+): Vec2 | null {
 
-  const dx = bCenter.x - aCenter.x;
-  const dy = bCenter.y - aCenter.y;
-  const distSq = dx * dx + dy * dy;
-  const radiiSum = aCol.radius + bCol.radius;
+  if (aRadius <= 0 || bRadius <= 0) return null;
 
-  if (distSq >= radiiSum * radiiSum) return null; 
+  Vec2Math.subtractInto(bPos, aPos, _tmp.delta);
+  const distSq = Vec2Math.lengthSquared(_tmp.delta);
 
-  const dist = Math.sqrt(distSq) || 0.0001;
+  const radiiSum = aRadius + bRadius;
+  if (distSq >= radiiSum * radiiSum) return null;
+
+  const dist = Math.sqrt(distSq) || EPSILON;
   const overlap = radiiSum - dist;
 
   return {
-    dx: -(dx / dist) * overlap,
-    dy: -(dy / dist) * overlap
+    x: -(_tmp.delta.x / dist) * overlap,
+    y: -(_tmp.delta.y / dist) * overlap
   };
 }

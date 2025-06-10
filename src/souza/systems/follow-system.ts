@@ -3,9 +3,10 @@ import { setAnimatorState, type AnimatorComponent } from "../types/animator";
 import { ComponentType } from "../types/component-type";
 import type { System } from "../types/system";
 import type { ECSComponents } from "../ecs/ecs-components";
-import Vec2 from "../helpers/vec2-math";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
 import type TransformComponent from "../components/transform";
+import Vec2Math from "../helpers/vec2-math";
+import Time from "../time/time";
 
 export default function FollowSystem(
   playerId: Entity,
@@ -26,7 +27,7 @@ export default function FollowSystem(
   }
 
   return {
-    update(ecs: ECSComponents, deltaTime: number) {
+    update(ecs: ECSComponents) {
       const playerTransform = ecs.getComponent<TransformComponent>(playerId, ComponentType.TRANSFORM);
       if (!playerTransform || !playerTransform.enabled) return;
 
@@ -39,10 +40,10 @@ export default function FollowSystem(
 
         const spriteRender = ecs.getComponent<SpriteRenderComponent>(slimeId, ComponentType.SPRITE_RENDER);
 
-        const dist = Vec2.distance(slimeTransform.position, playerTransform.position);
+        const dist = Vec2Math.distance(slimeTransform.position, playerTransform.position);
 
         if (dist <= followRange && dist > stopRange) {
-          let direction = Vec2.normalize(Vec2.subtract(playerTransform.position, slimeTransform.position));
+          let direction = Vec2Math.normalize(Vec2Math.subtract(playerTransform.position, slimeTransform.position));
 
           const jitterAmount = jitterVariation.get(slimeId) ?? 0;
           const jitter = {
@@ -50,7 +51,7 @@ export default function FollowSystem(
             y: (Math.random() - 0.5) * jitterAmount,
           };
 
-          direction = Vec2.normalize({
+          direction = Vec2Math.normalize({
             x: direction.x + jitter.x,
             y: direction.y + jitter.y,
           });
@@ -58,8 +59,8 @@ export default function FollowSystem(
           const speedFactor = speedVariation.get(slimeId) ?? 1;
           const effectiveSpeed = baseSpeed * speedFactor;
 
-          slimeTransform.position.x += direction.x * effectiveSpeed * deltaTime;
-          slimeTransform.position.y += direction.y * effectiveSpeed * deltaTime;
+          slimeTransform.position.x += direction.x * effectiveSpeed * Time.deltaTime;
+          slimeTransform.position.y += direction.y * effectiveSpeed * Time.deltaTime;
 
           // FLIP HORIZONTAL baseado na direção x
           if (spriteRender) {

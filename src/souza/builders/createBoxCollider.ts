@@ -1,5 +1,5 @@
 import type { Entity } from "../../lib/types";
-import type { BoxColliderComponent } from "../collider/IBoxCollider";
+import type { BoxColliderComponent } from "../collider/types/BoxCollider";
 import { ComponentType } from "../types/component-type";
 import { getId } from "./createId";
 

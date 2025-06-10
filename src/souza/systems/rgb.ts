@@ -21,7 +21,7 @@ export function hslToRgb({ h, s, l }: HSL): RGB {
   let r: number, g: number, b: number;
 
   if (s === 0) {
-    r = g = b = l;  
+    r = g = b = l; 
   } else {
     const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
     const p = 2 * l - q;
@@ -37,4 +37,8 @@ export function hslToRgb({ h, s, l }: HSL): RGB {
     g: Math.round(g * 255),
     b: Math.round(b * 255),
   };
+}
+
+export function rgb(r: number, g: number, b: number): RGB {
+  return { r, g, b };
 }

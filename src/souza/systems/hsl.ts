@@ -1,13 +1,12 @@
 import type { RGB } from "./rgb";
 
 export interface HSL {
-  h: number; 
-  s: number; 
-  l: number; 
+  h: number; // 0–360
+  s: number; // 0–1
+  l: number; // 0–1
 }
 
 export function rgbToHsl({ r, g, b }: RGB): HSL {
-
   const rNorm = r / 255;
   const gNorm = g / 255;
   const bNorm = b / 255;
@@ -40,11 +39,12 @@ export function rgbToHsl({ r, g, b }: RGB): HSL {
   }
 
   return {
-    h: h / 360, 
+    h,
     s,
     l,
   };
 }
+
 
 
 function lerpHue(a: number, b: number, t: number): number {
