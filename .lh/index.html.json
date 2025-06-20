@@ -1,0 +1,18 @@
+{
+    "sourceFile": "index.html",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1750456212802,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1750456212802,
+            "name": "Commit-0",
+            "content": "<!doctype html>\r\n<html lang=\"en\">\r\n  <head>\r\n    <meta charset=\"UTF-8\" />\r\n    <link rel=\"icon\" type=\"image/svg+xml\" href=\"/vite.svg\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\r\n    <title>Vite + TS</title>\r\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\" />\r\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin />\r\n    <link\r\n      href=\"https://fonts.googleapis.com/css2?family=Underdog&display=swap\"\r\n      rel=\"stylesheet\"\r\n    />\r\n    <link rel=\"stylesheet\" href=\"src/style.css\" />\r\n  </head>\r\n  <body>\r\n    <div id=\"app\">\r\n      <div id=\"debug\" style=\"position: absolute;\"></div>\r\n      <canvas id=\"canvas\" width=\"400px\" height=\"400px\"></canvas>\r\n    \r\n      <div id=\"ui\"></div>\r\n    </div>\r\n    <script type=\"module\" src=\"/src/main.ts\"></script>\r\n      <script type=\"module\" src=\"/src/souza/app.ts\"></script>\r\n  </body>\r\n</html>\r\n"
+        }
+    ]
+}
