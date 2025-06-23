@@ -1,18 +1,18 @@
-import type { Entity } from "../../lib/types";
 import { ComponentType } from "../types/component-type";
+import type { GameEntity } from "../types/EngineEntity";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
 import { getId } from "./createId";
 
 type SpriteRenderOptions = Partial<Omit<SpriteRenderComponent, "entity">>;
 
 export function createSpriteRender(
-  entity: Entity,
+  gameEntity: GameEntity,
   options: SpriteRenderOptions = {}
 ): SpriteRenderComponent {
   return {
     instanceId: getId(),
     type: ComponentType.SPRITE_RENDER,
-    entityRef: entity,
+    gameEntity: gameEntity,
     sprite: null,
     scale: 1,
     color: "white",

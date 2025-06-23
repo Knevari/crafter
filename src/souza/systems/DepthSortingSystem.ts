@@ -11,7 +11,7 @@ export function DepthSortingSystem(): System {
             const spriteRenders = ecs.getComponentsByType<SpriteRenderComponent>(ComponentType.SPRITE_RENDER);
 
             for (const spriteRender of spriteRenders) {
-                const entity = spriteRender.entityRef;
+                const entity = spriteRender.gameEntity;
                 if (!entity || entity.tag === "ground") continue;
 
                 const transform = ecs.getComponent<TransformComponent>(entity, ComponentType.TRANSFORM);

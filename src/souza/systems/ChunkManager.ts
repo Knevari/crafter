@@ -1,14 +1,12 @@
-import type { Entity } from "../../lib/types";
-import { EventEmitter, type EventCallback } from "../time/emitter";
+import { type EventCallback, EventEmitter } from "../time/emitter";
+import type { GameEntity } from "../types/EngineEntity";
 import type { Vec2 } from "../Vec2/Vec2";
 import type { TerrainCell, World } from "./Word";
-
-
 
 interface Chunk {
     position: Vec2;
     cells: TerrainCell[];
-    entities: Entity[];
+    gameEntities: GameEntity[];
 }
 
 interface ChunkEvents {
@@ -17,32 +15,41 @@ interface ChunkEvents {
 }
 
 export class ChunkManager {
-
     public static CHUNK_WIDTH = 16;
     public static CHUNK_HEIGHT = 16;
 
-
     private static loadedChunks = new Map<string, Chunk>();
     private static events = new EventEmitter<ChunkEvents>();
-
 
     public static loadChunk(x: number, y: number, world: World): void {
         const key = `${x},${y}`;
         if (this.loadedChunks.has(key)) return;
 
-        const cells = world.generateCells(ChunkManager.CHUNK_WIDTH, ChunkManager.CHUNK_HEIGHT, x, y);
-        const chunk: Chunk = { cells: cells, entities: [], position: { x: x, y: y } };
+        const cells = world.generateCells(
+            ChunkManager.CHUNK_WIDTH,
+            ChunkManager.CHUNK_HEIGHT,
+            x,
+            y,
+        );
+        const chunk: Chunk = {
+            cells: cells,
+            gameEntities: [],
+            position: { x: x, y: y },
+        };
         this.loadedChunks.set(key, chunk);
         this.events.emit("chunkLoaded", { x: x, y: y });
     }
 
     public static updateAround(pos: Vec2, radius: number, world: World): void {
-
         const halfChunkWidthInTiles = ChunkManager.CHUNK_WIDTH / 2;
         const halfChunkHeightInTiles = ChunkManager.CHUNK_HEIGHT / 2;
 
-        const tileX = Math.floor(pos.x / world.TILE_SIZE + halfChunkWidthInTiles);
-        const tileY = Math.floor(pos.y / world.TILE_SIZE + halfChunkHeightInTiles);
+        const tileX = Math.floor(
+            pos.x / world.TILE_SIZE + halfChunkWidthInTiles,
+        );
+        const tileY = Math.floor(
+            pos.y / world.TILE_SIZE + halfChunkHeightInTiles,
+        );
 
         const chunkX = Math.floor(tileX / ChunkManager.CHUNK_WIDTH);
         const chunkY = Math.floor(tileY / ChunkManager.CHUNK_HEIGHT);
@@ -84,8 +91,10 @@ export class ChunkManager {
         return this.loadedChunks.get(`${x},${y}`);
     }
 
-    public static on<K extends keyof ChunkEvents>(event: K, callback: EventCallback<ChunkEvents[K]>): void {
+    public static on<K extends keyof ChunkEvents>(
+        event: K,
+        callback: EventCallback<ChunkEvents[K]>,
+    ): void {
         this.events.on(event, callback);
     }
-
 }

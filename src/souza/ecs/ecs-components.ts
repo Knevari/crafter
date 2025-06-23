@@ -1,10 +1,10 @@
-import type { Entity } from "../../lib/types";
 import type { Component } from "../types/component";
 import type { ComponentType } from "../types/component-type";
+import type { GameEntity } from "../types/EngineEntity";
 
 export class ECSComponents {
-  private readonly persistentComponents: Map<string, Map<Entity, Component>>;
-  private readonly transientComponents: Map<string, Map<Entity, Component>>;
+  private readonly persistentComponents: Map<string, Map<GameEntity, Component>>;
+  private readonly transientComponents: Map<string, Map<GameEntity, Component>>;
 
   private readonly persistentSingletons: Map<string, Component>;
   private readonly transientSingletons: Map<string, Component>;
@@ -15,12 +15,12 @@ export class ECSComponents {
     this.persistentSingletons = new Map();
     this.transientSingletons = new Map();
   }
-  getEntityByComponent(component: Component): Entity | undefined {
-    return component.entityRef;
+  getEntityByComponent(component: Component): GameEntity | undefined {
+    return component.gameEntity;
   }
 
   addComponent<T extends Component>(
-    entity: Entity,
+    entity: GameEntity,
     component: T,
     persistent: boolean = true
   ): void {
@@ -30,12 +30,12 @@ export class ECSComponents {
       target.set(component.type, new Map());
     }
 
-    component.entityRef = entity;
+    component.gameEntity = entity;
     target.get(component.type)!.set(entity, component);
   }
 
   getComponent<T extends Component>(
-    entityId: Entity,
+    entityId: GameEntity,
     componentType: ComponentType
   ): T | null {
     return (
@@ -44,7 +44,7 @@ export class ECSComponents {
     ) as T | null;
   }
 
-  hasComponent(entityId: Entity, componentType: ComponentType): boolean {
+  hasComponent(entityId: GameEntity, componentType: ComponentType): boolean {
     return (
       this.persistentComponents.get(componentType)?.has(entityId) ??
       this.transientComponents.get(componentType)?.has(entityId) ??
@@ -52,12 +52,12 @@ export class ECSComponents {
     );
   }
 
-  removeComponent(entityId: Entity, componentType: ComponentType): void {
+  removeComponent(entityId: GameEntity, componentType: ComponentType): void {
     this.persistentComponents.get(componentType)?.delete(entityId);
     this.transientComponents.get(componentType)?.delete(entityId);
   }
 
-  removeEntity(entityId: Entity): void {
+  removeEntity(entityId: GameEntity): void {
     for (const map of this.persistentComponents.values()) {
       map.delete(entityId);
     }
@@ -66,10 +66,10 @@ export class ECSComponents {
     }
   }
 
-  getEntityByRef(ref: number): Entity | undefined {
+  getEntityByRef(ref: number): GameEntity | undefined {
   for (const componentMap of this.persistentComponents.values()) {
     for (const [entity, component] of componentMap.entries()) {
-      if (component && component.entityRef?.id === ref) {
+      if (component && component.gameEntity?.id === ref) {
         return entity;
       }
     }
@@ -77,7 +77,7 @@ export class ECSComponents {
 
   for (const componentMap of this.transientComponents.values()) {
     for (const [entity, component] of componentMap.entries()) {
-      if (component && component.entityRef?.id === ref) {
+      if (component && component.gameEntity?.id === ref) {
         return entity;
       }
     }
@@ -86,7 +86,7 @@ export class ECSComponents {
   return undefined;
 }
 
-  getEntitiesWithComponent(componentType: ComponentType): Entity[] {
+  getEntitiesWithComponent(componentType: ComponentType): GameEntity[] {
     const persistent = [...(this.persistentComponents.get(componentType)?.keys() ?? [])];
     const transient = [...(this.transientComponents.get(componentType)?.keys() ?? [])];
     return [...persistent, ...transient];
@@ -104,7 +104,7 @@ export class ECSComponents {
     component: T,
     persistent: boolean = true
   ): void {
-    component.entityRef = undefined;
+    component.gameEntity = undefined;
     const target = persistent ? this.persistentSingletons : this.transientSingletons;
     target.set(componentType, component);
   }

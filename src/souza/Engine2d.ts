@@ -1,11 +1,16 @@
 class Engine2d {
-
     private ctx: CanvasRenderingContext2D;
     private canvas: HTMLCanvasElement;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d")!;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        window.addEventListener("resize", () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
     }
 
     public clear() {

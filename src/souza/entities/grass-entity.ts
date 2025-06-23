@@ -1,7 +1,7 @@
 import type { Entity } from "../../lib/types";
 import { createBoxCollider } from "../builders/createBoxCollider";
 import { createCircleCollider } from "../builders/createCircleCollider";
-import { createEntity } from "../builders/createEntity";
+import { createGameEntity } from "../builders/createGameEntity";
 import { createSpriteRender } from "../builders/createSpriteRender";
 import { createTransform } from "../components/transform";
 import type { ECSComponents } from "../ecs/ecs-components";
@@ -9,14 +9,14 @@ import type { Sprite } from "../types/sprite";
 import type { Vec2 } from "../Vec2/Vec2";
 
 export function entity_create_grass(ecs: ECSComponents, pos: Vec2, sprite: Sprite, layer: number, scale: number) {
-    const entity: Entity = createEntity("grass");
+    const entity: Entity = createGameEntity("grass");
     ecs.addComponent(entity, createTransform(entity, pos), false);
     ecs.addComponent(entity, createSpriteRender(entity, { sprite, scale, layer }), false);
     return entity;
 }
 
 export function entity_create_tree(ecs: ECSComponents, pos: Vec2, sprite: Sprite, layer: number, scale: number) {
-    const entity: Entity = createEntity("tree", "tree");
+    const entity: Entity = createGameEntity("tree", "tree");
     ecs.addComponent(entity, createTransform(entity, pos), false);
     ecs.addComponent(entity, createSpriteRender(entity, { sprite, scale, layer }), false);
     ecs.addComponent(entity, createCircleCollider(entity, { isTrigger: false, offset: { x: 0, y: -12 } }));
@@ -25,14 +25,14 @@ export function entity_create_tree(ecs: ECSComponents, pos: Vec2, sprite: Sprite
 }
 
 export function entity_create_dry(ecs: ECSComponents, pos: Vec2, sprite: Sprite, layer: number, scale: number) {
-    const entity: Entity = createEntity("dry");
+    const entity: Entity = createGameEntity("dry");
     ecs.addComponent(entity, createTransform(entity, pos), false);
     ecs.addComponent(entity, createSpriteRender(entity, { sprite, scale, layer }), false);
     return entity;
 }
 
 export function entity_create_static(ecs: ECSComponents, pos: Vec2, sprite: Sprite, layer: number, scale: number) {
-    const entity: Entity = createEntity("static_entity", "grass");
+    const entity: Entity = createGameEntity("static_entity", "grass");
     ecs.addComponent(entity, createTransform(entity, pos), false);
     ecs.addComponent(entity, createSpriteRender(entity, { sprite, scale, layer }), false);
     return entity;

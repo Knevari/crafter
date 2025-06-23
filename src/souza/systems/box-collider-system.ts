@@ -3,7 +3,6 @@ import type { ECSComponents } from "../ecs/ecs-components";
 import { ComponentType } from "../types/component-type";
 import type { BoxColliderComponent } from "../collider/types/BoxCollider";
 import { systems } from "../app";
-import type { Entity } from "../../lib/types";
 import { Gizmos } from "./gizmos";
 import type TransformComponent from "../components/transform";
 import { SpatialHash } from "./SpatialHash";
@@ -12,6 +11,7 @@ import type { CircleColliderComponent } from "../collider/types/CircleCollider";
 import type { Collider } from "../collider/types/Collider";
 import { testOverlap } from "../collider/overlap/testOverlap";
 import { resolveOverlap } from "../collider/resolution/resolveOverlap";
+import type { GameEntity } from "../types/EngineEntity";
 
 // Util
 function makePairKey(id1: string, id2: string): string {
@@ -20,7 +20,7 @@ function makePairKey(id1: string, id2: string): string {
 
 interface ColliderData {
   collider: Collider;
-  entity: Entity;
+  gameEntity: GameEntity;
   t: TransformComponent;
   debugColor?: string;
 }
@@ -84,7 +84,7 @@ export function ColliderSystem(): System {
           max.y = t.position.y + offset.y + circle.radius;
         }
 
-        const data: ColliderData = { collider, entity, t, debugColor: "rgb(0, 255, 13)" };
+        const data: ColliderData = { collider, gameEntity: entity, t, debugColor: "rgb(0, 255, 13)" };
         colliderData.push(data);
         spatialHash.insert(min, max, data);
       }
@@ -136,7 +136,7 @@ function detectCollisions(
       for (let j = i + 1; j < length; j++) {
         const b = collidersInCell[j];
 
-        if (a.entity.id === b.entity.id) continue;
+        if (a.gameEntity.id === b.gameEntity.id) continue;
 
         const pairKey = makePairKey(
           a.collider.instanceId.toString(),

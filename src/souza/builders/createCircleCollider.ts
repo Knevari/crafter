@@ -1,12 +1,12 @@
-import type { Entity } from "../../lib/types";
 import type { CircleColliderComponent } from "../collider/types/CircleCollider";
 import { ComponentType } from "../types/component-type";
+import type { GameEntity } from "../types/EngineEntity";
 import { getId } from "./createId";
 type CircleColliderOptions = Partial<Omit<CircleColliderComponent, "entityRef">>;
 
-export function createCircleCollider(entity: Entity, options: CircleColliderOptions): CircleColliderComponent {
+export function createCircleCollider(gameEntity: GameEntity, options: CircleColliderOptions): CircleColliderComponent {
     return {
-        entityRef: entity,
+        gameEntity: gameEntity,
         ignoreSelfCollisions: true,
         instanceId: getId(),
         type: ComponentType.CIRCLE_COLLIDER,

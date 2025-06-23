@@ -1,8 +1,8 @@
-import type { Entity } from "../../lib/types";
 import type { ComponentType } from "./component-type";
+import type { GameEntity } from "./EngineEntity";
 
 export interface Component {
-  entityRef?: Entity;
+  gameEntity?: GameEntity;
   enabled: boolean;
   readonly type: ComponentType;
   readonly instanceId: number;

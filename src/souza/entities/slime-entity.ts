@@ -1,7 +1,5 @@
-import type { Entity } from "../../lib/types";
 import type { ECSComponents } from "../ecs/ecs-components";
 import type { AnimatorComponent } from "../types/animator";
-import type { BoxColliderComponent } from "../collider/types/BoxCollider";
 import { ComponentType } from "../types/component-type";
 import type { SpriteRenderComponent } from "../types/sprite-render-component";
 import { SLIME_ANIMATOR_CONTROLLER } from "../animator/controllers/slime-controller";
@@ -10,25 +8,16 @@ import type TransformComponent from "../components/transform";
 import { createAnimator } from "../builders/createAnimator";
 import { getId } from "../builders/createId";
 import type { CircleColliderComponent } from "../collider/types/CircleCollider";
-import { createEntity } from "../builders/createEntity";
+import { createGameEntity } from "../builders/createGameEntity";
+import type { GameEntity } from "../types/EngineEntity";
 
 export function createSlime(ecs: ECSComponents, name: string) {
 
-  const entity: Entity = createEntity("slime");
+  const gameEntity: GameEntity = createGameEntity(name, "slime");
 
-  ecs.addComponent<TransformComponent>(entity, createTransform(entity));
+  ecs.addComponent<TransformComponent>(gameEntity, createTransform(gameEntity));
 
-  // ecs.addComponent<BoxColliderComponent>(entity, {
-  //   instanceId: getId(),
-  //   type: ComponentType.BOX_COLLIDER,
-  //   ignoreSelfCollisions: true,
-  //   size: { x: 32, y: 32 },
-  //   offset: { x: 0, y: 0 },
-  //   enabled: true,
-  //   isTrigger: false
-  // });
-
-  ecs.addComponent<CircleColliderComponent>(entity, {
+  ecs.addComponent<CircleColliderComponent>(gameEntity, {
     instanceId: getId(),
     offset: { x: 0, y: 0 },
     enabled: true,
@@ -36,11 +25,11 @@ export function createSlime(ecs: ECSComponents, name: string) {
     ignoreSelfCollisions: true,
     radius: 32,
     type: ComponentType.CIRCLE_COLLIDER,
-    entityRef: entity
+    gameEntity: gameEntity
   });
 
 
-  ecs.addComponent<SpriteRenderComponent>(entity, {
+  ecs.addComponent<SpriteRenderComponent>(gameEntity, {
     instanceId: getId(),
     type: ComponentType.SPRITE_RENDER,
     color: "white",
@@ -53,8 +42,8 @@ export function createSlime(ecs: ECSComponents, name: string) {
     enabled: true,
   });
 
-  ecs.addComponent<AnimatorComponent>(entity, createAnimator(entity, SLIME_ANIMATOR_CONTROLLER));
+  ecs.addComponent<AnimatorComponent>(gameEntity, createAnimator(gameEntity, SLIME_ANIMATOR_CONTROLLER));
 
-  return entity;
+  return gameEntity;
 }
 

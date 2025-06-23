@@ -1,4 +1,4 @@
-import { createEntity } from "../builders/createEntity";
+import { createGameEntity } from "../builders/createGameEntity";
 import { getId } from "../builders/createId";
 import { createTransform } from "../components/transform";
 import type { ECSComponents } from "../ecs/ecs-components";
@@ -8,12 +8,16 @@ import { ComponentType } from "../types/component-type";
 
 
 
+
+
+
+
 export function createCamera(ecs: ECSComponents) {
   const camera: CameraComponent = {
     instanceId: getId(),
     type: ComponentType.CAMERA,
     enabled: true,
-    transform: createTransform(createEntity("a")),
+    transform: createTransform(createGameEntity("a")),
       zoom: 1,
   };
 

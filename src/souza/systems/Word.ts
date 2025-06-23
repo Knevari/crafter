@@ -1,31 +1,37 @@
 import { SimplexNoise } from "../algorithms/SimplexNoise";
-import { Biome, classifyBiomes } from "./biome";
+import { BiomeName, classifyBiomes } from "./biome";
 
 export interface TerrainCell {
   x: number;
   y: number;
   scale: number;
-  value: number;
-  biome?: Biome;
-  isWater?: boolean;
+  height: number;
+  temperature: number;
+  biome?: BiomeName;
 }
 
 export class World {
-  private readonly noise: SimplexNoise;
+  private readonly heightNoiseGenerator: SimplexNoise;
+  private readonly temperatureNoiseGenerator: SimplexNoise;
+
+  public readonly HEIGHT_NOISE_SCALE = 64;
+  public readonly TEMPERATURE_NOISE_SCALE = 256;
+
   private readonly OCTAVES = 6;
   private readonly PERSISTENCE = 0.4;
-  public readonly NOISE_SCALE = 64;
+
   public readonly TILE_SIZE = 32;
 
   constructor(seed: number) {
-    this.noise = new SimplexNoise(seed);
+    this.heightNoiseGenerator = new SimplexNoise(seed);
+    this.temperatureNoiseGenerator = new SimplexNoise(seed + 9999);
   }
 
   public generateCells(
     width: number,
     height: number,
     chunkX: number,
-    chunkY: number
+    chunkY: number,
   ): TerrainCell[] {
     const terrain: TerrainCell[] = [];
 
@@ -37,18 +43,26 @@ export class World {
         const tileX = chunkX * width + x;
         const tileY = chunkY * height + y;
 
-        const value = this.noise.fractalNoise2D(
-          tileX / this.NOISE_SCALE,
-          tileY / this.NOISE_SCALE,
+        const heightNoise = this.heightNoiseGenerator.fractalNoise2D(
+          tileX / this.HEIGHT_NOISE_SCALE,
+          tileY / this.HEIGHT_NOISE_SCALE,
           this.OCTAVES,
-          this.PERSISTENCE
+          this.PERSISTENCE,
+        );
+
+        const temperatureNoise = this.temperatureNoiseGenerator.fractalNoise2D(
+          tileX / this.TEMPERATURE_NOISE_SCALE,
+          tileY / this.TEMPERATURE_NOISE_SCALE,
+          this.OCTAVES,
+          this.PERSISTENCE,
         );
 
         terrain.push({
           x: tileX * this.TILE_SIZE,
           y: tileY * this.TILE_SIZE,
           scale: this.TILE_SIZE,
-          value: (value + 1) / 2,
+          height: (heightNoise + 1) / 2,
+          temperature: (temperatureNoise + 1) / 2,
           biome: undefined,
         });
       }
@@ -58,6 +72,4 @@ export class World {
 
     return terrain;
   }
-
-
 }
