@@ -11,6 +11,7 @@ export function createSpriteRender(
 ): SpriteRenderComponent {
   return {
     instanceId: getId(),
+    category: ComponentType.SPRITE_RENDER,
     type: ComponentType.SPRITE_RENDER,
     gameEntity: gameEntity,
     sprite: null,

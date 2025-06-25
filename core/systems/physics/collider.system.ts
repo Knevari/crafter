@@ -1,15 +1,15 @@
-import { ComponentType } from "../types/component-type";
-import type { BoxColliderComponent } from "../gears/collider/box/BoxCollider";
-import type TransformComponent from "../gears/transform/transform.types";
-import { SpatialHash } from "./SpatialHash";
-import type { CircleColliderComponent } from "../collider/types/CircleCollider";
-import type { Collider } from "../collider/types/Collider";
-import { testOverlap } from "../collider/overlap/testOverlap";
-import { resolveOverlap } from "../collider/resolution/resolveOverlap";
-import type { Vec2 } from "../Vec2/Vec2";
-import { ECS } from "../../engine/TwoD";
-import type { ECSComponentState } from "../gears/ecs/component";
-import type { System } from "../gears/ecs/system";
+import { ComponentType } from "../../types/component-type";
+import type { BoxColliderComponent } from "../../gears/collider/box/BoxCollider";
+import type TransformComponent from "../../gears/transform/transform.types";
+import { SpatialHash } from "../../algorithms/SpatialHash";
+import type { CircleColliderComponent } from "../../collider/types/CircleCollider";
+import type { Collider } from "../../collider/types/Collider";
+import { testOverlap } from "../../collider/overlap/testOverlap";
+import { resolveOverlap } from "../../collider/resolution/resolveOverlap";
+import type { Vec2 } from "../../Vec2/Vec2";
+import { ECS } from "../../../engine/TwoD";
+import type { ECSComponentState } from "../../gears/ecs/component";
+import type { System } from "../../gears/ecs/system";
 // import { Gizmos } from "./gizmos";
 
 

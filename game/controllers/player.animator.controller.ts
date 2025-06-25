@@ -1,7 +1,6 @@
 import { Components } from "../../engine/TwoD";
 import { PLAYER_ANIMATIONS } from "../animations/player.animations";
 
-
 export const PLAYER_ANIMATOR_CONTROLLER: Components.Animator.AnimatorController = {
   name: "playerController",
   currentState: "idle",

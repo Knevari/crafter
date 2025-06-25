@@ -58,3 +58,26 @@ export function getComponentsByType<T extends Component>(state: ECSComponentStat
 export function getComponentsByCategory<T extends Component>(state: ECSComponentState, category: string): T[] {
   return Array.from(state.category.get(category) ?? []) as T[];
 }
+
+export function destroyEntityAndComponents(
+  ecs: ECSComponentState,
+  entity: GameEntity
+): void {
+ 
+  for (const [_, map] of ecs.persistent.entries()) {
+    const component = map.get(entity);
+    if (component) {
+      removeFromCategory(ecs, component);
+      map.delete(entity);
+    }
+  }
+
+
+  for (const [_, map] of ecs.transient.entries()) {
+    const component = map.get(entity);
+    if (component) {
+      removeFromCategory(ecs, component);
+      map.delete(entity);
+    }
+  }
+}

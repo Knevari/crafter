@@ -4,7 +4,6 @@ import Draw from "../../helpers/draw-helper";
 import Vec2Math from "../../helpers/vec2-math";
 import { resourceManager } from "../../managers/resources-manager";
 import { Result } from "../../managers/result";
-import type { CameraComponent } from "../../types/camera";
 import { ComponentType } from "../../types/component-type";
 import type { SpriteRenderComponent } from "../../gears/render/sprite_render/sprite.render.types";
 
@@ -12,17 +11,20 @@ import type { Vec2 } from "../../Vec2/Vec2";
 import type { System } from "../../gears/ecs/system";
 import type { ECSComponentState } from "../../gears/ecs/component";
 import { ECS } from "../../../engine/TwoD";
+import type { GameEntity } from "../../types/EngineEntity";
 
+const origin: Vec2 = { x: 0.5, y: 0.5 };
 
-export function SpriteRenderSystem(componentState: ECSComponentState): System {
+export function SpriteRenderSystem(componentState: ECSComponentState, camera: GameEntity): System {
   return {
     render() {
 
-      const camera = ECS.Component.getSingleton<CameraComponent>(
+      const cameraTransform = ECS.Component.getComponent<TransformComponent>(
         componentState,
-        ComponentType.CAMERA,
+        camera,
+        ComponentType.TRANSFORM
       );
-      if (!camera) return;
+      if (!cameraTransform) return;
 
       const spriteRenderers = ECS.Component.getComponentsByType<SpriteRenderComponent>(
         componentState,
@@ -44,7 +46,7 @@ export function SpriteRenderSystem(componentState: ECSComponentState): System {
 
         const position = Vec2Math.subtract(
           transform.position,
-          camera.transform.position,
+          cameraTransform.position,
         );
         const scale: Vec2 = {
           x: spriteRender.scale ?? 32,
@@ -71,23 +73,18 @@ export function SpriteRenderSystem(componentState: ECSComponentState): System {
             spriteRender.flipHorizontal ?? false,
             spriteRender.flipVertical ?? false,
             spriteRender.alpha ?? 1.0,
+
           );
 
-          Draw.drawWireSquare(
-            ctx,
-            position,
-            scale,
-            sprite.origin,
-            "rgb(255, 0, 0)",
-          );
+
         } else {
-          const origin: Vec2 = { x: 0.5, y: 0.5 };
           Draw.drawFillRect(
             ctx,
             position,
             scale,
             origin,
             spriteRender.color ?? " #ffffff",
+
           );
         }
       }

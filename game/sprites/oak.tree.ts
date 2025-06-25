@@ -13,5 +13,3 @@ export const OAK_TRE_0: Resources.Sprite.Sprite = {
     position: { x: 240, y: 0 },
     size: { x: 80, y: 128 },
 }
-
-

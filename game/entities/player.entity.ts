@@ -2,8 +2,6 @@ import { createAnimator } from "../../core/builders/createAnimator";
 import { createGameEntity } from "../../core/builders/createGameEntity";
 import { getId } from "../../core/builders/createId";
 import { createSpriteRender } from "../../core/builders/createSpriteRender";
-import type { BoxColliderComponent } from "../../core/gears/collider/box/BoxCollider";
-import type { CircleColliderComponent } from "../../core/collider/types/CircleCollider";
 import { createTransform } from "../../core/gears/transform/transform.types";
 import { ComponentType } from "../../core/types/component-type";
 import type { GameEntity } from "../../core/types/EngineEntity";
@@ -12,14 +10,14 @@ import type { AnimatorComponent } from "../../core/gears/animator";
 import type { ECSComponentState } from "../../core/gears/ecs/component";
 import { ECS } from "../../engine/TwoD";
 
-export function createPlayer(componentState: ECSComponentState, name: string) {
+export function createPlayer(componentState: ECSComponentState, name: string = "player") {
 
   const gameEntity: GameEntity = createGameEntity(name, "player");
 
   const transform = createTransform(gameEntity);
   ECS.Component.addComponent(componentState, gameEntity, transform);
 
-  ECS.Component.addComponent<BoxColliderComponent>(componentState, gameEntity, {
+  ECS.Component.addComponent(componentState, gameEntity, {
     instanceId: getId(),
     gameEntity: gameEntity,
     category: ComponentType.COLLIDER,
@@ -31,7 +29,7 @@ export function createPlayer(componentState: ECSComponentState, name: string) {
     isTrigger: false
   });
 
-  ECS.Component.addComponent<CircleColliderComponent>(componentState, gameEntity, {
+  ECS.Component.addComponent(componentState, gameEntity, {
     instanceId: getId(),
     enabled: true,
     ignoreSelfCollisions: true,
@@ -43,7 +41,6 @@ export function createPlayer(componentState: ECSComponentState, name: string) {
     gameEntity: gameEntity,
     collisionGroup: "player"
   })
-
 
   ECS.Component.addComponent(componentState, gameEntity, {
     instanceId: getId(),
