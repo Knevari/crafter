@@ -1,0 +1,38 @@
+import { ComponentType } from "../../types/component-type";
+import Time from "../../time/time";
+import type { System } from "../../gears/ecs/system";
+
+import type { AnimatorComponent } from "../../gears/animator";
+import type { SpriteRenderComponent } from "../../gears/render/sprite_render/sprite.render.types";
+import { Animator } from "../../../engine/components";
+import type { ECSComponentState } from "../../gears/ecs/component";
+import { ECS } from "../../../engine/TwoD";
+
+export function AnimatorSystem(componentState: ECSComponentState): System {
+  return {
+    lateUpdate() {
+
+      const animators = ECS.Component.getComponentsByType<AnimatorComponent>(componentState, ComponentType.ANIMATOR);
+
+      for (const animator of animators) {
+        if (!animator.enabled || !animator.controller) continue;
+
+        const spriteRender = ECS.Component.getComponent<SpriteRenderComponent>(componentState,animator.gameEntity, ComponentType.SPRITE_RENDER);
+        if (!spriteRender) continue;
+
+        const result = Animator.getAnimatorState(animator);
+
+        if (!result.ok) {
+          console.warn("Animator state error:", result.error);
+          continue;
+        }
+
+        const state = result.value;
+
+       Animator.advanceFrame(animator, state, Time.deltaTime);
+       Animator.updateSprite(animator, state, spriteRender);
+
+      }
+    }
+  }
+}

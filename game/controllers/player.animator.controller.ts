@@ -1,0 +1,38 @@
+import { Components } from "../../engine/TwoD";
+import { PLAYER_ANIMATIONS } from "../animations/player.animations";
+
+
+export const PLAYER_ANIMATOR_CONTROLLER: Components.Animator.AnimatorController = {
+  name: "playerController",
+  currentState: "idle",
+  states: {
+    idle: {
+      clip: PLAYER_ANIMATIONS.PLAYER_IDLE_DOWN_CLIP,
+      loop: true
+    },
+    walk_front: {
+      clip: PLAYER_ANIMATIONS.PLAYER_WALK_DOWN_CLIP,
+      loop: true
+    },
+    walk_back: {
+      clip: PLAYER_ANIMATIONS.PLAYER_WALK_UP_CLIP,
+      loop: true
+    },
+    walk_side: {
+      clip: PLAYER_ANIMATIONS.PLAYER_WALK_SIDE_CLIP,
+      loop: true
+    },
+    attack_down: {
+      clip: PLAYER_ANIMATIONS.PLAYER_ATTACK_DOWN_CLIP,
+      loop: false
+    },
+    attack_up: {
+      clip: PLAYER_ANIMATIONS.PLAYER_ATTACK_UP_CLIP,
+      loop: false
+    },
+    attack_side: {
+      clip: PLAYER_ANIMATIONS.PLAYER_ATTACK_SIDE_CLIP,
+      loop: false
+    },
+  }
+};
