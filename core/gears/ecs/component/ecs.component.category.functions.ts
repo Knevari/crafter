@@ -1,4 +1,4 @@
-import type { Component } from "../../../types/component";
+import type { Component } from "../../component/component";
 import type { ECSComponentState } from "./ecs.component.types";
 
 export function addToCategory(state: ECSComponentState, component: Component): void {

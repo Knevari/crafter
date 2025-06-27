@@ -1,5 +1,7 @@
-import type { Component } from "../../../types/component";
+import type { Component, ComponentOptions } from "../../component/component.ts";
 import type { Sprite } from "../../sprite/sprite.types.ts";
+
+export type SpriteRenderOptions = ComponentOptions<SpriteRenderComponent>;
 
 export interface SpriteRenderComponent extends Component {
   sprite: Sprite | null; 
@@ -12,3 +14,4 @@ export interface SpriteRenderComponent extends Component {
   layer: number;
   enabled: boolean;
 }
+

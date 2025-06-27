@@ -1,4 +1,4 @@
-import type { Component } from "../../types/component";
+import type { Component, ComponentOptions } from "../component/component";
 import type { AnimationClip } from "../animation";
 
 export interface AnimatorComponent extends Component {
@@ -16,9 +16,12 @@ export interface AnimatorState {
   loop: boolean;
 }
 
+
 export interface AnimatorController {
   name: string;
   currentState: string | null;
   states: Record<string, AnimatorState>;
   syncCollider?: boolean;
 }
+
+export type AnimatorOptions = ComponentOptions<AnimatorComponent>;

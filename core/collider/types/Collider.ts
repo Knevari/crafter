@@ -1,4 +1,4 @@
-import type { Component } from "../../types/component";
+import type { Component } from "../../gears/component/component";
 import type { Vec2 } from "../../Vec2/Vec2";
 
 export interface Collider extends Component {

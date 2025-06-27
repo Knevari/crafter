@@ -1,4 +1,4 @@
-import type { Component } from "../../../types/component";
+import type { Component } from "../../component/component";
 import type { GameEntity } from "../../../types/EngineEntity";
 
 export interface ECSComponentState {
@@ -8,10 +8,3 @@ export interface ECSComponentState {
 
 }
 
-export function createState(): ECSComponentState {
-  return {
-    persistent: new Map(),
-    transient: new Map(),
-    category: new Map(),
-  };
-}

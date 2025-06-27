@@ -4,6 +4,7 @@ export interface EngineEntity {
 
 export interface GameEntity extends EngineEntity {
     tag: string;
-    acitve: boolean;
+    active: boolean;
     name: string;
+    layerMask: number;
 }

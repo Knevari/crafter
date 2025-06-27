@@ -1,7 +1,15 @@
-import type { Component } from "../../../types/component";
+import type { Component } from "../../component/component";
 import type { GameEntity } from "../../../types/EngineEntity";
 import { addToCategory, removeFromCategory } from "./ecs.component.category.functions";
 import type { ECSComponentState } from "./ecs.component.types";
+
+export function createState(): ECSComponentState {
+  return {
+    persistent: new Map(),
+    transient: new Map(),
+    category: new Map(),
+  };
+}
 
 export function addComponent<T extends Component>(
   state: ECSComponentState,

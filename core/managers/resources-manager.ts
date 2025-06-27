@@ -1,9 +1,11 @@
 import { Result } from "./result";
 
-export interface Texture {
+export interface Resource {
   name: string;
   path: string;
 }
+export type Texture = Resource;
+export type TextFile = Resource;
 
 export class ResourceManager {
   private images = new Map<string, HTMLImageElement>();
@@ -25,13 +27,7 @@ export class ResourceManager {
     await Promise.all(promises);
   }
 
-  getTexture(name: string): HTMLImageElement {
-    const img = this.images.get(name);
-    if (!img) throw new Error(`Image not found: ${name}`);
-    return img;
-  }
-
- getTextureSafe(name: string): Result<HTMLImageElement> {
+  getTextureSafe(name: string): Result<HTMLImageElement> {
     const img = this.images.get(name);
     if (!img) {
       return Result.err(`Texture "${name}" not found.`);

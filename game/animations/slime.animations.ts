@@ -1,6 +1,6 @@
-import { Resources } from "../../engine/TwoD";
+import { Resources, Types } from "../../engine/TwoD";
 
-const SLIME_IDLE_CLIP: Resources.Animation.AnimationClip = Resources.Animation
+const SLIME_IDLE_CLIP: Types.AnimationClip = Resources.Animation
   .createAnimationClip(
     "idle",
     "slime",
@@ -12,7 +12,7 @@ const SLIME_IDLE_CLIP: Resources.Animation.AnimationClip = Resources.Animation
     12,
   );
 
-const SLIME_MOVE_CLIP: Resources.Animation.AnimationClip = Resources.Animation
+const SLIME_MOVE_CLIP: Types.AnimationClip = Resources.Animation
   .createAnimationClip(
     "move",
     "slime",
@@ -24,7 +24,7 @@ const SLIME_MOVE_CLIP: Resources.Animation.AnimationClip = Resources.Animation
     12,
   );
 
-const SLIME_DEAD_CLIP: Resources.Animation.AnimationClip = Resources.Animation
+const SLIME_DEAD_CLIP: Types.AnimationClip = Resources.Animation
   .createAnimationClip(
     "dead",
     "slime",

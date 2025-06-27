@@ -1,52 +1,19 @@
-import { createAnimator } from "../../core/builders/createAnimator";
-import { createGameEntity } from "../../core/builders/createGameEntity";
-import { getId } from "../../core/builders/createId";
-import { createSpriteRender } from "../../core/builders/createSpriteRender";
-import { createTransform } from "../../core/gears/transform/transform.types";
-import { ComponentType } from "../../core/types/component-type";
-import type { GameEntity } from "../../core/types/EngineEntity";
+import { Builders, ECS, Types } from "../../engine/TwoD";
 import { PLAYER_ANIMATOR_CONTROLLER } from "../controllers/player.animator.controller";
-import type { AnimatorComponent } from "../../core/gears/animator";
-import type { ECSComponentState } from "../../core/gears/ecs/component";
-import { ECS } from "../../engine/TwoD";
+import type { CharacterControlerComponent } from "../systems/character-controller/character-controller";
 
-export function createPlayer(componentState: ECSComponentState, name: string = "player") {
+export function createPlayer(componentState: Types.ECSComponentState, name: string) {
 
-  const gameEntity: GameEntity = createGameEntity(name, "player");
+  const gameEntity = Builders.createGameEntity(name, "Player");
 
-  const transform = createTransform(gameEntity);
+  const transform = Builders.createTransformComponent(gameEntity);
   ECS.Component.addComponent(componentState, gameEntity, transform);
 
-  ECS.Component.addComponent(componentState, gameEntity, {
-    instanceId: getId(),
+  ECS.Component.addComponent<CharacterControlerComponent>(componentState, gameEntity, {
+    instanceId: Builders.createIncrementalId(),
     gameEntity: gameEntity,
-    category: ComponentType.COLLIDER,
-    type: ComponentType.BOX_COLLIDER,
-    ignoreSelfCollisions: true,
-    size: { x: 32, y: 32 },
-    offset: { x: 0, y: 0 },
-    enabled: true,
-    isTrigger: false
-  });
-
-  ECS.Component.addComponent(componentState, gameEntity, {
-    instanceId: getId(),
-    enabled: true,
-    ignoreSelfCollisions: true,
-    radius: 12,
-    isTrigger: false,
-    offset: { x: 0, y: -8 },
-    type: ComponentType.CIRCLE_COLLIDER,
-    category: ComponentType.COLLIDER,
-    gameEntity: gameEntity,
-    collisionGroup: "player"
-  })
-
-  ECS.Component.addComponent(componentState, gameEntity, {
-    instanceId: getId(),
-    gameEntity: gameEntity,
-    type: ComponentType.CHARACTER_CONTROLLER,
-    category: ComponentType.CHARACTER_CONTROLLER,
+    type: "CHARACTER_CONTROLLER",
+    category: "CONTROLLER",
     enabled: true,
     facing: "side",
     state: "idle",
@@ -57,11 +24,12 @@ export function createPlayer(componentState: ECSComponentState, name: string = "
 
   });
 
-  const spriteRener = createSpriteRender(gameEntity, { scale: 2, layer: 10 });
+  const spriteRener = Builders.createSpriteRender(gameEntity, { scale: 2, layer: 1 });
   ECS.Component.addComponent(componentState, gameEntity, spriteRener);
 
-  const animator = createAnimator(gameEntity, PLAYER_ANIMATOR_CONTROLLER);
-  ECS.Component.addComponent<AnimatorComponent>(componentState, gameEntity, animator);
+
+  const animator = Builders.createAnimatorComponent(gameEntity, { controller: PLAYER_ANIMATOR_CONTROLLER });
+  ECS.Component.addComponent(componentState, gameEntity, animator);
 
   return gameEntity;
 }

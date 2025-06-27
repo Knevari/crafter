@@ -2,7 +2,7 @@ import { ComponentType } from "../../types/component-type";
 import type { Vec2 } from "../../Vec2/Vec2";
 import type { CircleColliderComponent } from "../types/CircleCollider";
 import type { Collider } from "../types/Collider";
-import type { BoxColliderComponent } from "../../gears/collider/box/BoxCollider";
+import type { BoxColliderComponent } from "../../gears/box_collider/BoxCollider";
 import { isOfType } from "../util/isOfType";
 import { resolveBoxBoxOverlap } from "./resolveBoxBoxCollision";
 import { resolveBoxCircleOverlap } from "./resolveBoxCircleOverlap";

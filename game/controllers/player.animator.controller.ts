@@ -1,9 +1,11 @@
-import { Components } from "../../engine/TwoD";
+import { Types } from "../../engine/TwoD";
 import { PLAYER_ANIMATIONS } from "../animations/player.animations";
 
-export const PLAYER_ANIMATOR_CONTROLLER: Components.Animator.AnimatorController = {
+export const PLAYER_ANIMATOR_CONTROLLER: Types.AnimatorController = {
+  
   name: "playerController",
   currentState: "idle",
+
   states: {
     idle: {
       clip: PLAYER_ANIMATIONS.PLAYER_IDLE_DOWN_CLIP,
