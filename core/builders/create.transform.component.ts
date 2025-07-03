@@ -1,23 +1,35 @@
-import type TransformComponent from "../gears/transform/transform.types";
+import { matrixManager } from "../../webgl/managers/matrix_manager";
+import { createMat4 as createIdentityMat4, rotateMatrix, scaleMatrix, translateMatrix } from "../../webgl/mat4";
+import { generic_manager_add } from "../../webgl/managers/generic_manager";
+import type { TransformComponent, TransformOptions } from "../gears/transform";
 import { ComponentType } from "../types/component-type";
 import type { GameEntity } from "../types/EngineEntity";
-import type { Vec2 } from "../Vec2/Vec2";
 import { createIncrementalId } from "./create.incremental.id";
 
 export function createTransformComponent(
     entity: GameEntity,
-    position: Vec2 = { x: 0, y: 0 },
-    rotation: number = 0,
-    scale: Vec2 = { x: 1, y: 1 },
+    options?: TransformOptions
 ): TransformComponent {
-    return {
+
+    const transform: TransformComponent = {
         category: ComponentType.TRANSFORM,
         instanceId: createIncrementalId(),
         type: ComponentType.TRANSFORM,
         enabled: true,
         gameEntity: entity,
-        position: position,
-        rotation: rotation,
-        scale: scale,
+        position: { x: 0, y: 0, z: 0 },
+        rotation: { x: 0, y: 0, z: 0, w: 1 },
+        scale: { x: 1, y: 1, z: 1 },
+        ...options
     }
+
+    const modelMatrix = createIdentityMat4();
+
+    scaleMatrix(modelMatrix, options?.scale ?? { x: 1, y: 1, z: 1 });
+    rotateMatrix(modelMatrix, options?.rotation ?? { x: 0, y: 0, z: 0, w: 1 });
+    translateMatrix(modelMatrix, options?.position ?? { x: 0, y: 0, z: 0 });
+
+    generic_manager_add(matrixManager, transform.instanceId, modelMatrix);
+
+    return transform;
 }

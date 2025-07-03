@@ -16,8 +16,8 @@ interface ChunkEvents {
 }
 
 export class ChunkManager {
-    public static CHUNK_WIDTH = 16;
-    public static CHUNK_HEIGHT = 16;
+    public static CHUNK_WIDTH = 32;
+    public static CHUNK_HEIGHT = 32;
 
     private static loadedChunks = new Map<string, Chunk>();
     private static events = new EventEmitter<ChunkEvents>();
@@ -45,12 +45,8 @@ export class ChunkManager {
         const halfChunkWidthInTiles = ChunkManager.CHUNK_WIDTH / 2;
         const halfChunkHeightInTiles = ChunkManager.CHUNK_HEIGHT / 2;
 
-        const tileX = Math.floor(
-            pos.x / world.TILE_SIZE + halfChunkWidthInTiles,
-        );
-        const tileY = Math.floor(
-            pos.y / world.TILE_SIZE + halfChunkHeightInTiles,
-        );
+        const tileX =pos.x / world.TILE_SIZE + halfChunkWidthInTiles
+        const tileY =  pos.y / world.TILE_SIZE + halfChunkHeightInTiles
 
         const chunkX = Math.floor(tileX / ChunkManager.CHUNK_WIDTH);
         const chunkY = Math.floor(tileY / ChunkManager.CHUNK_HEIGHT);

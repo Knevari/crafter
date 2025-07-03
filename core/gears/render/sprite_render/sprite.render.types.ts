@@ -1,17 +1,22 @@
+import { Render } from "../../../../engine/TwoD.ts";
+import type { RgbColor } from "../../../../game/systems/procedural-world/biome.ts";
 import type { Component, ComponentOptions } from "../../component/component.ts";
 import type { Sprite } from "../../sprite/sprite.types.ts";
 
 export type SpriteRenderOptions = ComponentOptions<SpriteRenderComponent>;
 
-export interface SpriteRenderComponent extends Component {
-  sprite: Sprite | null; 
-  scale?: number;
-  rotation?: number;
-  color?: string;
+export interface Render extends Component {
+  color: RgbColor;
   alpha?: number;
+}
+
+export interface SpriteRenderComponent extends Render {
+  sprite: Sprite | null;
+  rotation?: number;
   flipHorizontal?: boolean;
   flipVertical?: boolean;
+  materialName: string;
+  meshName: string;
   layer: number;
-  enabled: boolean;
 }
 

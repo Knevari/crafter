@@ -1,18 +1,21 @@
-import { Mulberry32 } from "../../../core/algorithms/mulberry32";
-import type TransformComponent from "../../../core/gears/transform/transform.types";
 import { ComponentType } from "../../../core/types/component-type";
 import type { GameEntity } from "../../../core/types/EngineEntity";
 import type { Vec2 } from "../../../core/Vec2/Vec2";
-import { createGameEntity, createTransformComponent, createSpriteRender } from "../../../engine/builders";
+import { createGameEntity, createTransformComponent, createSpriteRenderComponent } from "../../../engine/builders";
 import { Layer } from "../../../engine/enums";
 import type { System } from "../../../engine/resources";
 import { ECS } from "../../../engine/TwoD";
-import type { ECSComponentState, Sprite } from "../../../engine/types";
-import { BUSHES } from "../../sprites/bushes.sprite";
-import { OAK_TRE_0, OAK_TRE_SHADOW } from "../../sprites/oak.trees.sprite";
-import { getBiomeColor, BiomeName } from "./biome";
+import type { ECSComponentState, Sprite, TransformComponent } from "../../../engine/types";
+import { matrixManager } from "../../../webgl/managers/matrix_manager";
+import { translateMatrix } from "../../../webgl/mat4";
+import { generic_manager_get } from "../../../webgl/managers/generic_manager";
+import { type Vec3 } from "../../../webgl/vec3";
 import { ChunkManager } from "./chunk/ChunkManager";
 import { World, type TerrainCell } from "./Word";
+import { PLAYER_ANIMATIONS } from "../../animations/player.animations";
+import { OAK_TRE_0, OAK_TRE_SHADOW, OAK_TREE_1 } from "../../sprites/oak.trees.sprite";
+import { BiomeName, getBiomeColor } from "./biome";
+import { Mulberry32 } from "../../../core/algorithms/mulberry32";
 
 
 export function TerrainSystem(componentState: ECSComponentState): System {
@@ -29,7 +32,7 @@ export function TerrainSystem(componentState: ECSComponentState): System {
         const chunk = ChunkManager.getChunk(pos.x, pos.y);
         if (chunk) {
           generateTerrainEntities(componentState, chunk.cells, chunk.gameEntities);
-          generateTrees(componentState, chunk.cells, chunk.gameEntities, pos);
+          generateTrees(componentState, chunk.cells, chunk.gameEntities, chunk.position);
 
         }
       });
@@ -59,20 +62,30 @@ function generateTerrainEntities(
   gameEntities: GameEntity[],
 ): void {
   for (const cell of terrainCells) {
-    const gameEntity: GameEntity = createGameEntity(`ground`, "Ground", Layer.IgnoreDepthSorting);
 
-    const transform = createTransformComponent(gameEntity, cell.position);
-    ECS.Component.addComponent(componentState, gameEntity, transform, false);
+    if (cell.biome === BiomeName.SHALLOW_WATER) {
 
-    const spriteReder = createSpriteRender(gameEntity, {
-      color: getBiomeColor(cell.biome ?? BiomeName.DEEP_WATER),
-      layer: -1,
-      scale: cell.scale,
-    });
+      const gameEntity: GameEntity = createGameEntity(`ground`, "Ground", Layer.IgnoreDepthSorting);
 
-    ECS.Component.addComponent(componentState, gameEntity, spriteReder, false);
+      const transform = createTransformComponent(gameEntity, { position: cell.position, });
+      ECS.Component.addComponent(componentState, gameEntity, transform, false);
 
-    gameEntities.push(gameEntity);
+      const spriteReder = createSpriteRenderComponent(gameEntity, { materialName: "water_material", sprite: OAK_TRE_0 });
+      ECS.Component.addComponent(componentState, gameEntity, spriteReder, false);
+
+      gameEntities.push(gameEntity);
+    } else {
+
+      const gameEntity: GameEntity = createGameEntity(`ground`, "Ground", Layer.IgnoreDepthSorting);
+
+      const transform = createTransformComponent(gameEntity, { position: cell.position });
+      ECS.Component.addComponent(componentState, gameEntity, transform, false);
+
+      const spriteReder = createSpriteRenderComponent(gameEntity, { sprite: null, color: getBiomeColor(cell.biome ?? BiomeName.DEEP_WATER) });
+      ECS.Component.addComponent(componentState, gameEntity, spriteReder, false);
+
+      gameEntities.push(gameEntity);
+    }
   }
 }
 
@@ -100,75 +113,47 @@ export function generateTrees(
     const busheChance = rng.nextFloat();
     const treeChance = rng.nextFloat();
 
-    if (cell.biome === BiomeName.DENSE_FOREST || cell.biome === BiomeName.FOREST) {
 
+    if (cell.biome === BiomeName.DENSE_FOREST || cell.biome === BiomeName.SPARSE_FOREST) {
       if (treeChance < 0.1) {
 
-        const treeShadow = createTreeShadow(componentState, cell.position);
+        // const treeShadow = createTreeShadow(componentState, cell.position);
         const treeEntity = createTree(componentState, cell.position);
-        gameEntities.push(treeEntity, treeShadow);
+        gameEntities.push(treeEntity);
 
       } else if (busheChance < 0.1) {
-        const bushIndex = Math.floor(rng.nextFloat() * BUSHES.length);
-        const bushSprite = BUSHES[bushIndex];
-        const busheEntity = createBushes(componentState, cell.position, bushSprite);
-        gameEntities.push(busheEntity);
+        // const bushIndex = Math.floor(rng.nextFloat() * BUSHES.length);
+        // const bushSprite = BUSHES[bushIndex];
+        // const busheEntity = createBushes(componentState, cell.position, bushSprite);
+        // gameEntities.push(busheEntity);
       }
     }
+
 
   }
 
 }
 
-function createTree(componentState: ECSComponentState, position: Vec2): GameEntity {
+function createTree(componentState: ECSComponentState, position: Vec3): GameEntity {
 
   const gameEntity: GameEntity = createGameEntity(`tree`, "Tree");
 
-  const transform = createTransformComponent(gameEntity, position);
+
+  const scale = { x: 1, y: 1.5, z: 0 };
+  const offSetX = position.x + scale.x / 2;
+  const offSetY = position.y + scale.y / 2;
+  const transform = createTransformComponent(gameEntity, { position: { x: offSetX, y: offSetY, z: 0 }, scale: scale });
   ECS.Component.addComponent(componentState, gameEntity, transform, false);
 
-  const spriteReder = createSpriteRender(gameEntity, {
-    layer: -1,
-    sprite: OAK_TRE_0,
-    scale: 2,
+
+
+
+  const spriteReder = createSpriteRenderComponent(gameEntity, {
+    materialName: "advanced_material",
+    layer: 1,
+    sprite: OAK_TREE_1
   });
 
   ECS.Component.addComponent(componentState, gameEntity, spriteReder, false);
-  return gameEntity;
-}
-
-function createTreeShadow(componentState: ECSComponentState, position: Vec2): GameEntity {
-
-  const gameEntity: GameEntity = createGameEntity(`tree_shadow`, "Shadow", Layer.IgnoreDepthSorting);
-
-  const transform = createTransformComponent(gameEntity, position);
-  ECS.Component.addComponent(componentState, gameEntity, transform, false);
-
-  const spriteReder = createSpriteRender(gameEntity, {
-    layer: 2,
-    sprite: OAK_TRE_SHADOW,
-    scale: 3,
-  });
-
-  ECS.Component.addComponent(componentState, gameEntity, spriteReder, false);
-  return gameEntity;
-}
-
-
-
-
-function createBushes(componentState: ECSComponentState, position: Vec2, sprite: Sprite): GameEntity {
-  const gameEntity: GameEntity = createGameEntity("bushe", "Bushe");
-
-  const transform = createTransformComponent(gameEntity, position);
-  ECS.Component.addComponent(componentState, gameEntity, transform, false);
-
-  const spriteRender = createSpriteRender(gameEntity, {
-    layer: -1,
-    sprite,
-    scale: 2,
-  });
-
-  ECS.Component.addComponent(componentState, gameEntity, spriteRender, false);
   return gameEntity;
 }

@@ -3,10 +3,10 @@ import { ComponentType } from "../types/component-type";
 import type { GameEntity } from "../types/EngineEntity";
 import { createIncrementalId } from "./create.incremental.id";
 
-export function createAnimatorComponent(gameEntity: GameEntity, options: AnimatorOptions): AnimatorComponent {
+export function createAnimatorComponent(gameEntity: GameEntity, options?: AnimatorOptions): AnimatorComponent {
     return {
         instanceId: createIncrementalId(),
-        category: ComponentType.ANIMATOR,
+        category: ComponentType.Animator,
         controller: null,
         currentClip: null,
         currentFrameIndex: 0,
@@ -16,7 +16,7 @@ export function createAnimatorComponent(gameEntity: GameEntity, options: Animato
         locked: false,
         playbackSpeed: 1,
         time: 0,
-        type: ComponentType.ANIMATOR,
+        type: ComponentType.Animator,
         ...options
     };
 }

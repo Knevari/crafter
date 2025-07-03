@@ -16,7 +16,8 @@ export function createAnimationClip(
   for (let i = 0; i < frameCount; i++) {
     const frame: AnimationFrame = {
       sprite: {
-        texture: texture,
+        meshName: "quad_mesh",
+        textureName: texture,
         position: {
           x: startX + i * (frameWidth + frameSpacing),
           y: startY,

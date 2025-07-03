@@ -3,18 +3,19 @@ import type { GameEntity } from "../types/EngineEntity";
 import type { SpriteRenderComponent, SpriteRenderOptions } from "../gears/render/sprite_render/sprite.render.types";
 import { createIncrementalId } from "./create.incremental.id";
 
-export function createSpriteRender(
+export function createSpriteRenderComponent(
   gameEntity: GameEntity,
   options: SpriteRenderOptions = {}
 ): SpriteRenderComponent {
   return {
+    materialName: "simple_material",
+    meshName: "quad_mesh",
     instanceId: createIncrementalId(),
     category: ComponentType.SPRITE_RENDER,
     type: ComponentType.SPRITE_RENDER,
     gameEntity: gameEntity,
     sprite: null,
-    scale: 1,
-    color: "white",
+    color: { r: 1, g: 1, b: 1, a: 1 },
     alpha: 1.0,
     rotation: 0,
     flipHorizontal: false,

@@ -1,92 +1,66 @@
-import type TransformComponent from "../../transform/transform.types";
-import { engine2d } from "../../../Engine2d";
-import Draw from "../../../helpers/draw-helper";
-import Vec2Math from "../../../helpers/vec2-math";
-import { resourceManager } from "../../../managers/resources-manager";
-import { Result } from "../../../managers/result";
 import { ComponentType } from "../../../types/component-type";
 import type { SpriteRenderComponent } from "./sprite.render.types";
-
-import type { Vec2 } from "../../../Vec2/Vec2";
 import type { System } from "../../ecs/system";
 import type { ECSComponentState } from "../../ecs/component";
 import { ECS } from "../../../../engine/TwoD";
 import type { GameEntity } from "../../../types/EngineEntity";
+import type { TransformComponent } from "../../transform";
+import { materialManager } from "../../../../webgl/managers/material_manager";
+import { generic_manager_get } from "../../../../webgl/managers/generic_manager";
+import { meshManager } from "../../../../webgl/managers/mesh_manager";
+import { vaoManager } from "../../../../webgl/managers/vao_manager";
+import { shaderSystemManager } from "../../../../webgl/managers/shader_system_manager";
+import { shaderManager } from "../../../../webgl/managers/shader_manager";
 
-const origin: Vec2 = { x: 0.5, y: 0.5 };
-
-export function SpriteRenderSystem(componentState: ECSComponentState, camera: GameEntity): System {
+export function SpriteRenderSystem(
+  gl: WebGL2RenderingContext,
+  componentState: ECSComponentState,
+  camera: GameEntity
+): System {
   return {
     render() {
-
-      const cameraTransform = ECS.Component.getComponent<TransformComponent>(
-        componentState,
-        camera,
-        ComponentType.TRANSFORM
-      );
-      if (!cameraTransform) return;
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
       const spriteRenderers = ECS.Component.getComponentsByType<SpriteRenderComponent>(
         componentState,
-        ComponentType.SPRITE_RENDER,
+        ComponentType.SPRITE_RENDER
       );
-      spriteRenderers.sort((a, b) => (a.layer ?? 0) - (b.layer ?? 0));
+
+      spriteRenderers.sort((a, b) => a.layer - b.layer);
 
       for (const spriteRender of spriteRenderers) {
-        if (!spriteRender || !spriteRender.enabled) continue;
+        if (!spriteRender.enabled) continue;
+
+        const material = generic_manager_get(materialManager, spriteRender.materialName);
+        if (!material) continue;
+
+        const shader = generic_manager_get(shaderManager, material.shaderName)!;
+        gl.useProgram(shader.program);
+
+        const shaderSystem = generic_manager_get(shaderSystemManager, material.name);
+        if (!shaderSystem) continue;
+
+        shaderSystem.global?.(gl, camera, componentState);
 
         const transform = ECS.Component.getComponent<TransformComponent>(
           componentState,
           spriteRender.gameEntity,
-          ComponentType.TRANSFORM,
+          ComponentType.TRANSFORM
         );
         if (!transform) continue;
 
-        const sprite = spriteRender.sprite;
+        shaderSystem.local?.(gl, spriteRender, transform);
 
-        const position = Vec2Math.subtract(
-          transform.position,
-          cameraTransform.position,
-        );
-        const scale: Vec2 = {
-          x: spriteRender.scale ?? 32,
-          y: spriteRender.scale ?? 32,
-        };
-        const ctx = engine2d.getContext();
-        if (sprite) {
-          const textureResult = resourceManager.getTextureSafe(sprite.texture);
+        const mesh = generic_manager_get(meshManager, spriteRender.meshName);
+        if (!mesh) continue;
 
-          if (Result.isErr(textureResult)) {
-            console.warn(`Texture not found: ${textureResult.error}`);
-            continue;
-          }
+        const vao = generic_manager_get(vaoManager, mesh.name);
+        if (!vao) continue;
 
-          const texture = textureResult.value;
-
-          Draw.drawSprite(
-            ctx,
-            texture,
-            sprite,
-            position,
-            scale,
-            0,
-            spriteRender.flipHorizontal ?? false,
-            spriteRender.flipVertical ?? false,
-            spriteRender.alpha ?? 1.0,
-
-          );
-
-
-        } else {
-          Draw.drawFillRect(
-            ctx,
-            position,
-            scale,
-            origin,
-            spriteRender.color ?? " #ffffff",
-
-          );
-        }
+        gl.bindVertexArray(vao.vao);
+        gl.drawElements(gl.TRIANGLES, mesh.indices.length, gl.UNSIGNED_SHORT, 0);
+        gl.bindVertexArray(null);
       }
     },
   };

@@ -6,10 +6,10 @@ const PLAYER_IDLE_DOWN_CLIP: Types.AnimationClip = Resources.Animation
     "player",
     6,
     0,
-    0,
+    1,
     32,
     32,
-    8,
+    12,
   );
 
 const PLAYER_WALK_UP_CLIP: Types.AnimationClip = Resources.Animation

@@ -1,4 +1,3 @@
-import { engine2d } from "../../../Engine2d";
 import type { CollisionEvent, TriggerEvent } from "../../../types/collision-event";
 import type { ECSSystemState } from "./ecs.system.types";
 
@@ -27,7 +26,6 @@ export function callLateUpdate(state: ECSSystemState): void {
 }
 
 export function callRender(state: ECSSystemState): void {
-  engine2d.clear();
   for (const system of state.systems) {
     system.render?.();
   }

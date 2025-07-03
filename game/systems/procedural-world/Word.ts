@@ -1,9 +1,9 @@
 import { SimplexNoise } from "../../../core/algorithms/SimplexNoise";
-import type { Vec2 } from "../../../core/Vec2/Vec2";
+import type { Vec3 } from "../../../webgl/vec3";
 import { BiomeName, classifyBiomes } from "./biome";
 
 export interface TerrainCell {
-  position: Vec2;
+  position: Vec3;
   scale: number;
   height: number;
   temperature: number;
@@ -20,7 +20,7 @@ export class World {
   private readonly OCTAVES = 6;
   private readonly PERSISTENCE = 0.4;
 
-  public readonly TILE_SIZE = 64;
+  public readonly TILE_SIZE = 0.25;
 
   constructor(seed: number) {
     this.heightNoiseGenerator = new SimplexNoise(seed);
@@ -61,7 +61,8 @@ export class World {
 
           position: {
             x: tileX * this.TILE_SIZE,
-            y: tileY * this.TILE_SIZE
+            y: tileY * this.TILE_SIZE,
+            z: 0
           },
 
           scale: this.TILE_SIZE,

@@ -1,5 +1,4 @@
 import { ComponentType } from "../../types/component-type";
-import type TransformComponent from "../transform/transform.types";
 import { SpatialHash } from "../../algorithms/SpatialHash";
 import type { CircleColliderComponent } from "../../collider/types/CircleCollider";
 import type { Collider } from "../../collider/types/Collider";
@@ -10,6 +9,8 @@ import { ECS } from "../../../engine/TwoD";
 import type { ECSComponentState } from "../ecs/component";
 import type { System } from "../ecs/system";
 import type { BoxColliderComponent } from "./box/BoxCollider";
+import type { TransformComponent } from "../transform";
+import type { RigidBodyComponent } from "../rigid_body/rigid.body";
 // import { Gizmos } from "./gizmos";
 
 
@@ -103,52 +104,7 @@ export function ColliderSystem(componentState: ECSComponentState, state: ECS.Sys
         collisionState,
         state,
       );
-    },
-
-    onDrawGizmos() {
-      // const collidersColliding = collisionState.collision;
-
-      // const colliders = component.getComponentsByCategory<Collider>(ComponentType.COLLIDER);
-
-      // for (const collider of colliders) {
-      //   const transform = component.getComponent<TransformComponent>(collider.gameEntity, ComponentType.TRANSFORM);
-      //   if (!transform) continue;
-
-      //   const posX = transform.position.x + (collider.offset?.x ?? 0);
-      //   const posY = transform.position.y + (collider.offset?.y ?? 0);
-
-      //   const isColliding = collidersColliding.has(collider.instanceId.toString());
-
-      //   let color = 'rgba(0, 255, 0, 0.5)';
-      //   if (collider.isTrigger) {
-      //     color = 'rgba(255, 0, 0, 0.5)';
-      //   }
-      //   if (isColliding) {
-      //     color = 'rgba(255, 255, 0, 0.8)';
-      //   }
-
-      //   if (collider.type === ComponentType.BOX_COLLIDER) {
-      //     const box = collider as BoxColliderComponent;
-      //     Gizmos.drawRect({
-      //       x: posX,
-      //       y: posY,
-      //       width: box.size.x,
-      //       height: box.size.y,
-      //       color,
-      //     });
-      //   }
-      //   else if (collider.type === ComponentType.CIRCLE_COLLIDER) {
-      //     const circle = collider as CircleColliderComponent;
-      //     Gizmos.drawCircle({
-      //       x: posX,
-      //       y: posY,
-      //       radius: circle.radius,
-      //       color,
-      //     });
-      //   }
-      // }
     }
-
   };
 }
 
@@ -170,7 +126,7 @@ function detectCollisions(
         const b = collidersInCell[j];
         if (a.gameEntity.id === b.gameEntity.id) continue;
 
-        const bT = ECS.Component.getComponent<TransformComponent>(componentState,b.gameEntity, ComponentType.TRANSFORM);
+        const bT = ECS.Component.getComponent<TransformComponent>(componentState, b.gameEntity, ComponentType.TRANSFORM);
         if (!bT) continue;
 
         const pairKey = makePairKey(a.instanceId, b.instanceId);
@@ -210,9 +166,44 @@ function detectCollisions(
         );
 
         if (resolution) {
-          aT.position.x += resolution.x;
-          aT.position.y += resolution.y;
+          const aRigid = ECS.Component.getComponent<RigidBodyComponent>(
+            componentState,
+            a.gameEntity,
+            ComponentType.RigidBody
+          );
+          const bRigid = ECS.Component.getComponent<RigidBodyComponent>(
+            componentState,
+            b.gameEntity,
+            ComponentType.RigidBody
+          );
+
+          const aStatic = aRigid?.isStatic ?? true;
+          const bStatic = bRigid?.isStatic ?? true;
+
+          if (aStatic && bStatic) {
+            // Ambos estáticos, não mover
+            return;
+          }
+
+          if (!aStatic && !bStatic && aRigid && bRigid) {
+            const totalMass = aRigid.mass + bRigid.mass;
+            const aFactor = bRigid.mass / totalMass;
+            const bFactor = aRigid.mass / totalMass;
+
+            aT.position.x += resolution.x * aFactor;
+            aT.position.y += resolution.y * aFactor;
+
+            bT.position.x -= resolution.x * bFactor;
+            bT.position.y -= resolution.y * bFactor;
+          } else if (!aStatic) {
+            aT.position.x += resolution.x;
+            aT.position.y += resolution.y;
+          } else if (!bStatic) {
+            bT.position.x -= resolution.x;
+            bT.position.y -= resolution.y;
+          }
         }
+
       }
     }
   }
@@ -222,7 +213,7 @@ function detectCollisions(
       if (pair.a.isTrigger || pair.b.isTrigger) {
         ECS.System.callTriggerExitEvents(systems, pair);
       } else {
-        ECS.System.callCollisionExitEvents(systems,pair);
+        ECS.System.callCollisionExitEvents(systems, pair);
       }
     }
   }

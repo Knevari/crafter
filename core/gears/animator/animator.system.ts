@@ -12,7 +12,7 @@ export function AnimatorSystem(componentState: ECSComponentState): System {
   return {
     lateUpdate() {
 
-      const animators = ECS.Component.getComponentsByType<AnimatorComponent>(componentState, ComponentType.ANIMATOR);
+      const animators = ECS.Component.getComponentsByType<AnimatorComponent>(componentState, ComponentType.Animator);
 
       for (const animator of animators) {
         if (!animator.enabled || !animator.controller) continue;

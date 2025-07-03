@@ -1,10 +1,10 @@
-import type TransformComponent from "../../transform/transform.types";
 import { ComponentType } from "../../../types/component-type";
 import type { SpriteRenderComponent } from "../sprite_render/sprite.render.types";
 import type { ECSComponentState } from "../../ecs/component";
 import type { System } from "../../ecs/system";
 import { ECS } from "../../../../engine/TwoD";
 import { Layer } from "../../../builders/create.game.entity";
+import type { TransformComponent } from "../../transform";
 
 const BASE_LAYER = 10000;
 
