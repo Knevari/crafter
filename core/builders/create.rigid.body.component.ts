@@ -10,7 +10,7 @@ export function createRigidBodyComponent(
     return {
         instanceId: createIncrementalId(),
         type: ComponentType.RigidBody,
-        category: "PHYSICS",
+        category: ComponentType.RigidBody,
         gameEntity,
         mass: 1,
         velocity: { x: 0, y: 0 },

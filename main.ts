@@ -3,7 +3,6 @@ import { ECS } from "./engine/TwoD";
 import { SYSTEM_STATE } from "./core/gears/ecs/system";
 import { GameMain } from "./game/game.main";
 
-
 await GameMain();
 
 const time = new Time();
@@ -44,3 +43,6 @@ window.addEventListener('wheel', (e) => {
 ['gesturestart', 'gesturechange', 'gestureend'].forEach(event => {
   window.addEventListener(event, e => e.preventDefault());
 });
+
+
+

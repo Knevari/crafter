@@ -16,8 +16,8 @@ interface ChunkEvents {
 }
 
 export class ChunkManager {
-    public static CHUNK_WIDTH = 32;
-    public static CHUNK_HEIGHT = 32;
+    public static CHUNK_WIDTH = 8;
+    public static CHUNK_HEIGHT = 8;
 
     private static loadedChunks = new Map<string, Chunk>();
     private static events = new EventEmitter<ChunkEvents>();

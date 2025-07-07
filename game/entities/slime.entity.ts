@@ -8,17 +8,27 @@ export function createSlime(componentState: ECSComponentState, name: string) {
   const transform = Builders.createTransformComponent(gameEntity);
   ECS.Component.addComponent(componentState, gameEntity, transform);
 
-  const spriteReder = Builders.createSpriteRenderComponent(gameEntity, {  layer: 1, scale: 1 , materialName: "advanced_material" });
+  const spriteReder = Builders.createSpriteRenderComponent(gameEntity, { layer: 1, materialName: "advanced_material" });
   ECS.Component.addComponent(componentState, gameEntity, spriteReder);
 
   const animator = Builders.createAnimatorComponent(gameEntity, { controller: SLIME_ANIMATOR_CONTROLLER });
   ECS.Component.addComponent(componentState, gameEntity, animator);
 
-  const circleCollider = Builders.createCircleColliderComponent(gameEntity);
+  const circleCollider = Builders.createBoxColliderComponent(gameEntity);
   ECS.Component.addComponent(componentState, gameEntity, circleCollider);
 
-  const rigidBody = Builders.createRigidBodyComponent(gameEntity, {useGravity: false});
+  const rigidBody = Builders.createRigidBodyComponent(gameEntity, { useGravity: false });
   ECS.Component.addComponent(componentState, gameEntity, rigidBody);
   return gameEntity;
 
 }
+
+// export function createMusic(componentState: ECSComponentState, name: string) {
+//   const gameEntity = Builders.createGameEntity(name, "Enemy");
+
+//   const transform = Builders.createTransformComponent(gameEntity, {scale: {x: 10, y: 10, z: 0}});
+//   ECS.Component.addComponent(componentState, gameEntity, transform);
+
+//   const spriteReder = Builders.createSpriteRenderComponent(gameEntity, { layer: 1, materialName: "music_material" });
+//   ECS.Component.addComponent(componentState, gameEntity, spriteReder);
+// }

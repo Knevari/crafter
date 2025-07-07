@@ -4,7 +4,7 @@ export const OAK_TREE_1: Types.Sprite = {
     meshName: null,
     textureName: "oak_tree",
     origin: { x: 0.5, y: 0.9 },
-    position: { x: 320, y: 0 },
+    position: { x:80 + 80, y: 0 },
     size: { x: 80, y: 128 },
 }
 

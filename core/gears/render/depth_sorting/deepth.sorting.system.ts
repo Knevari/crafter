@@ -19,9 +19,7 @@ export function DepthSortingSystem(componentState: ECSComponentState): System {
             for (const spriteRender of spriteRenders) {
                 const entity = spriteRender.gameEntity;
 
-                if ((entity.layerMask & Layer.IgnoreDepthSorting) !== 0) {
-                    continue;
-                }
+                if ((entity.layerMask & Layer.IgnoreDepthSorting) !== 0) continue;
 
                 const transform = ECS.Component.getComponent<TransformComponent>(
                     componentState,

@@ -11,7 +11,8 @@ import type { System } from "../ecs/system";
 import type { BoxColliderComponent } from "./box/BoxCollider";
 import type { TransformComponent } from "../transform";
 import type { RigidBodyComponent } from "../rigid_body/rigid.body";
-// import { Gizmos } from "./gizmos";
+import type { GameEntity } from "../../types/EngineEntity";
+
 
 
 // Util
@@ -166,42 +167,7 @@ function detectCollisions(
         );
 
         if (resolution) {
-          const aRigid = ECS.Component.getComponent<RigidBodyComponent>(
-            componentState,
-            a.gameEntity,
-            ComponentType.RigidBody
-          );
-          const bRigid = ECS.Component.getComponent<RigidBodyComponent>(
-            componentState,
-            b.gameEntity,
-            ComponentType.RigidBody
-          );
-
-          const aStatic = aRigid?.isStatic ?? true;
-          const bStatic = bRigid?.isStatic ?? true;
-
-          if (aStatic && bStatic) {
-            // Ambos estáticos, não mover
-            return;
-          }
-
-          if (!aStatic && !bStatic && aRigid && bRigid) {
-            const totalMass = aRigid.mass + bRigid.mass;
-            const aFactor = bRigid.mass / totalMass;
-            const bFactor = aRigid.mass / totalMass;
-
-            aT.position.x += resolution.x * aFactor;
-            aT.position.y += resolution.y * aFactor;
-
-            bT.position.x -= resolution.x * bFactor;
-            bT.position.y -= resolution.y * bFactor;
-          } else if (!aStatic) {
-            aT.position.x += resolution.x;
-            aT.position.y += resolution.y;
-          } else if (!bStatic) {
-            bT.position.x -= resolution.x;
-            bT.position.y -= resolution.y;
-          }
+          resolve_rigid_body(componentState, a.gameEntity, b.gameEntity, resolution);
         }
 
       }
@@ -221,5 +187,104 @@ function detectCollisions(
   collisionState.previous.clear();
   for (const [pairKey, pair] of collisionState.current.entries()) {
     collisionState.previous.set(pairKey, pair);
+  }
+}
+
+
+export function resolve_rigid_body(
+  componentState: ECSComponentState,
+  aEntity: GameEntity,
+  bEntity: GameEntity,
+  resolution: Vec2
+) {
+  const aTransform = ECS.Component.getComponent<TransformComponent>(
+    componentState,
+    aEntity,
+    ComponentType.TRANSFORM
+  );
+
+  const bTransform = ECS.Component.getComponent<TransformComponent>(
+    componentState,
+    bEntity,
+    ComponentType.TRANSFORM
+  );
+
+  if (!aTransform || !bTransform) return;
+
+  const aRigid = ECS.Component.getComponent<RigidBodyComponent>(
+    componentState,
+    aEntity,
+    ComponentType.RigidBody
+  );
+
+  const bRigid = ECS.Component.getComponent<RigidBodyComponent>(
+    componentState,
+    bEntity,
+    ComponentType.RigidBody
+  );
+
+  if (!aRigid && !bRigid) {
+    resolve_without_rigidbody(aTransform, bTransform, resolution);
+    return;
+  }
+
+  if (aRigid && bRigid) {
+    resolve_with_rigidbody(aTransform, bTransform, aRigid, bRigid, resolution);
+    return;
+  }
+
+  if (aRigid) {
+    if (!aRigid.isStatic) {
+      aTransform.position.x += resolution.x;
+      aTransform.position.y += resolution.y;
+    }
+  } else if (bRigid) {
+    if (!bRigid.isStatic) {
+      bTransform.position.x -= resolution.x;
+      bTransform.position.y -= resolution.y;
+    }
+  }
+}
+
+function resolve_without_rigidbody(
+  aTransform: TransformComponent,
+  bTransform: TransformComponent,
+  resolution: Vec2
+) {
+  aTransform.position.x += resolution.x * 0.5;
+  aTransform.position.y += resolution.y * 0.5;
+
+  bTransform.position.x -= resolution.x * 0.5;
+  bTransform.position.y -= resolution.y * 0.5;
+}
+
+function resolve_with_rigidbody(
+  aTransform: TransformComponent,
+  bTransform: TransformComponent,
+  aRigid: RigidBodyComponent,
+  bRigid: RigidBodyComponent,
+  resolution: Vec2
+) {
+  if (aRigid.isStatic && bRigid.isStatic) return;
+
+  const aStatic = aRigid.isStatic ?? true;
+  const bStatic = bRigid.isStatic ?? true;
+
+  if (!aStatic && !bStatic) {
+    const totalMass = aRigid.mass + bRigid.mass;
+    const aFactor = bRigid.mass / totalMass;
+    const bFactor = aRigid.mass / totalMass;
+
+    aTransform.position.x += resolution.x * aFactor;
+    aTransform.position.y += resolution.y * aFactor;
+
+    bTransform.position.x -= resolution.x * bFactor;
+    bTransform.position.y -= resolution.y * bFactor;
+  } else if (!aStatic) {
+    aTransform.position.x += resolution.x;
+    aTransform.position.y += resolution.y;
+  } else if (!bStatic) {
+    bTransform.position.x -= resolution.x;
+    bTransform.position.y -= resolution.y;
   }
 }

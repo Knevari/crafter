@@ -59,7 +59,7 @@ export function SpriteRenderSystem(
         if (!vao) continue;
 
         gl.bindVertexArray(vao.vao);
-        gl.drawElements(gl.TRIANGLES, mesh.indices.length, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, vao.indexCount, gl.UNSIGNED_SHORT, 0);
         gl.bindVertexArray(null);
       }
     },

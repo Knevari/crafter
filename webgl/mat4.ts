@@ -63,6 +63,168 @@ export function setTranslation(m: Mat4, t: Vec3) {
     e[15] = 1;
 }
 
+export function setScale(m: Mat4, s: Vec3) {
+    const e = m.value;
+
+    e[0] = s.x;
+    e[5] = s.y;
+    e[10] = s.z;
+}
+
+export function setQuatRotation(m: Mat4, q: Quat) {
+    const x = q.x, y = q.y, z = q.z, w = q.w;
+
+    const x2 = x + x;
+    const y2 = y + y;
+    const z2 = z + z;
+
+    const xx = x * x2;
+    const xy = x * y2;
+    const xz = x * z2;
+    const yy = y * y2;
+    const yz = y * z2;
+    const zz = z * z2;
+    const wx = w * x2;
+    const wy = w * y2;
+    const wz = w * z2;
+
+    const e = m.value;
+
+    e[0] = 1 - (yy + zz);
+    e[1] = xy + wz;
+    e[2] = xz - wy;
+    e[3] = 0;
+
+    e[4] = xy - wz;
+    e[5] = 1 - (xx + zz);
+    e[6] = yz + wx;
+    e[7] = 0;
+
+    e[8] = xz + wy;
+    e[9] = yz - wx;
+    e[10] = 1 - (xx + yy);
+    e[11] = 0;
+
+    e[12] = 0;
+    e[13] = 0;
+    e[14] = 0;
+    e[15] = 1;
+}
+
+export function setEuleRotation(m: Mat4, r: Vec3) {
+    const sx = Math.sin(r.x), cx = Math.cos(r.x);
+    const sy = Math.sin(r.y), cy = Math.cos(r.y);
+    const sz = Math.sin(r.z), cz = Math.cos(r.z);
+
+    const e = m.value;
+
+    e[0] = cy * cz;
+    e[1] = cy * sz;
+    e[2] = -sy;
+    e[3] = 0;
+
+    e[4] = sx * sy * cz - cx * sz;
+    e[5] = sx * sy * sz + cx * cz;
+    e[6] = sx * cy;
+    e[7] = 0;
+
+    e[8] = cx * sy * cz + sx * sz;
+    e[9] = cx * sy * sz - sx * cz;
+    e[10] = cx * cy;
+    e[11] = 0;
+
+    e[12] = 0;
+    e[13] = 0;
+    e[14] = 0;
+    e[15] = 1;
+}
+
+export function composeTRS(m: Mat4, t: Vec3, r: Quat, s: Vec3) {
+    const x = r.x, y = r.y, z = r.z, w = r.w;
+
+    const x2 = x + x;
+    const y2 = y + y;
+    const z2 = z + z;
+
+    const xx = x * x2;
+    const xy = x * y2;
+    const xz = x * z2;
+    const yy = y * y2;
+    const yz = y * z2;
+    const zz = z * z2;
+    const wx = w * x2;
+    const wy = w * y2;
+    const wz = w * z2;
+
+    const sx = s.x, sy = s.y, sz = s.z;
+
+    const e = m.value;
+
+    // Escala + rotação
+    e[0] = (1 - (yy + zz)) * sx;
+    e[1] = (xy + wz) * sx;
+    e[2] = (xz - wy) * sx;
+    e[3] = 0;
+
+    e[4] = (xy - wz) * sy;
+    e[5] = (1 - (xx + zz)) * sy;
+    e[6] = (yz + wx) * sy;
+    e[7] = 0;
+
+    e[8] = (xz + wy) * sz;
+    e[9] = (yz - wx) * sz;
+    e[10] = (1 - (xx + yy)) * sz;
+    e[11] = 0;
+
+    // Translação
+    e[12] = t.x;
+    e[13] = t.y;
+    e[14] = t.z;
+    e[15] = 1;
+}
+
+export function composeTR(m: Mat4, t: Vec3, r: Quat) {
+    const x = r.x, y = r.y, z = r.z, w = r.w;
+
+    const x2 = x + x;
+    const y2 = y + y;
+    const z2 = z + z;
+
+    const xx = x * x2;
+    const xy = x * y2;
+    const xz = x * z2;
+    const yy = y * y2;
+    const yz = y * z2;
+    const zz = z * z2;
+    const wx = w * x2;
+    const wy = w * y2;
+    const wz = w * z2;
+
+
+    const e = m.value;
+
+    // Escala + rotação
+    e[0] = (1 - (yy + zz));
+    e[1] = (xy + wz);
+    e[2] = (xz - wy);
+    e[3] = 0;
+
+    e[4] = (xy - wz);
+    e[5] = (1 - (xx + zz));
+    e[6] = (yz + wx);
+    e[7] = 0;
+
+    e[8] = (xz + wy);
+    e[9] = (yz - wx);
+    e[10] = (1 - (xx + yy));
+    e[11] = 0;
+
+    e[12] = t.x;
+    e[13] = t.y;
+    e[14] = t.z;
+    e[15] = 1;
+}
+
 
 export function rotateMatrix(m: Mat4, r: Quat) {
     const x = r.x, y = r.y, z = r.z, w = r.w;

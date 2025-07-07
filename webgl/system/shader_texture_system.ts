@@ -4,13 +4,14 @@ import { ComponentType } from "../../engine/enums";
 import { ECS } from "../../engine/TwoD";
 import type { TransformComponent } from "../../engine/types";
 import { globalMouseState } from "../../game/input/input.system";
-import { rgb, rgba } from "../../game/systems/procedural-world/biome";
+import { rgb } from "../../game/systems/procedural-world/biome";
 import { generic_manager_get } from "../managers/generic_manager";
 import { matrixManager } from "../managers/matrix_manager";
 import { shaderManager } from "../managers/shader_manager";
 import { textureManager } from "../managers/texture_manager";
-import { setTranslation } from "../mat4";
-import type { Material, TexturedMaterial } from "../material";
+import { composeTR, composeTRS, setTranslation, translateMatrix } from "../mat4";
+import type { Material } from "../material/material";
+import type { TexturedMaterial } from "../material/textured_material";
 import {
     shader_set_uniform_1f,
     shader_set_uniform_2f,
@@ -18,6 +19,7 @@ import {
     shader_set_uniform_mat4,
     shader_set_uniform_texture,
 } from "../shader";
+import type { Vec3 } from "../vec3";
 import type { ShaderSystem } from "./shader_system";
 
 export function MaterialSolidColorSystem(material: Material): ShaderSystem {
@@ -75,6 +77,8 @@ export function MaterialSolidColorSystem(material: Material): ShaderSystem {
 export function MaterialTexturedSystem(material: TexturedMaterial): ShaderSystem {
     const shader = generic_manager_get(shaderManager, material.shaderName)!;
 
+    let flipCache: Vec3 = { x: 0, y: 0, z: 0 };
+
     return {
         global(gl, camera, componentState) {
             const cameraTransform = ECS.Component.getComponent<TransformComponent>(
@@ -89,7 +93,7 @@ export function MaterialTexturedSystem(material: TexturedMaterial): ShaderSystem
             )!;
 
             const viewMatrix = generic_manager_get(matrixManager, cameraTransform.instanceId)!;
-            setTranslation(viewMatrix, cameraTransform.position);
+            composeTR(viewMatrix, cameraTransform.position, cameraTransform.rotation);
             shader_set_uniform_mat4(gl, shader, "uView", viewMatrix.value);
 
             const projectionMatrix = generic_manager_get(matrixManager, cameraComponent.instanceId)!;
@@ -100,33 +104,26 @@ export function MaterialTexturedSystem(material: TexturedMaterial): ShaderSystem
             if (!spriteRender.sprite) return;
 
             const modelMatrix = generic_manager_get(matrixManager, transform.instanceId)!;
-            setTranslation(modelMatrix, transform.position);
+
+            flipCache.x = spriteRender.flipHorizontal ? -transform.scale.x : transform.scale.x;
+            flipCache.y = spriteRender.flipVertical ? -transform.scale.y : transform.scale.y;
+            flipCache.z = transform.scale.z;
+
+           
+            composeTRS(modelMatrix, transform.position, transform.rotation, flipCache);
+
             shader_set_uniform_mat4(gl, shader, "uModel", modelMatrix.value);
 
             const texture = generic_manager_get(textureManager, spriteRender.sprite.textureName)!;
             shader_set_uniform_texture(gl, shader, "uTexture", texture, 0);
 
-
-            const flipX = spriteRender.flipHorizontal ? -1 : 1;
-            const flipY = spriteRender.flipVertical ? -1 : 1;
-
-            const uvScaleX = flipX * spriteRender.sprite.size.x / texture.width;
-            const uvScaleY = flipY * spriteRender.sprite.size.y / texture.height;
+            const uvScaleX = spriteRender.sprite.size.x / texture.width;
+            const uvScaleY = spriteRender.sprite.size.y / texture.height;
             shader_set_uniform_2f(gl, shader, "uUVScale", uvScaleX, uvScaleY);
 
-            let uvOffsetX: number;
-            if (spriteRender.flipHorizontal) {
-                uvOffsetX = (spriteRender.sprite.position.x + spriteRender.sprite.size.x) / texture.width;
-            } else {
-                uvOffsetX = spriteRender.sprite.position.x / texture.width;
-            }
+            const uvOffsetX = spriteRender.sprite.position.x / texture.width;
+            const uvOffsetY = (texture.height - spriteRender.sprite.position.y - spriteRender.sprite.size.y) / texture.height;
 
-            let uvOffsetY: number;
-            if (spriteRender.flipVertical) {
-                uvOffsetY = spriteRender.sprite.position.y / texture.height;
-            } else {
-                uvOffsetY = (texture.height - spriteRender.sprite.position.y - spriteRender.sprite.size.y) / texture.height;
-            }
 
             shader_set_uniform_2f(gl, shader, "uUVOffset", uvOffsetX, uvOffsetY);
 
@@ -140,6 +137,7 @@ export function MaterialTexturedSystem(material: TexturedMaterial): ShaderSystem
                 spriteRender.color.a,
             );
         },
+
     };
 }
 
@@ -189,7 +187,7 @@ export function MaterialWater2DNoTextureSystem(material: Material): ShaderSystem
                 spriteRender.color.a,
             );
 
-            const pos = getMousePosition(globalMouseState); 
+            const pos = getMousePosition(globalMouseState);
             const width = gl.canvas.width;
             const height = gl.canvas.height;
 
@@ -199,7 +197,7 @@ export function MaterialWater2DNoTextureSystem(material: Material): ShaderSystem
             shader_set_uniform_2f(gl, shader, "uMouse", mouseX, mouseY);
 
 
-            shader_set_uniform_1f(gl, shader, "uMouseDown", getMouseButton(globalMouseState, 0) ? 1: 0)
+            shader_set_uniform_1f(gl, shader, "uMouseDown", getMouseButton(globalMouseState, 0) ? 1 : 0)
 
             // NÃO MULTIPLICAR pelo waveScale aqui
             shader_set_uniform_2f(gl, shader, "uTileSize", transform.scale.x, transform.scale.y);

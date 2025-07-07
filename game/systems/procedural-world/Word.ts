@@ -20,7 +20,7 @@ export class World {
   private readonly OCTAVES = 6;
   private readonly PERSISTENCE = 0.4;
 
-  public readonly TILE_SIZE = 0.25;
+  public readonly TILE_SIZE = 1;
 
   constructor(seed: number) {
     this.heightNoiseGenerator = new SimplexNoise(seed);

@@ -13,7 +13,7 @@ export function createBoxColliderComponent(gameEntity: GameEntity, options?: Box
         instanceId: createIncrementalId(),
         isTrigger: false,
         offset: { x: 0, y: 0 },
-        size: { x: 32, y: 32 },
+        size: { x: 0.5, y: 0.5 },
         ...options
     }
 }

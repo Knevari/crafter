@@ -61,6 +61,13 @@ export function shader_set_uniform_4f(gl: WebGL2RenderingContext, shader: Shader
     }
 }
 
+export function shader_set_uniform_3f(gl: WebGL2RenderingContext, shader: ShaderProgram, name: string, x: number, y: number, z: number) {
+    const location = getUniform(shader, name);
+    if (location) {
+        gl.uniform3f(location, x, y, z);
+    }
+}
+
 export function shader_set_uniform_2f(gl: WebGL2RenderingContext, shader: ShaderProgram, name: string, x: number, y: number) {
     const location = getUniform(shader, name);
     if (location) {
