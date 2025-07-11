@@ -10,7 +10,7 @@ export function createCircleColliderComponent(gameEntity: GameEntity, options?: 
         type: ComponentType.CIRCLE_COLLIDER,
         enabled: true,
         ignoreSelfCollisions: true,
-        instanceId: createIncrementalId(),
+        instance: createIncrementalId(),
         isTrigger: false,
         offset: { x: 0, y: 0 },
         radius: 32,

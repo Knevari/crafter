@@ -10,7 +10,7 @@ export function createSpriteRenderComponent(
   return {
     materialName: "simple_material",
     meshName: "quad_mesh",
-    instanceId: createIncrementalId(),
+    instance: createIncrementalId(),
     category: ComponentType.SPRITE_RENDER,
     type: ComponentType.SPRITE_RENDER,
     gameEntity: gameEntity,

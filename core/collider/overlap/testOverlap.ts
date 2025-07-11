@@ -3,7 +3,7 @@ import { testBoxBoxOverlap } from "./testBoxBoxOverlap";
 import type { Collider } from "../types/Collider";
 import type { Vec2 } from "../../Vec2/Vec2";
 import { isOfType } from "../util/isOfType";
-import Vec2Math from "../../helpers/vec2-math";
+import Vec2Math from "../../Vec2/vec2-math";
 import { getBounds } from "../util/getCircleCenter";
 import type { Bounds } from "../types/Bounds";
 import type { BoxColliderComponent } from "../../gears/collider/box/BoxCollider";

@@ -1,10 +1,11 @@
-import { matrixManager } from "../../webgl/managers/matrix_manager";
-import { createMat4 as createIdentityMat4, rotateMatrix, scaleMatrix, translateMatrix } from "../../webgl/mat4";
-import { generic_manager_add } from "../../webgl/managers/generic_manager";
+
+import { generic_manager_add } from "../managers/generic_manager";
 import type { TransformComponent, TransformOptions } from "../gears/transform";
 import { ComponentType } from "../types/component-type";
 import type { GameEntity } from "../types/EngineEntity";
 import { createIncrementalId } from "./create.incremental.id";
+import { ENGINE } from "../../engine/engine.manager";
+import { mat4_create_TRS, mat4_identity } from "../webgl/mat4";
 
 export function createTransformComponent(
     entity: GameEntity,
@@ -13,7 +14,7 @@ export function createTransformComponent(
 
     const transform: TransformComponent = {
         category: ComponentType.TRANSFORM,
-        instanceId: createIncrementalId(),
+        instance: createIncrementalId(),
         type: ComponentType.TRANSFORM,
         enabled: true,
         gameEntity: entity,
@@ -23,13 +24,10 @@ export function createTransformComponent(
         ...options
     }
 
-    const modelMatrix = createIdentityMat4();
+    const modelMatrix = mat4_identity();
 
-    scaleMatrix(modelMatrix, options?.scale ?? { x: 1, y: 1, z: 1 });
-    rotateMatrix(modelMatrix, options?.rotation ?? { x: 0, y: 0, z: 0, w: 1 });
-    translateMatrix(modelMatrix, options?.position ?? { x: 0, y: 0, z: 0 });
-
-    generic_manager_add(matrixManager, transform.instanceId, modelMatrix);
+    mat4_create_TRS(modelMatrix, transform.position, transform.rotation, transform.scale);
+    generic_manager_add(ENGINE.MANAGER.MAT4, transform.instance, modelMatrix);
 
     return transform;
 }

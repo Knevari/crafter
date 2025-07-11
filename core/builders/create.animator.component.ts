@@ -5,7 +5,7 @@ import { createIncrementalId } from "./create.incremental.id";
 
 export function createAnimatorComponent(gameEntity: GameEntity, options?: AnimatorOptions): AnimatorComponent {
     return {
-        instanceId: createIncrementalId(),
+        instance: createIncrementalId(),
         category: ComponentType.Animator,
         controller: null,
         currentClip: null,

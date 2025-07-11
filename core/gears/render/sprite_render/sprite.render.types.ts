@@ -1,12 +1,12 @@
 import { Render } from "../../../../engine/TwoD.ts";
-import type { RgbColor } from "../../../../game/systems/procedural-world/biome.ts";
+import type { Color } from "../../../../game/systems/procedural-world/biome.ts";
 import type { Component, ComponentOptions } from "../../component/component.ts";
 import type { Sprite } from "../../sprite/sprite.types.ts";
 
 export type SpriteRenderOptions = ComponentOptions<SpriteRenderComponent>;
 
 export interface Render extends Component {
-  color: RgbColor;
+  color: Color;
   alpha?: number;
 }
 

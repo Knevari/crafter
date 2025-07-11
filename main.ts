@@ -23,14 +23,13 @@ time.on("lateUpdate", () => {
 });
 
 time.on("render", () => {
-
   ECS.System.callRender(SYSTEM_STATE);
-  ECS.System.callDrawGizmos(SYSTEM_STATE);
 
 });
 
 time.on("update", () => {
   ECS.System.callUpdate(SYSTEM_STATE);
+  
 });
 
 time.start();

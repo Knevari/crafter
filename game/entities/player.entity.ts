@@ -12,7 +12,7 @@ export function createPlayer(
   ECS.Component.addComponent(componentState, gameEntity, transform);
 
   const character_controler: CharacterControlerComponent = {
-    instanceId: Builders.createIncrementalId(),
+    instance: Builders.createIncrementalId(),
     gameEntity: gameEntity,
     type: "CHARACTER_CONTROLLER",
     category: "CONTROLLER",
@@ -28,7 +28,7 @@ export function createPlayer(
 
   const rigidBody = Builders.createRigidBodyComponent(gameEntity, {
     useGravity: false,
-    mass: 1000,
+    mass: 70
   });
   ECS.Component.addComponent(componentState, gameEntity, rigidBody);
 

@@ -1,16 +1,16 @@
-import { matrixManager } from "../../webgl/managers/matrix_manager";
-import { generic_manager_add } from "../../webgl/managers/generic_manager";
+import { generic_manager_add } from "../managers/generic_manager";
 import type { CameraComponent } from "../gears/render/camera";
 import { ComponentType } from "../types/component-type";
 import type { GameEntity } from "../types/EngineEntity";
 import { createIncrementalId } from "./create.incremental.id";
-import { createIdentity, updateProjectionMatrix } from "../../webgl/mat4";
+import { mat4_identity, mat4_create_projection } from "../webgl/mat4";
+import { ENGINE } from "../../engine/engine.manager";
 
 export function createCameraComponent(gameEntity: GameEntity) {
     const camera: CameraComponent = {
         category: ComponentType.CAMERA,
         gameEntity: gameEntity,
-        instanceId: createIncrementalId(),
+        instance: createIncrementalId(),
         type: ComponentType.CAMERA,
         enabled: true,
         aspec: 1,
@@ -20,8 +20,8 @@ export function createCameraComponent(gameEntity: GameEntity) {
     };
 
 
-    const identity = createIdentity();
-    updateProjectionMatrix(
+    const identity = mat4_identity();
+    mat4_create_projection(
         identity,
         camera.fov,
         window.innerWidth / window.innerHeight,
@@ -29,7 +29,7 @@ export function createCameraComponent(gameEntity: GameEntity) {
         camera.far
     );
 
-    generic_manager_add(matrixManager, camera.instanceId, identity);
+    generic_manager_add(ENGINE.MANAGER.MAT4, camera.instance, identity);
 
     return camera;
 

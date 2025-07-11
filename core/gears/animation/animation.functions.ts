@@ -26,7 +26,7 @@ export function createAnimationClip(
           x: frameWidth,
           y: frameHeight,
         },
-        origin: { x: 0.5, y: 0.5 },
+        origin: { x: -0, y: -0 },
       },
     };
 

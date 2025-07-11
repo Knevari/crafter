@@ -1,8 +1,10 @@
-import Vec2Math from "../../../core/helpers/vec2-math";
+import Vec2Math from "../../../core/Vec2/vec2-math";
 import Time from "../../../core/time/time";
 import { type Types, ECS, Enums, Input } from "../../../engine/TwoD";
 import { globalKeyState } from "../../input/input.system";
 import type { CharacterControlerComponent } from "./character.controller.types";
+
+
 
 export default function CharacterControlerSystem(componentState: Types.ECSComponentState): Types.System {
   return {
@@ -26,7 +28,6 @@ export default function CharacterControlerSystem(componentState: Types.ECSCompon
           Enums.ComponentType.TRANSFORM
         );
         if (!characterTransform) continue;
-
         characterControler.direction.x = 0;
         characterControler.direction.y = 0;
 

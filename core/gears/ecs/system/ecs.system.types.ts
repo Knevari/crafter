@@ -5,7 +5,6 @@ export interface ECSSystemState {
 }
 
 export interface System {
-  priority?: number;
   start?: () => void;
   update?: () => void;
   fixedUpdate?: () => void;

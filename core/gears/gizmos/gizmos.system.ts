@@ -4,7 +4,7 @@ import type { ECSComponentState } from "../ecs/component";
 import type { System } from "../ecs/system";
 
 import Draw from "../../helpers/draw-helper";
-import Vec2Math from "../../helpers/vec2-math";
+import Vec2Math from "../../Vec2/vec2-math";
 import { ComponentType } from "../../types/component-type";
 import type { BoxColliderComponent } from "../collider/box/BoxCollider";
 import type { TransformComponent } from "../transform";

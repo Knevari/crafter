@@ -27,17 +27,17 @@ interface Biome {
   name: BiomeName;
   height: BiomeRange;
   temperature: BiomeRange;
-  color: RgbColor;
+  color: Color;
 }
 
-export interface RgbColor {
+export interface Color {
   r: number;
   g: number;
   b: number;
   a: number;
 }
 
-export function rgba(r: number, g: number, b: number, a: number = 1): RgbColor {
+export function rgba(r: number, g: number, b: number, a: number = 1): Color {
   return {
     r: r / 255,
     g: g / 255,
@@ -46,7 +46,7 @@ export function rgba(r: number, g: number, b: number, a: number = 1): RgbColor {
   };
 }
 
-export function rgb(r: number, g: number, b: number): RgbColor {
+export function rgb(r: number, g: number, b: number): Color {
   return {
     r: r / 255,
     g: g / 255,
@@ -160,7 +160,7 @@ export function classifyBiomes(cells: TerrainCell[]): void {
   }
 }
 
-export function getBiomeColor(val: BiomeName): RgbColor {
+export function getBiomeColor(val: BiomeName): Color {
   for (const biomeDef of BIOME_DEFAULT) {
     if (biomeDef.name === val) {
       return biomeDef.color;

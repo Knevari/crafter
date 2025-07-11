@@ -1,5 +1,5 @@
 import { SimplexNoise } from "../../../core/algorithms/SimplexNoise";
-import type { Vec3 } from "../../../webgl/vec3";
+import type { Vec3 } from "../../../core/webgl/vec3";
 import { BiomeName, classifyBiomes } from "./biome";
 
 export interface TerrainCell {
@@ -62,7 +62,7 @@ export class World {
           position: {
             x: tileX * this.TILE_SIZE,
             y: tileY * this.TILE_SIZE,
-            z: 0
+            z:  0
           },
 
           scale: this.TILE_SIZE,

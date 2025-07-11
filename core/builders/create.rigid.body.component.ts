@@ -8,7 +8,7 @@ export function createRigidBodyComponent(
     options: RigidBodyOptions = {}
 ): RigidBodyComponent {
     return {
-        instanceId: createIncrementalId(),
+        instance: createIncrementalId(),
         type: ComponentType.RigidBody,
         category: ComponentType.RigidBody,
         gameEntity,

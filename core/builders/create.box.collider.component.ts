@@ -10,7 +10,7 @@ export function createBoxColliderComponent(gameEntity: GameEntity, options?: Box
         type: ComponentType.BOX_COLLIDER,
         enabled: true,
         ignoreSelfCollisions: true,
-        instanceId: createIncrementalId(),
+        instance: createIncrementalId(),
         isTrigger: false,
         offset: { x: 0, y: 0 },
         size: { x: 0.5, y: 0.5 },

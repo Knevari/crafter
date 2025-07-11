@@ -5,9 +5,9 @@ export interface Component {
   enabled: boolean;
   readonly type: string;
   readonly category: string;
-  readonly instanceId: number;
+  readonly instance: number;
 }
 
-type BaseOmittedKeys = "gameEntity" | "instanceId" | "type" | "category";
+type BaseOmittedKeys = "gameEntity" | "instance" | "type" | "category";
 
 export type ComponentOptions<T extends Component> = Partial<Omit<T, BaseOmittedKeys>>;

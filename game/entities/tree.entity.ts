@@ -1,6 +1,7 @@
 import { Builders, ECS, Types } from "../../engine/TwoD";
 import type { Sprite } from "../../engine/types";
-import type { Vec3 } from "../../webgl/vec3";
+import type { Vec3 } from "../../core/webgl/vec3";
+
 
 export function createTreeEntity(
     componentState: Types.ECSComponentState,
@@ -14,6 +15,7 @@ export function createTreeEntity(
         position: position,
         scale: { x: 2, y: 3, z: 0 }
     });
+
     ECS.Component.addComponent(componentState, gameEntity, transform);
 
     const spriteRener = Builders.createSpriteRenderComponent(gameEntity, {
@@ -21,14 +23,6 @@ export function createTreeEntity(
         layer: 1,
         materialName: "advanced_material",
     });
-
-
-    const boxCollider = Builders.createBoxColliderComponent(gameEntity);
-    ECS.Component.addComponent(componentState, gameEntity, boxCollider);
-
-    
-
-
 
     ECS.Component.addComponent(componentState, gameEntity, spriteRener);
 

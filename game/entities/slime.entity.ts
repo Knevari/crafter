@@ -22,13 +22,3 @@ export function createSlime(componentState: ECSComponentState, name: string) {
   return gameEntity;
 
 }
-
-// export function createMusic(componentState: ECSComponentState, name: string) {
-//   const gameEntity = Builders.createGameEntity(name, "Enemy");
-
-//   const transform = Builders.createTransformComponent(gameEntity, {scale: {x: 10, y: 10, z: 0}});
-//   ECS.Component.addComponent(componentState, gameEntity, transform);
-
-//   const spriteReder = Builders.createSpriteRenderComponent(gameEntity, { layer: 1, materialName: "music_material" });
-//   ECS.Component.addComponent(componentState, gameEntity, spriteReder);
-// }

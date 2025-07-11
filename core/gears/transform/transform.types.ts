@@ -1,7 +1,6 @@
 import type { Component, ComponentOptions } from "../component/component";
-import type { Vec3 } from "../../../webgl/vec3";
-import type { Quat } from "../../../webgl/mat4";
-
+import type { Vec3 } from "../../webgl/vec3";
+import type { Quat } from "../../webgl/quat";
 
 export type TransformOptions = ComponentOptions<TransformComponent>;
 

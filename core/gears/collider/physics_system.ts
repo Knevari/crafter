@@ -17,7 +17,7 @@ export function PhysicsSystem(componentState: ECSComponentState): System {
             );
 
             for (const rigid of rigidbodies) {
-                if (rigid.isStatic || !rigid.useGravity) continue;
+                if (rigid.isStatic) continue;
 
                 const transform = ECS.Component.getComponent<TransformComponent>(
                     componentState,
@@ -26,9 +26,15 @@ export function PhysicsSystem(componentState: ECSComponentState): System {
                 );
 
                 if (!transform) continue;
-              
-                rigid.velocity.x += GRAVITY.x * Time.fixedDeltaTime;
-                rigid.velocity.y += GRAVITY.y * Time.fixedDeltaTime;
+
+                if (rigid.useGravity) {
+                    rigid.velocity.x += GRAVITY.x * Time.fixedDeltaTime;
+                    rigid.velocity.y += GRAVITY.y * Time.fixedDeltaTime;
+                }
+     
+                const decay = Math.exp(-rigid.drag * Time.fixedDeltaTime);
+                rigid.velocity.x *= decay;
+                rigid.velocity.y *= decay;
 
                 transform.position.x -= rigid.velocity.x * Time.fixedDeltaTime;
                 transform.position.y -= rigid.velocity.y * Time.fixedDeltaTime;

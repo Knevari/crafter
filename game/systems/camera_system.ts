@@ -1,8 +1,10 @@
+import Time from "../../core/time/time";
 import type { GameEntity } from "../../core/types/EngineEntity";
 import { ComponentType } from "../../engine/enums";
 import type { System } from "../../engine/resources";
 import { ECS } from "../../engine/TwoD";
 import type { TransformComponent, ECSComponentState } from "../../engine/types";
+import { vec3_lerp } from "../../core/webgl/vec3";
 
 export function CameraSystem(componentState: ECSComponentState, cameraEntity: GameEntity, targetEntity: GameEntity): System {
 
@@ -17,8 +19,10 @@ export function CameraSystem(componentState: ECSComponentState, cameraEntity: Ga
 
         update() {
             if (!targetTransform || !cameraTransform) return;
-            cameraTransform.position.x = targetTransform.position.x;
-            cameraTransform.position.y = targetTransform.position.y;
+
+            const target = {...targetTransform.position};
+            target.z = cameraTransform.position.z;
+            cameraTransform.position = vec3_lerp(cameraTransform.position, cameraTransform.position, target, 1 * Time.deltaTime);
 
         },
     };

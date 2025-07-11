@@ -1,4 +1,4 @@
-import Vec2Math from "../../helpers/vec2-math";
+import Vec2Math from "../../Vec2/vec2-math";
 import type { Vec2 } from "../../Vec2/Vec2";
 import type { Bounds } from "../types/Bounds";
 import { getBoundsCenterInto, getBoxOverlapInto, getSeparationDirection } from "../util/getCircleCenter";

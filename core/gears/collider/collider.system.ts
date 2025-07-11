@@ -130,7 +130,7 @@ function detectCollisions(
         const bT = ECS.Component.getComponent<TransformComponent>(componentState, b.gameEntity, ComponentType.TRANSFORM);
         if (!bT) continue;
 
-        const pairKey = makePairKey(a.instanceId, b.instanceId);
+        const pairKey = makePairKey(a.instance, b.instance);
 
         if (collisionState.checked.has(pairKey)) continue;
         collisionState.checked.add(pairKey);
@@ -141,8 +141,8 @@ function detectCollisions(
 
         collisionState.current.set(pairKey, { a, b });
 
-        collisionState.collision.add(a.instanceId.toString());
-        collisionState.collision.add(b.instanceId.toString());
+        collisionState.collision.add(a.instance.toString());
+        collisionState.collision.add(b.instance.toString());
 
         const wasColliding = collisionState.previous.has(pairKey);
 

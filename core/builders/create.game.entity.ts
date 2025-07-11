@@ -1,5 +1,5 @@
-import { entityManager } from "../../webgl/managers/entity_manager";
-import { generic_manager_add } from "../../webgl/managers/generic_manager";
+import { MANAGER } from "../managers/entity_manager";
+import { generic_manager_add } from "../managers/generic_manager";
 import type { GameEntity } from "../types/EngineEntity";
 import { createIncrementalId } from "./create.incremental.id";
 
@@ -20,6 +20,7 @@ export function createGameEntity(
 ): GameEntity {
 
   const gameEntity: GameEntity = {
+    parent: null,
     id: createIncrementalId(),
     name,
     tag,
@@ -27,7 +28,7 @@ export function createGameEntity(
     layerMask
   };
 
-  generic_manager_add(entityManager, gameEntity.id, gameEntity);
+  generic_manager_add(MANAGER.GAME_ENTITY, gameEntity.id, gameEntity);
 
   return gameEntity;
 }
